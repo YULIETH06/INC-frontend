@@ -1,0 +1,94 @@
+import { createContext, useContext, useEffect, useState } from "react";
+import api from "../api/axios";
+import {
+    connectSocket,
+    disconnectSocket,
+} from "../services/sockets/socketService";
+import type { AuthUser, ProfileResponse } from "../interfaces/auth/auth.interface";
+
+interface AuthContextType {
+    user: AuthUser | null;
+    token: string | null;
+    loading: boolean;
+    login: (token: string) => Promise<void>;
+    logout: () => void;
+    isAuthenticated: boolean;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+    const [user, setUser] = useState<AuthUser | null>(null);
+    const [token, setToken] = useState<string | null>(
+        localStorage.getItem("token")
+    );
+    const [loading, setLoading] = useState(true);
+
+    const getProfile = async () => {
+        try {
+            const response = await api.get<ProfileResponse>("/profile");
+            setUser(response.data.user);
+        } catch (error) {
+            console.error("Error al obtener el perfil:", error);
+            localStorage.removeItem("token");
+            setToken(null);
+            setUser(null);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const login = async (newToken: string) => {
+        localStorage.setItem("token", newToken);
+        setToken(newToken);
+        await getProfile();
+    };
+
+    const logout = () => {
+        disconnectSocket();
+        localStorage.removeItem("token");
+        setToken(null);
+        setUser(null);
+    };
+
+    // Carga el perfil del usuario cuando existe un token
+    useEffect(() => {
+        if (token) {
+            getProfile();
+        } else {
+            setLoading(false);
+        }
+    }, [token]);
+
+    // Conecta Socket.IO cuando el usuario ya está autenticado
+    useEffect(() => {
+        if (token && user) {
+            connectSocket(token);
+        }
+    }, [token, user]);
+
+    return (
+        <AuthContext.Provider
+            value={{
+                user,
+                token,
+                loading,
+                login,
+                logout,
+                isAuthenticated: !!token && !!user,
+            }}
+        >
+            {children}
+        </AuthContext.Provider>
+    );
+};
+
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+
+    if (!context) {
+        throw new Error("useAuth debe usarse dentro de AuthProvider");
+    }
+
+    return context;
+};
