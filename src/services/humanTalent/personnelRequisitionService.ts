@@ -16,6 +16,7 @@ import type {
     PersonnelRequisitionCandidatesResponse,
     PersonnelRequisitionResponse,
 } from "../../interfaces/humanTalent/personnelRequisition.interface";
+
 // Obtiene las áreas activas disponibles para crear una requisición de personal.
 export const getDepartments = async (): Promise<DepartmentsResponse> => {
     const response = await api.get<DepartmentsResponse>(

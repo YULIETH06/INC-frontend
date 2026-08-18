@@ -137,6 +137,8 @@ components/
 │   ├── NotificationBell.tsx
 │   ├── PageContainer.tsx
 │   ├── PageHeader.tsx
+│   ├── ProcessStepper.tsx
+│   ├── RadioOptionGroup.tsx
 │   ├── SectionCard.tsx
 │   ├── SettingsMenu
 │   ├── SidebarMenu.tsx
@@ -151,6 +153,13 @@ components/
 │   ├── PersonnelRequisitionCandidatesSection.tsx
 │   ├── PersonnelRequisitionListItem.tsx
 │   ├── PersonnelRequisitionStatusBadge.tsx
+│   │
+│   ├── candidateValidation/
+│   │   ├── CandidateApplicationConceptStep.tsx
+│   │   ├── CandidatePositionValidationStep.tsx
+│   │   ├── CandidateRequirementValidationTable.tsx
+│   │   ├── CandidateValidationStep.tsx
+│   │   └── PersonnelCandidateValidationSection.tsx
 │   │
 │   └── requisitionFormat/
 │       ├── FormatLine.tsx
@@ -207,7 +216,9 @@ Estos componentes no pertenecen exclusivamente a un módulo, por lo tanto, puede
 | `NotificationBell.tsx`    | Componente reutilizable que muestra la campana de notificaciones, el contador de notificaciones no leídas y el listado de notificaciones del usuario autenticado.                                                                                                                                                                                                                                                                                                                                                                                                          | Se utiliza dentro de `Header.tsx` para mostrar novedades de módulos como PQR y Talento Humano.                                                                                                         |
 | `PageContainer.tsx`       | Componente reutilizable que sirve como contenedor general para organizar el contenido de una página. Ayuda a mantener márgenes, espaciados y estructura visual consistente.                                                                                                                                                                                                                                                                                                                                                                                                | Puede utilizarse en páginas como usuarios, PQR, dashboard, reportes y demás vistas internas.                                                                                                           |
 | `PageHeader.tsx`          | Componente reutilizable para mostrar el encabezado particular de una página. Recibe título, subtítulo, acciones principales y contenido adicional mediante `titleAdornment`, lo que permite colocar junto al título elementos como estados, chips, indicadores o ayudas informativas.                                                                                                                                                                                                                                                                                      | Puede utilizarse en listados, formularios y páginas de detalle, como el detalle de una requisición donde se muestra el estado general junto al título.                                                 |
-| `SectionCard.tsx`         | Componente reutilizable para agrupar contenido dentro de una tarjeta visual con título, subtítulo opcional y contenido interno. Permite dividir páginas de detalle o formularios extensos en secciones claramente identificadas.                                                                                                                                                                                                                                                                                                                                           | Puede utilizarse en detalles de requisición, formularios, configuraciones, perfiles, reportes y otras páginas que necesiten organizar información por bloques.                                         |
+| `ProcessStepper.tsx`      | Componente reutilizable para representar procesos por etapas mediante `Stepper`. Permite definir pasos completados, deshabilitados, etapa activa y navegación controlada entre pasos.                                                                                                                                                                                                                                                                                                                                                         | Puede utilizarse en flujos secuenciales como validaciones, aprobaciones, configuraciones guiadas u otros procesos por etapas.                                                                           |
+| `RadioOptionGroup.tsx`    | Componente reutilizable para seleccionar una única opción mediante botones de radio. Permite configurar opciones, valor, estado deshabilitado, mensaje de error, orientación y un `label` opcional.                                                                                                                                                                                                                                                                            | Puede utilizarse en formularios y etapas que necesiten elecciones exclusivas como Sí/No, tipo de cargo, concepto de aplicación u otras opciones cerradas.                                               |
+| `SectionCard.tsx`         | Componente reutilizable para agrupar contenido dentro de una tarjeta visual. Admite título, subtítulo y acciones opcionales; cuando no se requiere encabezado puede utilizarse únicamente como contenedor visual del contenido.                                                                                                                                                                                                                                                                                                                | Puede utilizarse en detalles de requisición, formularios, configuraciones, perfiles, reportes y otras páginas que necesiten organizar información por bloques.                                         |
 | `SettingsMenu.tsx`        | Componente reutilizable encargado de mostrar las opciones personales y de configuración del usuario autenticado mediante un menú desplegable. Centraliza accesos relacionados con el perfil, la firma del usuario y otras configuraciones que puedan agregarse posteriormente.                                                                                                                                                                                                                                                                                             | Se utiliza normalmente desde `Header.tsx` para permitir que el usuario acceda a sus configuraciones sin ocupar espacio permanente dentro del encabezado.                                               |
 | `SidebarMenu.tsx`         | Componente reutilizable que representa el menú lateral del sistema. Permite mostrar opciones de navegación según los módulos disponibles y el rol del usuario.                                                                                                                                                                                                                                                                                                                                                                                                             | Se utiliza dentro del layout principal para navegar entre las secciones del sistema.                                                                                                                   |
 | `StatsSummary.tsx`        | Componente reutilizable para mostrar tarjetas de resumen con un ícono, una etiqueta y un valor numérico o textual. Permite presentar indicadores importantes de una vista de forma clara y compacta.                                                                                                                                                                                                                                                                                                                                                                       | Puede utilizarse en módulos como PQR, usuarios, dashboard o reportes para mostrar conteos como total de registros, pendientes, cerrados, asignados o por calificar.                                    |
@@ -244,6 +255,30 @@ Estos componentes dependen directamente de las requisiciones de personal, sus ap
 | `PersonnelRequisitionCandidatesSection.tsx` | Componente contenedor encargado de consultar, presentar y gestionar los candidatos de una requisición. Muestra el estado del cargue, el contador de candidatos, estados de carga o vacío, tarjetas, formularios y confirmaciones para eliminar, cerrar o reabrir el proceso. Cuando el cargue está `ABIERTA`, el Auxiliar de Talento Humano puede registrar, editar, eliminar y cerrar; cuando está `CERRADA`, los candidatos quedan bloqueados y el mismo usuario puede utilizar la acción **Reabrir cargue** para habilitar nuevamente los ajustes. El componente actualiza localmente el estado y la fecha de cierre sin recargar toda la página. | Se integra en `PersonnelRequisitionDetail.tsx` cuando el proceso de candidatos ya fue iniciado.                                          |
 | `PersonnelRequisitionListItem.tsx`          | Componente encargado de mostrar una requisición en formato de tarjeta o elemento de lista. Presenta cargo, estado, área, ciudad, salario, tipo de contratación, fecha, solicitante, responsable actual y acciones disponibles según los permisos del usuario.                                                                                                                                                                                                                                                                                                                                                                                        | Se utiliza en el listado general de requisiciones para consultar, aprobar, rechazar, confirmar contratación o ingresar al detalle.       |
 | `PersonnelRequisitionStatusBadge.tsx`       | Componente encargado de mostrar el estado general de una requisición mediante un `CustomChip`. Cuando el estado es rechazado o cancelado y existe un comentario, muestra también un `InfoTooltip` con el motivo correspondiente.                                                                                                                                                                                                                                                                                                                                                                                                                     | Se utiliza junto al título de la página de detalle para identificar rápidamente el estado general de la requisición.                     |
+
+---
+
+
+##### `src/components/humanTalent/candidateValidation/`
+
+Esta subcarpeta contiene los componentes específicos del proceso **Validación de cargo y postulante**.
+
+```txt
+components/humanTalent/candidateValidation/
+├── CandidateApplicationConceptStep.tsx
+├── CandidatePositionValidationStep.tsx
+├── CandidateRequirementValidationTable.tsx
+├── CandidateValidationStep.tsx
+└── PersonnelCandidateValidationSection.tsx
+```
+
+| Componente | Descripción | Uso dentro del proyecto |
+| ---------- | ----------- | ----------------------- |
+| `CandidateApplicationConceptStep.tsx` | Representa la **Fase 1: Concepto de aplicación**. Permite seleccionar `Ingreso` o `Modificación de cargo`, muestra los errores de validación correspondientes y permite guardar para habilitar la siguiente fase. | Se renderiza desde `PersonnelCandidateValidationSection.tsx` cuando la primera etapa está activa. |
+| `CandidatePositionValidationStep.tsx` | Representa la **Fase 2: Validación de cargo**. Muestra información de la revisión utilizada, permite clasificar el proceso como `Nuevo cargo` o `Cargo existente`, solicita el código de control de cambios cuando corresponde y, para cargo existente, presenta si el perfil de cargo utilizado continúa vigente. | Se renderiza después de completar la Fase 1. |
+| `CandidateRequirementValidationTable.tsx` | Tabla reutilizable dentro del flujo de validación. Agrupa las descripciones por requerimiento y permite evaluar cada descripción de forma independiente. Si el candidato cumple, solicita evidencia; si no cumple, solicita el cierre de brecha. | Se utiliza dentro de `CandidateValidationStep.tsx` para presentar de forma compacta Formación, Experiencia y Conocimientos específicos, incluyendo múltiples descripciones por requisito. |
+| `CandidateValidationStep.tsx` | Representa la **Fase 3: Validación del postulante**. Agrupa las descripciones de la revisión exacta utilizada por la requisición, delega su evaluación a `CandidateRequirementValidationTable.tsx`, solicita el resultado final de aptitud y muestra la fecha y el usuario que realizó la validación cuando el proceso fue completado. | Se renderiza después de completar la Fase 2. |
+| `PersonnelCandidateValidationSection.tsx` | Componente coordinador del detalle. Consulta el hook de validación, muestra el `ProcessStepper`, la información general del cargo y del candidato, controla la etapa activa y delega cada fase a su componente correspondiente. También presenta estados de carga, errores, estado vacío y mensajes mediante snackbar. | Se utiliza en la página `PersonnelCandidateValidationDetail.tsx`. |
 
 ---
 
@@ -434,6 +469,8 @@ El archivo `humanTalentOptions.ts` contiene las opciones estáticas utilizadas e
 | `directContractTypeOptions` | Contiene las opciones permitidas cuando el tipo de contratación es directa.     | Se utiliza para seleccionar si el contrato directo será indefinido o fijo.                                    |
 | `internContractTypeOptions` | Contiene las opciones permitidas cuando el tipo de contratación es practicante. | Se utiliza para seleccionar si el practicante será aprendiz, pasante o rotante.                               |
 | `requisitionStatusOptions`  | Contiene los estados disponibles para una requisición de personal.              | Se utilizará en listados, filtros o vistas donde se necesite mostrar o consultar el estado de la requisición. |
+| `candidateApplicationConceptOptions` | Contiene las opciones `Ingreso` y `Modificación de cargo` utilizadas en el concepto de aplicación. | Se utiliza en la Fase 1 de la validación de cargo y postulante. |
+| `candidatePositionTypeOptions` | Contiene las opciones `Nuevo cargo` y `Cargo existente`. | Se utiliza en la Fase 2 de la validación para clasificar el cargo del proceso. |
 
 ---
 
@@ -553,6 +590,8 @@ hooks/auth/
 ```txt
 hooks/humanTalent/
 ├── useCreatePersonnelRequisition.ts
+├── usePersonnelCandidateValidationDetail.ts
+├── usePersonnelCandidateValidations.ts
 ├── usePersonnelRequisitionCandidates.ts
 ├── usePersonnelRequisitionDetail.ts
 └── usePersonnelRequisitions.ts
@@ -561,6 +600,8 @@ hooks/humanTalent/
 | Hook                                   | Descripción                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | Uso dentro del proyecto                                                                                                                                                  |
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `useCreatePersonnelRequisition.ts`     | Maneja la lógica del formulario para crear una requisición de personal. Controla los estados del formulario, carga departamentos, perfiles de cargo y ciudades, consulta automáticamente la revisión vigente del cargo seleccionado, valida la información con Yup, limpia errores, muestra mensajes de respuesta y envía la requisición al backend junto con el identificador de la revisión utilizada. También controla campos condicionales relacionados con el motivo y el tipo de contratación.                                                                      | Se utiliza en la página `CreatePersonnelRequisition.tsx`.                                                                                                                |
+| `usePersonnelCandidateValidations.ts`  | Maneja la consulta del listado de candidatos disponibles para el módulo de validación, los permisos generales de gestión, estados de carga, errores y mensajes del listado. | Se utiliza en `PersonnelCandidateValidations.tsx`. |
+| `usePersonnelCandidateValidationDetail.ts` | Maneja la lógica completa del detalle y de las tres fases de validación. Inicializa los formularios y errores según la revisión exacta de la requisición, valida con Yup, guarda cada fase, vuelve a consultar el detalle después de cada guardado y administra mensajes y estados de carga. | Se utiliza en `PersonnelCandidateValidationSection.tsx`. |
 | `usePersonnelRequisitionCandidates.ts` | Maneja la lógica completa del cargue de candidatos de una requisición. Consulta los candidatos y los tipos de identificación activos, controla el formulario, valida con Yup, registra y actualiza candidatos mediante archivos, elimina registros, cierra y reabre el cargue, administra diálogos y estados de carga, y muestra mensajes de éxito o error. También expone callbacks como `onSubmissionClosed` y `onSubmissionReopened` para que la interfaz actualice inmediatamente `candidateSubmissionStatus` y `candidateSubmissionClosedAt` después de cada cambio. | Se utiliza en `PersonnelRequisitionCandidatesSection.tsx`.                                                                                                               |
 | `usePersonnelRequisitionDetail.ts`     | Maneja la consulta del detalle completo de una requisición de personal mediante su identificador. Controla el estado de carga, almacena la requisición obtenida, procesa errores de la petición y permite volver a cargar la información cuando sea necesario.                                                                                                                                                                                                                                                                                                            | Se utiliza en `PersonnelRequisitionDetail.tsx` y `PersonnelRequisitionFormat.tsx` para consultar la misma información desde la vista de detalle y el formato imprimible. |
 | `usePersonnelRequisitions.ts`          | Maneja la lógica principal del listado y flujo de requisiciones de personal. Consulta las requisiciones disponibles, controla estados de carga, selecciona la requisición sobre la que se realizará una acción y coordina las decisiones de aprobación o rechazo. También maneja la creación de la confirmación de contratación, las decisiones de Talento Humano, la apertura y cierre de diálogos y los mensajes mostrados mediante snackbar.                                                                                                                           | Se utiliza en la página `PersonnelRequisitions.tsx` para listar y gestionar las requisiciones según los permisos y el paso actual del usuario dentro del flujo.          |
@@ -733,11 +774,13 @@ interfaces/common/
 
 ```txt
 interfaces/humanTalent/
+├── personnelCandidateValidation.interface.ts
 └── personnelRequisition.interface.ts
 ```
 
 | Archivo                             | Descripción                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Uso dentro del proyecto                                                                                                                                                          |
 | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `personnelCandidateValidation.interface.ts` | Define los tipos e interfaces del proceso de validación de cargo y postulante. Incluye conceptos de aplicación, tipo de cargo, estados del proceso, detalle del candidato, revisión de perfil, descripciones de requisitos, formularios de las tres fases, errores de validación y payloads enviados al backend. | Se utiliza en servicios, hooks y componentes del módulo de validación de candidatos. |
 | `personnelRequisition.interface.ts` | Define los tipos e interfaces relacionados con el flujo completo de requisiciones de personal. Incluye motivos, contratación, decisiones, estados, departamentos, perfiles y revisiones de cargo, aprobaciones, confirmación final y candidatos. Para cada candidato contempla tipo de identificación, número de identificación, hoja de vida, formulario, errores de validación y respuestas de los servicios. | Se utiliza en servicios, hooks, componentes y páginas relacionadas con la creación, consulta, aprobación, confirmación y gestión de candidatos de las requisiciones de personal. |
 
 ---
@@ -886,6 +929,8 @@ pages/
 ```txt
 pages/humanTalent/
 ├── CreatePersonnelRequisition.tsx
+├── PersonnelCandidateValidationDetail.tsx
+├── PersonnelCandidateValidations.tsx
 ├── PersonnelRequisitionDetail.tsx
 ├── PersonnelRequisitionFormat.tsx
 └── PersonnelRequisitions.tsx
@@ -894,6 +939,8 @@ pages/humanTalent/
 | Página                           | Descripción                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `CreatePersonnelRequisition.tsx` | Muestra el formulario para crear una requisición de personal. Utiliza `useCreatePersonnelRequisition.ts` para cargar departamentos, perfiles de cargo y ciudades, consultar y mostrar automáticamente la revisión vigente del cargo seleccionado, controlar los valores, validar la información y enviar la solicitud al backend.                                                                                                                                                                                                                    |
+| `PersonnelCandidateValidations.tsx` | Muestra el listado de candidatos disponibles para el proceso de validación de cargo y postulante. Permite buscar candidatos y navegar al detalle individual de validación. |
+| `PersonnelCandidateValidationDetail.tsx` | Muestra la vista independiente del proceso de validación de un candidato. Obtiene `candidateId` desde la ruta, presenta el encabezado de página y delega el flujo de etapas a `PersonnelCandidateValidationSection.tsx`. |
 | `PersonnelRequisitions.tsx`      | Muestra el listado general de requisiciones de personal y las acciones disponibles según el usuario y el paso actual del flujo. Utiliza `usePersonnelRequisitions.ts` para consultar, aprobar, rechazar, cancelar y registrar o decidir la confirmación de contratación.                                                                                                                                                                                                                                                                             |
 | `PersonnelRequisitionDetail.tsx` | Muestra la información completa de una requisición, incluyendo el perfil de cargo, la revisión utilizada al crear la solicitud, datos generales, condiciones de contratación, aprobaciones iniciales, confirmación final, vistos buenos y la sección de candidatos cuando el cargue ya fue iniciado. Utiliza `usePersonnelRequisitionDetail.ts` para consultar la requisición y delega la gestión de candidatos a `PersonnelRequisitionCandidatesSection.tsx`, donde el Auxiliar de Talento Humano puede cerrar y reabrir el cargue según su estado. |
 | `PersonnelRequisitionFormat.tsx` | Construye la vista independiente utilizada para visualizar e imprimir el formato de requisición. Presenta la información general, el código y la revisión del perfil de cargo utilizada, opciones seleccionadas, firmas, fechas y estado general mediante una marca de agua. Reutiliza `usePersonnelRequisitionDetail.ts` y los componentes ubicados en `components/humanTalent/requisitionFormat/`.                                                                                                                                                 |
@@ -1126,12 +1173,35 @@ getIdentificationTypes()
 
 ```txt
 services/humanTalent/
+├── personnelCandidateValidationService.ts
 └── personnelRequisitionService.ts
 ```
 
 | Archivo                          | Descripción                                                                                                                                                                                                                                                                                                                                                              | Uso dentro del proyecto                                                                                                                                 |
 | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `personnelCandidateValidationService.ts` | Contiene las funciones HTTP del proceso de validación de cargo y postulante. Permite consultar el listado y el detalle, crear la validación de la Fase 1, guardar la validación del cargo y completar la validación del postulante. | Se utiliza desde los hooks de validación de candidatos. |
 | `personnelRequisitionService.ts` | Contiene las funciones HTTP relacionadas con el flujo completo de requisiciones de personal. Permite consultar departamentos, crear y obtener requisiciones, tomar decisiones, gestionar la confirmación final y administrar el cargue de candidatos con hojas de vida mediante `FormData`, incluyendo las acciones para cerrar y reabrir la presentación de candidatos. | Se utiliza desde los hooks del módulo de Talento Humano para comunicarse con los endpoints de requisiciones, aprobaciones, confirmaciones y candidatos. |
+
+---
+
+
+##### Funciones en `personnelCandidateValidationService.ts`
+
+```txt
+getPersonnelCandidateValidations()
+getPersonnelCandidateValidationDetail()
+createPersonnelCandidateValidation()
+updatePersonnelCandidatePositionValidation()
+completePersonnelCandidateValidation()
+```
+
+| Función | Descripción |
+| ------- | ----------- |
+| `getPersonnelCandidateValidations()` | Consulta los candidatos disponibles para el módulo de validación junto con el estado resumido del proceso y los permisos de gestión. |
+| `getPersonnelCandidateValidationDetail(candidateId)` | Consulta el detalle de un candidato, la requisición, la revisión exacta del perfil y la validación existente cuando aplica. |
+| `createPersonnelCandidateValidation(candidateId, data)` | Crea la validación al guardar la Fase 1 con el concepto de aplicación seleccionado. |
+| `updatePersonnelCandidatePositionValidation(candidateId, data)` | Guarda la Fase 2 con el tipo de cargo y el código de control de cambios cuando corresponde. |
+| `completePersonnelCandidateValidation(candidateId, data)` | Completa la Fase 3 enviando el resultado final y la evaluación de cada descripción de requisito. |
 
 ---
 
@@ -1387,30 +1457,73 @@ uploadUsersBulk()
 
 ---
 
+
 ### `src/styles/`
 
-Esta carpeta contiene archivos de estilos globales o estilos reutilizables que no pertenecen directamente a un componente específico.
+Esta carpeta contiene estilos reutilizables del proyecto que pueden ser compartidos entre diferentes páginas y componentes.
+
+Su objetivo principal es centralizar configuraciones visuales repetidas, evitar declarar los mismos estilos directamente dentro de las vistas y mantener una apariencia consistente en toda la aplicación.
+
+Los estilos pueden utilizar la configuración definida en el tema de Material UI, permitiendo que los colores y estados visuales dependan de la paleta global del sistema en lugar de utilizar valores de color escritos directamente en los componentes.
 
 **Estructura:**
 
 ```txt
 styles/
-└── filterStyles.css
+├── filterStyles.ts
+└── tableStyles.ts
 ```
 
-| Archivo            | Descripción                                                                                                                       | Uso dentro del proyecto                                                             |
-| ------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| `filterStyles.css` | Archivo de estilos utilizado para personalizar elementos visuales relacionados con filtros, contenedores o controles de búsqueda. | Puede aplicarse en vistas que tengan filtros, formularios de búsqueda, carga masiva |
+| Archivo | Descripción | Uso dentro del proyecto |
+| ------- | ----------- | ----------------------- |
+| `filterStyles.ts` | Contiene estilos reutilizables para controles de búsqueda, filtros, botones de acciones y menús de filtrado. | Se utiliza en páginas con tablas o listados que incluyen búsqueda, filtros y acciones de actualización. |
+| `tableStyles.ts` | Contiene estilos reutilizables para elementos visuales de tablas y listados. | Se utiliza en listados que compartan estilos de numeración o botones de acción. |
 
 ---
 
 #### Responsabilidad principal
 
 ```txt
-Guardar estilos globales o reutilizables del proyecto.
+Centralizar estilos reutilizables del frontend.
+Evitar repetir configuraciones visuales en páginas y componentes.
 ```
 
-La carpeta `styles/` ayuda a mantener separados los estilos generales de la lógica de los componentes. Esto permite que el proyecto conserve una mejor organización visual y que ciertos estilos puedan reutilizarse sin repetir código.
+---
+
+#### `filterStyles.ts`
+
+El archivo `filterStyles.ts` contiene los estilos reutilizables utilizados principalmente en controles de búsqueda y filtrado.
+
+La función `getFilterStyles(theme)` recibe el tema activo de Material UI para construir los estilos de acuerdo con la paleta visual configurada en la aplicación.
+
+| Estilo | Descripción | Uso dentro del proyecto |
+| ------ | ----------- | ----------------------- |
+| `searchInput` | Define la apariencia del campo de búsqueda utilizado en los encabezados de listados. | Se utiliza en páginas que permiten buscar registros dentro de tablas o listados. |
+| `iconButton` | Define el estilo estándar de los botones utilizados para acciones como búsqueda, filtros o actualización. | Se utiliza en controles de acciones ubicados en encabezados de tablas. |
+| `activeIconButton` | Define el estilo visual de un botón cuando existe una búsqueda o filtro activo. | Se utiliza para indicar visualmente que existe un filtro aplicado. |
+| `smallFilterMenuPaper` | Define el contenedor visual de los menús pequeños de filtrado. | Se utiliza en menús desplegables de filtros. |
+| `smallFilterMenuContent` | Organiza el contenido interno de los menús de filtrado. | Se utiliza para distribuir selectores y acciones dentro de los filtros. |
+| `smallFilterTitle` | Define el estilo de los títulos utilizados dentro de un menú de filtro. | Se utiliza para identificar el criterio que se está filtrando. |
+| `filterSelect` | Define el estilo de los selectores utilizados dentro de los filtros. | Se utiliza en filtros por rol, estado u otras categorías. |
+| `clearFilterButtonWithMargin` | Define el estilo del botón utilizado para limpiar un filtro aplicado. | Se utiliza dentro de los menús de filtrado. |
+
+---
+
+#### `tableStyles.ts`
+
+El archivo `tableStyles.ts` contiene estilos reutilizables para elementos visuales utilizados dentro de tablas y listados del sistema.
+
+La función `getTableStyles(theme)` recibe el tema activo de Material UI y obtiene los colores desde `theme.palette`. Esto evita declarar colores hexadecimales directamente dentro de las páginas y permite mantener los estilos sincronizados con la identidad visual general de la aplicación.
+
+```txt
+getTableStyles(theme)
+```
+
+| Estilo | Descripción | Uso dentro del proyecto |
+| ------ | ----------- | ----------------------- |
+| `rowNumber` | Define el estilo utilizado para mostrar el número consecutivo de una fila. Utiliza `text.secondary` de la paleta y aplica un peso de fuente destacado. | Se utiliza en la columna `#` de las tablas del sistema. |
+| `primaryActionButton` | Define el estilo de los botones de acción principales dentro de una tabla. Utiliza `primary.main` y genera fondos suaves mediante `alpha()`, incluyendo el estado `hover`. | Se utiliza en acciones como editar, iniciar, continuar o visualizar un proceso. |
+| `neutralActionButton` | Define el estilo de acciones secundarias utilizando valores de `action.hover`, `action.selected` y `text.secondary` de la paleta. | Puede utilizarse en acciones como actualizar listados, cargar archivos u otros controles secundarios. |
 
 ---
 
@@ -1820,9 +1933,29 @@ Este archivo permite mantener las reglas de autenticación centralizadas y evita
 
 ```txt
 validations/humanTalent/
+├── personnelCandidateValidation.ts
 ├── personnelRequisitionCandidateValidation.ts
 └── personnelRequisitionValidation.ts
 ```
+
+
+##### `personnelCandidateValidation.ts`
+
+Este archivo contiene los esquemas Yup utilizados en las tres fases de la validación de cargo y postulante.
+
+```txt
+candidateApplicationConceptSchema
+candidatePositionValidationSchema
+candidateValidationSchema
+```
+
+| Esquema | Descripción | Uso dentro del proyecto |
+| ------- | ----------- | ----------------------- |
+| `candidateApplicationConceptSchema` | Valida que el usuario seleccione un concepto de aplicación permitido antes de crear la validación. | Se utiliza al guardar la Fase 1. |
+| `candidatePositionValidationSchema` | Valida el tipo de cargo y exige el código de control de cambios cuando se selecciona `NUEVO_CARGO`. | Se utiliza al guardar la Fase 2. |
+| `candidateValidationSchema` | Valida el resultado final y cada descripción de requisito. Cuando `complies` es `true`, exige evidencia; cuando es `false`, exige cierre de brecha. | Se utiliza al completar la Fase 3. |
+
+---
 
 ##### `personnelRequisitionValidation.ts`
 

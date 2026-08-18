@@ -36,6 +36,7 @@ import DataTable from "../../../components/common/DataTable";
 import UserRoleChip from "../../../components/users/UserRoleChip";
 import ChangeUserRoleDialog from "../../../components/users/ChangeUserRoleDialog";
 import { getFilterStyles } from "../../../styles/filterStyles";
+import { getTableStyles } from "../../../styles/tableStyles";
 import BulkUploadDialog from "../../../components/common/BulkUploadDialog";
 import { downloadBulkUsersTemplate } from "../../../template/users/downloadBulkUsersTemplate";
 
@@ -44,6 +45,7 @@ const AdminUsers = () => {
 
   const theme = useTheme();
   const filterStyles = getFilterStyles(theme);
+  const tableStyles = getTableStyles(theme);
 
   const {
     users,
@@ -168,10 +170,7 @@ const AdminUsers = () => {
       label: "#",
       render: (_user, index) => (
         <Typography
-          sx={{
-            color: "#64748b",
-            fontWeight: 700,
-          }}
+          sx={tableStyles.rowNumber}
         >
           {index + 1}
         </Typography>
@@ -212,14 +211,9 @@ const AdminUsers = () => {
           <Tooltip title="Cambiar rol">
             <IconButton
               onClick={() => openChangeRoleDialog(user)}
-              sx={{
-                backgroundColor: "#eff6ff",
-                color: "primary.main",
-                borderRadius: "12px",
-                "&:hover": {
-                  backgroundColor: "#dbeafe",
-                },
-              }}
+              sx={
+                tableStyles.primaryActionButton
+              }
             >
               <EditOutlinedIcon />
             </IconButton>

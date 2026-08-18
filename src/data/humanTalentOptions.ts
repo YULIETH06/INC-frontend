@@ -97,3 +97,27 @@ export const requisitionStatusOptions = [
         value: "CANCELADA",
     },
 ];
+
+// Opciones del concepto de aplicación del candidato.
+export const candidateApplicationConceptOptions = [
+    {
+        value: "INGRESO",
+        label: "Ingreso",
+    },
+    {
+        value: "MODIFICACION_CARGO",
+        label: "Modificación de cargo",
+    },
+];
+
+// Opciones disponibles para seleccionar el tipo de cargo en la validación.
+export const candidatePositionTypeOptions = [
+    {
+        value: "NUEVO_CARGO",
+        label: "Nuevo cargo",
+    },
+    {
+        value: "CARGO_EXISTENTE",
+        label: "Cargo existente",
+    },
+];

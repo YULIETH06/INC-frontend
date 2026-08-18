@@ -178,7 +178,7 @@ const PersonnelRequisitionCandidatesSection = ({
         currentSubmissionStatus === "CERRADA";
 
     const maximumCandidatesReached =
-        candidates.length >= 5;
+        candidates.length >= 10;
 
     const hasCandidates =
         candidates.length > 0;
@@ -253,7 +253,7 @@ const PersonnelRequisitionCandidatesSection = ({
                                     />
 
                                     <CustomChip
-                                        label={`${candidates.length} de 5 candidatos`}
+                                        label={`${candidates.length} de 10 candidatos`}
                                         color={
                                             maximumCandidatesReached
                                                 ? "warning"

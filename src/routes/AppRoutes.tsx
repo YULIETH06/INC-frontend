@@ -16,6 +16,9 @@ import CreatePersonnelRequisition from "../pages/humanTalen/CreatePersonnelRequi
 import PersonnelRequisitions from "../pages/humanTalen/PersonnelRequisitions";
 import PersonnelRequisitionDetail from "../pages/humanTalen/PersonnelRequisitionDetail";
 import PersonnelRequisitionFormat from "../pages/humanTalen/PersonnelRequisitionFormat";
+import PersonnelCandidateValidationDetail from "../pages/humanTalen/PersonnelCandidateValidationDetail";
+import PersonnelCandidateValidations from "../pages/humanTalen/PersonnelCandidateValidations";
+
 import UserSignature from "../pages/users/UserSignature";
 import PositionProfileRevisions from "../pages/positionManagement/PositionProfileRevisions";
 import PositionProfileRevisionDetail from "../pages/positionManagement/PositionProfileRevisionDetail";
@@ -56,6 +59,17 @@ const AppRoutes = () => {
           <Route
             path="/dashboard/human-talent/requisitions/create"
             element={<CreatePersonnelRequisition />}
+          />
+
+          {/* Validación de cargo y postulante */}
+          <Route
+            path="/dashboard/human-talent/candidate-validations"
+            element={<PersonnelCandidateValidations />}
+          />
+
+          <Route
+            path="/dashboard/human-talent/candidate-validations/:candidateId"
+            element={<PersonnelCandidateValidationDetail />}
           />
 
           {/* Gestión de Cargos */}
