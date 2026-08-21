@@ -18,7 +18,7 @@ import type {
     CandidatePositionValidationForm,
     CandidatePositionValidationFormErrors,
     PersonnelCandidateValidationCandidate,
-} from "../../../interfaces/humanTalent/personnelCandidateValidation.interface";
+} from "../../../interfaces/humanTalent/candidateValidation/personnelCandidateValidation.interface";
 
 interface CandidatePositionValidationStepProps {
     candidate:

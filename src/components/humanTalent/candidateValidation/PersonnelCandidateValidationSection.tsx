@@ -22,7 +22,7 @@ import CandidateValidationStep from "./CandidateValidationStep";
 
 import {
     usePersonnelCandidateValidationDetail,
-} from "../../../hooks/humanTalent/usePersonnelCandidateValidationDetail";
+} from "../../../hooks/humanTalent/candidateValidation/usePersonnelCandidateValidationDetail";
 import SectionCard from "../../common/SectionCard";
 
 interface PersonnelCandidateValidationSectionProps {

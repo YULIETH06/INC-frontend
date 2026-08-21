@@ -146,13 +146,10 @@ components/
 │   └── ViewToggleButtons.tsx
 │
 ├── humanTalent/
-│   ├── PersonnelApprovalCard.tsx
-│   ├── PersonnelHiringConfirmationDialog.tsx
-│   ├── PersonnelRequisitionCandidateCard.tsx
-│   ├── PersonnelRequisitionCandidateDialog.tsx
-│   ├── PersonnelRequisitionCandidatesSection.tsx
-│   ├── PersonnelRequisitionListItem.tsx
-│   ├── PersonnelRequisitionStatusBadge.tsx
+│   ├── candidateSubmission/
+│   │   ├── PersonnelRequisitionCandidateCard.tsx
+│   │   ├── PersonnelRequisitionCandidateDialog.tsx
+│   │   └── PersonnelRequisitionCandidatesSection.tsx
 │   │
 │   ├── candidateValidation/
 │   │   ├── CandidateApplicationConceptStep.tsx
@@ -161,12 +158,18 @@ components/
 │   │   ├── CandidateValidationStep.tsx
 │   │   └── PersonnelCandidateValidationSection.tsx
 │   │
-│   └── requisitionFormat/
-│       ├── FormatLine.tsx
-│       ├── FormatOptionBox.tsx
-│       ├── FormatSectionTitle.tsx
-│       ├── FormatSignatureBox.tsx
-│       └── PersonnelRequisitionWatermark.tsx
+│   ├── requisitionFormat/
+│   │   ├── FormatLine.tsx
+│   │   ├── FormatOptionBox.tsx
+│   │   ├── FormatSectionTitle.tsx
+│   │   ├── FormatSignatureBox.tsx
+│   │   └── PersonnelRequisitionWatermark.tsx
+│   │
+│   └── requisitions/
+│       ├── PersonnelApprovalCard.tsx
+│       ├── PersonnelHiringConfirmationDialog.tsx
+│       ├── PersonnelRequisitionListItem.tsx
+│       └── PersonnelRequisitionStatusBadge.tsx
 │
 ├── positionManagement/
 │   ├── PositionProfileRevisionCard.tsx
@@ -179,7 +182,7 @@ components/
 ├── layouts/
 │   └── DashboardLayout.tsx
 │
-├── pqr/
+├── pqrs/
 │   ├── PqrChatView.tsx
 │   ├── PqrRatingSummary.tsx
 │   └── PqrTicketCard.tsx
@@ -337,7 +340,7 @@ Estos componentes deben importar sus tipos, hooks y servicios desde `positionMan
 
 ---
 
-#### `src/components/pqr/`
+#### `src/components/pqrs/`
 
 En esta carpeta se ubican los componentes específicos del módulo de PQR.
 Estos componentes están relacionados directamente con la lógica visual de las solicitudes, el chat y la calificación del servicio.
@@ -348,7 +351,7 @@ Estos componentes están relacionados directamente con la lógica visual de las 
 | `PqrRatingSummary.tsx` | Componente encargado de mostrar el resumen de la calificación realizada por el usuario sobre una PQR. Puede incluir la puntuación, comentario y fecha de calificación.                                                                                                                                                                                                                 | Se utiliza en vistas donde se necesita mostrar la valoración dada a una PQR respondida o cerrada.                                                   |
 | `PqrTicketCard.tsx`    | Componente encargado de mostrar una PQR en formato de tarjeta compacta. Presenta el identificador de la PQR, tipo de caso, estado, prioridad, fecha, usuario, agente asignado cuando aplica, descripción, calificación, acciones relacionadas con estado, prioridad y chat. También puede mostrar un contador visual de mensajes sin revisar cuando la PQR tiene novedades en el chat. | Se utiliza en vistas como `AgentPqrs` y `AdminPqrs` para reutilizar el diseño visual de las tarjetas de PQR y evitar repetir código en cada página. |
 
-Estos componentes se ubican en `components/pqr/` porque dependen directamente del módulo de PQR y no son elementos generales del sistema.
+Estos componentes se ubican en `components/pqrs/` porque dependen directamente del módulo de PQR y no son elementos generales del sistema.
 
 ---
 
@@ -551,10 +554,15 @@ hooks/
 │   └── useRegister.ts
 │
 ├── humanTalent/
-│   ├── useCreatePersonnelRequisition.ts
-│   ├── usePersonnelRequisitionCandidates.ts
-│   ├── usePersonnelRequisitionDetail.ts
-│   └── usePersonnelRequisitions.ts
+│   ├── candidateValidation/
+│   │   ├── usePersonnelCandidateValidationDetail.ts
+│   │   └── usePersonnelCandidateValidations.ts
+│   │
+│   └── requisitions/
+│       ├── useCreatePersonnelRequisition.ts
+│       ├── usePersonnelRequisitionCandidates.ts
+│       ├── usePersonnelRequisitionDetail.ts
+│       └── usePersonnelRequisitions.ts
 │
 ├── positionManagement/
 │   ├── usePositionProfileRevisionSelector.ts
@@ -604,14 +612,20 @@ hooks/auth/
 
 #### Hooks del módulo de Talento Humano
 
+Los hooks de Talento Humano se separan entre `candidateValidation/` y `requisitions/` para mantener aislada la lógica de cada proceso.
+
+
 ```txt
 hooks/humanTalent/
-├── useCreatePersonnelRequisition.ts
-├── usePersonnelCandidateValidationDetail.ts
-├── usePersonnelCandidateValidations.ts
-├── usePersonnelRequisitionCandidates.ts
-├── usePersonnelRequisitionDetail.ts
-└── usePersonnelRequisitions.ts
+├── candidateValidation/
+│   ├── usePersonnelCandidateValidationDetail.ts
+│   └── usePersonnelCandidateValidations.ts
+│
+└── requisitions/
+    ├── useCreatePersonnelRequisition.ts
+    ├── usePersonnelRequisitionCandidates.ts
+    ├── usePersonnelRequisitionDetail.ts
+    └── usePersonnelRequisitions.ts
 ```
 
 | Hook                                   | Descripción                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | Uso dentro del proyecto                                                                                                                                                  |
@@ -737,7 +751,11 @@ interfaces/
 │   └── message.interface.ts
 │
 ├── humanTalent/
-│   └── personnelRequisition.interface.ts
+│   ├── candidateValidation/
+│   │   └── personnelCandidateValidation.interface.ts
+│   │
+│   └── requisitions/
+│       └── personnelRequisition.interface.ts
 │
 ├── positionManagement/
 │   ├── positionProfile.interface.ts
@@ -789,10 +807,16 @@ interfaces/common/
 
 #### Interfaces del módulo de Talento Humano
 
+Las interfaces se organizan por proceso: `candidateValidation/` para la validación de postulantes y `requisitions/` para requisiciones, contratación y cargue de candidatos.
+
+
 ```txt
 interfaces/humanTalent/
-├── personnelCandidateValidation.interface.ts
-└── personnelRequisition.interface.ts
+├── candidateValidation/
+│   └── personnelCandidateValidation.interface.ts
+│
+└── requisitions/
+    └── personnelRequisition.interface.ts
 ```
 
 | Archivo                             | Descripción                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Uso dentro del proyecto                                                                                                                                                          |
@@ -881,10 +905,15 @@ pages/
 ├── Register.tsx
 │
 ├── humanTalent/
-│   ├── CreatePersonnelRequisition.tsx
-│   ├── PersonnelRequisitionDetail.tsx
-│   ├── PersonnelRequisitionFormat.tsx
-│   └── PersonnelRequisitions.tsx
+│   ├── candidateValidation/
+│   │   ├── PersonnelCandidateValidationDetail.tsx
+│   │   └── PersonnelCandidateValidations.tsx
+│   │
+│   └── requisitions/
+│       ├── CreatePersonnelRequisition.tsx
+│       ├── PersonnelRequisitionDetail.tsx
+│       ├── PersonnelRequisitionFormat.tsx
+│       └── PersonnelRequisitions.tsx
 │
 ├── positionManagement/
 │   ├── PositionProfileRevisionDetail.tsx
@@ -943,14 +972,20 @@ pages/
 
 #### Páginas del módulo de Talento Humano
 
+Las páginas se dividen entre `candidateValidation/` y `requisitions/`, de acuerdo con el proceso que representan.
+
+
 ```txt
 pages/humanTalent/
-├── CreatePersonnelRequisition.tsx
-├── PersonnelCandidateValidationDetail.tsx
-├── PersonnelCandidateValidations.tsx
-├── PersonnelRequisitionDetail.tsx
-├── PersonnelRequisitionFormat.tsx
-└── PersonnelRequisitions.tsx
+├── candidateValidation/
+│   ├── PersonnelCandidateValidationDetail.tsx
+│   └── PersonnelCandidateValidations.tsx
+│
+└── requisitions/
+    ├── CreatePersonnelRequisition.tsx
+    ├── PersonnelRequisitionDetail.tsx
+    ├── PersonnelRequisitionFormat.tsx
+    └── PersonnelRequisitions.tsx
 ```
 
 | Página                           | Descripción                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
@@ -982,7 +1017,7 @@ pages/positionManagement/
 #### Páginas del módulo de PQR
 
 ```txt
-pages/PQR/
+pages/pqrs/
 ├── admin/
 │   ├── AdminPqrs.tsx
 │   └── AdminUser.tsx
@@ -1097,7 +1132,11 @@ services/
 │   └── identificationTypeService.ts
 │
 ├── humanTalent/
-│   └── personnelRequisitionService.ts
+│   ├── candidateValidation/
+│   │   └── personnelCandidateValidationService.ts
+│   │
+│   └── requisitions/
+│       └── personnelRequisitionService.ts
 │
 ├── positionManagement/
 │   ├── positionProfileRevisionService.ts
@@ -1188,10 +1227,16 @@ getIdentificationTypes()
 
 #### Servicios del módulo de Talento Humano
 
+Los servicios se separan entre `candidateValidation/` y `requisitions/` para mantener agrupadas las peticiones HTTP de cada proceso.
+
+
 ```txt
 services/humanTalent/
-├── personnelCandidateValidationService.ts
-└── personnelRequisitionService.ts
+├── candidateValidation/
+│   └── personnelCandidateValidationService.ts
+│
+└── requisitions/
+    └── personnelRequisitionService.ts
 ```
 
 | Archivo                          | Descripción                                                                                                                                                                                                                                                                                                                                                              | Uso dentro del proyecto                                                                                                                                 |
@@ -1909,8 +1954,14 @@ validations/
 │   └── authValidation.ts
 │
 ├── humanTalent/
-│   ├── personnelRequisitionCandidateValidation.ts
-│   └── personnelRequisitionValidation.ts
+│   ├── candidateSubmission/
+│   │   └── personnelRequisitionCandidateValidation.ts
+│   │
+│   ├── candidateValidation/
+│   │   └── personnelCandidateValidation.ts
+│   │
+│   └── requisitions/
+│       └── personnelRequisitionValidation.ts
 │
 ├── positionManagement/
 │   └── positionProfileRevisionValidation.ts
@@ -1950,11 +2001,19 @@ Este archivo permite mantener las reglas de autenticación centralizadas y evita
 
 #### Validaciones del módulo de Talento Humano
 
+Las validaciones se separan en `candidateSubmission/`, `candidateValidation/` y `requisitions/` según el proceso al que pertenecen.
+
+
 ```txt
 validations/humanTalent/
-├── personnelCandidateValidation.ts
-├── personnelRequisitionCandidateValidation.ts
-└── personnelRequisitionValidation.ts
+├── candidateSubmission/
+│   └── personnelRequisitionCandidateValidation.ts
+│
+├── candidateValidation/
+│   └── personnelCandidateValidation.ts
+│
+└── requisitions/
+    └── personnelRequisitionValidation.ts
 ```
 
 

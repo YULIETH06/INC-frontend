@@ -15,7 +15,7 @@ import type {
     CandidateValidationForm,
     CandidateValidationFormErrors,
     CandidateValidationRequirementDescription,
-} from "../../../interfaces/humanTalent/personnelCandidateValidation.interface";
+} from "../../../interfaces/humanTalent/candidateValidation/personnelCandidateValidation.interface";
 
 interface RequirementGroup {
     requirementId: number;

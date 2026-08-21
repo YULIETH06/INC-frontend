@@ -5,15 +5,15 @@ import {
 } from "react";
 
 import {
-    getDepartments,
-} from "../../services/humanTalent/personnelRequisitionService";
+    getDepartments
+} from "../../services/humanTalent/requisitions/personnelRequisitionService";
 
 import { getErrorMessage } from "../../utils/common/getErrorMessage";
 
 import type {
     Department,
     PositionProfile,
-} from "../../interfaces/humanTalent/personnelRequisition.interface";
+} from "../../interfaces/humanTalent/requisitions/personnelRequisition.interface";
 import { getPositionProfiles } from "../../services/positionManagement/positionProfileService";
 
 interface UsePositionProfileRevisionSelectorProps {

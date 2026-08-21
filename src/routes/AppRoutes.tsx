@@ -6,18 +6,18 @@ import Dashboard from "../pages/Dashboard";
 import PrivateRoute from "./PrivateRoute";
 import DashboardLayout from "../components/layouts/DashboardLayout";
 
-import CreatePqr from "../pages/PQR/user/CreatePqr";
-import MyPqrs from "../pages/PQR/user/MyPqrs";
-import AdminPqrs from "../pages/PQR/admin/AdminPqrs";
-import AdminUser from "../pages/PQR/admin/AdminUser";
-import AgentPqrs from "../pages/PQR/agent/AgentPqrs";
+import CreatePqr from "../pages/pqrs/user/CreatePqr";
+import MyPqrs from "../pages/pqrs/user/MyPqrs";
+import AdminPqrs from "../pages/pqrs/admin/AdminPqrs";
+import AdminUser from "../pages/pqrs/admin/AdminUser";
+import AgentPqrs from "../pages/pqrs/agent/AgentPqrs";
 
-import CreatePersonnelRequisition from "../pages/humanTalen/CreatePersonnelRequisition";
-import PersonnelRequisitions from "../pages/humanTalen/PersonnelRequisitions";
-import PersonnelRequisitionDetail from "../pages/humanTalen/PersonnelRequisitionDetail";
-import PersonnelRequisitionFormat from "../pages/humanTalen/PersonnelRequisitionFormat";
-import PersonnelCandidateValidationDetail from "../pages/humanTalen/PersonnelCandidateValidationDetail";
-import PersonnelCandidateValidations from "../pages/humanTalen/PersonnelCandidateValidations";
+import CreatePersonnelRequisition from "../pages/humanTalen/requisitions/CreatePersonnelRequisition";
+import PersonnelRequisitions from "../pages/humanTalen/requisitions/PersonnelRequisitions";
+import PersonnelRequisitionDetail from "../pages/humanTalen/requisitions/PersonnelRequisitionDetail";
+import PersonnelRequisitionFormat from "../pages/humanTalen/requisitions/PersonnelRequisitionFormat";
+import PersonnelCandidateValidationDetail from "../pages/humanTalen/candidateValidation/PersonnelCandidateValidationDetail";
+import PersonnelCandidateValidations from "../pages/humanTalen/candidateValidation/PersonnelCandidateValidations";
 
 import UserSignature from "../pages/users/UserSignature";
 import PositionProfileRevisions from "../pages/positionManagement/PositionProfileRevisions";

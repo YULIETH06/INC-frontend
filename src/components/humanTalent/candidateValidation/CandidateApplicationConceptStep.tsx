@@ -13,7 +13,7 @@ import {
 import type {
     CandidateApplicationConceptForm,
     CandidateApplicationConceptFormErrors,
-} from "../../../interfaces/humanTalent/personnelCandidateValidation.interface";
+} from "../../../interfaces/humanTalent/candidateValidation/personnelCandidateValidation.interface";
 import SectionCard from "../../common/SectionCard";
 
 interface CandidateApplicationConceptStepProps {

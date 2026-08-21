@@ -6,7 +6,7 @@ import {
 
 import { useTheme } from "@mui/material/styles";
 
-import type { PersonnelRequisition } from "../../../interfaces/humanTalent/personnelRequisition.interface";
+import type { PersonnelRequisition } from "../../../interfaces/humanTalent/requisitions/personnelRequisition.interface";
 
 import { requisitionStatusOptions } from "../../../data/humanTalentOptions";
 

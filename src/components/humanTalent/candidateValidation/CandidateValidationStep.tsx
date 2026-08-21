@@ -18,7 +18,7 @@ import type {
     CandidateValidationFormErrors,
     CandidateValidationRequirementDescription,
     PersonnelCandidateValidationCandidate,
-} from "../../../interfaces/humanTalent/personnelCandidateValidation.interface";
+} from "../../../interfaces/humanTalent/candidateValidation/personnelCandidateValidation.interface";
 import CandidateRequirementValidationTable from "./CandidateRequirementValidationTable";
 
 interface CandidateValidationStepProps {

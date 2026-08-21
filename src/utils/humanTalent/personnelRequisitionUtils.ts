@@ -4,7 +4,7 @@ import type {
     PersonnelHiringConfirmationApproval,
     PersonnelRequisition,
     PersonnelRequisitionApproval,
-} from "../../interfaces/humanTalent/personnelRequisition.interface";
+} from "../../interfaces/humanTalent/requisitions/personnelRequisition.interface";
 
 import { formatMoney } from "../common/numberUtils";
 
