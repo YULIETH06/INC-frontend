@@ -7,6 +7,7 @@ import {
     Alert,
     Box,
     Stack,
+    TextField,
     Typography,
 } from "@mui/material";
 
@@ -16,6 +17,7 @@ import CustomChip from "../common/CustomChip";
 import CustomSnackbar from "../common/CustomSnackbar";
 import EmptyState from "../common/EmptyState";
 import LoadingBox from "../common/LoadingBox";
+import InfoTooltip from "../common/InfoTooltip";
 import SectionCard from "../common/SectionCard";
 
 import PersonnelRequisitionCandidateCard from "./PersonnelRequisitionCandidateCard";
@@ -32,17 +34,20 @@ import type {
 interface PersonnelRequisitionCandidatesSectionProps {
     requisitionId: number;
     candidateSubmissionStatus: CandidateSubmissionStatus;
+    candidateSubmissionDeadlineAt: string | null;
     candidateSubmissionClosedAt: string | null;
+    candidateSubmissionLateReason: string | null;
 }
 
 // Sección encargada de mostrar y gestionar los candidatos de una requisición.
 const PersonnelRequisitionCandidatesSection = ({
     requisitionId,
     candidateSubmissionStatus,
+    candidateSubmissionDeadlineAt,
     candidateSubmissionClosedAt,
+    candidateSubmissionLateReason,
 }: PersonnelRequisitionCandidatesSectionProps) => {
-
-    // Estado local del cargue para reflejar el cierre sin recargar la página.
+    // Estado local del cargue para reflejar los cambios sin recargar la página.
     const [
         currentSubmissionStatus,
         setCurrentSubmissionStatus,
@@ -50,7 +55,7 @@ const PersonnelRequisitionCandidatesSection = ({
         candidateSubmissionStatus
     );
 
-    // Fecha local de cierre devuelta por el backend.
+    // Fecha del primer cierre registrada por el backend.
     const [
         currentSubmissionClosedAt,
         setCurrentSubmissionClosedAt,
@@ -58,10 +63,36 @@ const PersonnelRequisitionCandidatesSection = ({
         candidateSubmissionClosedAt
     );
 
+    // Fecha límite original para realizar la presentación inicial.
+    const [
+        currentSubmissionDeadlineAt,
+        setCurrentSubmissionDeadlineAt,
+    ] = useState<string | null>(
+        candidateSubmissionDeadlineAt
+    );
+
+    // Justificación registrada cuando el primer cierre fue tardío.
+    const [
+        currentSubmissionLateReason,
+        setCurrentSubmissionLateReason,
+    ] = useState<string | null>(
+        candidateSubmissionLateReason
+    );
+
     const {
         candidates,
         isCandidateManager,
         identificationTypes,
+
+        submissionHistory,
+        loadingHistory,
+
+        lateReason,
+        lateReasonError,
+        reopenReason,
+        reopenReasonError,
+
+        isLateFirstClosure,
 
         form,
         formErrors,
@@ -89,7 +120,8 @@ const PersonnelRequisitionCandidatesSection = ({
         isEditing,
         hasFormChanges,
 
-        loadCandidates,
+        handleLateReasonChange,
+        handleReopenReasonChange,
 
         handleIdentificationTypeChange,
         handleIdentificationNumberChange,
@@ -115,13 +147,18 @@ const PersonnelRequisitionCandidatesSection = ({
 
         handleSubmitCandidate,
         closeMessage,
-        resetForm,
     } = usePersonnelRequisitionCandidates({
         requisitionId,
 
         enabled:
             currentSubmissionStatus !==
             "NO_INICIADA",
+
+        candidateSubmissionDeadlineAt:
+            currentSubmissionDeadlineAt,
+
+        candidateSubmissionClosedAt:
+            currentSubmissionClosedAt,
 
         onSubmissionClosed: (
             updatedRequisition
@@ -132,11 +169,35 @@ const PersonnelRequisitionCandidatesSection = ({
                     .candidateSubmissionStatus
             );
 
-            // Guarda la fecha real del cierre.
+            // Conserva la fecha correspondiente al primer cierre.
             setCurrentSubmissionClosedAt(
                 updatedRequisition
                     .candidateSubmissionClosedAt
             );
+
+            // Actualiza la fecha límite si viene en la respuesta.
+            if (
+                updatedRequisition
+                    .candidateSubmissionDeadlineAt !==
+                undefined
+            ) {
+                setCurrentSubmissionDeadlineAt(
+                    updatedRequisition
+                        .candidateSubmissionDeadlineAt
+                );
+            }
+
+            // Guarda la justificación cuando el primer cierre fue tardío.
+            if (
+                updatedRequisition
+                    .candidateSubmissionLateReason !==
+                undefined
+            ) {
+                setCurrentSubmissionLateReason(
+                    updatedRequisition
+                        .candidateSubmissionLateReason
+                );
+            }
         },
 
         onSubmissionReopened: (
@@ -148,7 +209,7 @@ const PersonnelRequisitionCandidatesSection = ({
                     .candidateSubmissionStatus
             );
 
-            // Al reabrir, la fecha de cierre vuelve a null.
+            // La reapertura conserva la fecha del primer cierre.
             setCurrentSubmissionClosedAt(
                 updatedRequisition
                     .candidateSubmissionClosedAt
@@ -162,14 +223,25 @@ const PersonnelRequisitionCandidatesSection = ({
             candidateSubmissionStatus
         );
 
+        setCurrentSubmissionDeadlineAt(
+            candidateSubmissionDeadlineAt
+        );
+
         setCurrentSubmissionClosedAt(
             candidateSubmissionClosedAt
         );
+
+        setCurrentSubmissionLateReason(
+            candidateSubmissionLateReason
+        );
     }, [
         candidateSubmissionStatus,
+        candidateSubmissionDeadlineAt,
         candidateSubmissionClosedAt,
+        candidateSubmissionLateReason,
     ]);
 
+    // Indica si el cargue se encuentra abierto.
     const isSubmissionOpen =
         currentSubmissionStatus === "ABIERTA";
 
@@ -177,12 +249,14 @@ const PersonnelRequisitionCandidatesSection = ({
     const isSubmissionClosed =
         currentSubmissionStatus === "CERRADA";
 
+    // Máximo permitido por requisición.
     const maximumCandidatesReached =
         candidates.length >= 10;
 
     const hasCandidates =
         candidates.length > 0;
 
+    // Permisos para registrar, editar, eliminar y cerrar.
     const canManageCandidates =
         isSubmissionOpen &&
         isCandidateManager &&
@@ -208,6 +282,41 @@ const PersonnelRequisitionCandidatesSection = ({
             <SectionCard
                 title="Candidatos"
                 subtitle="Hojas de vida registradas para la requisición."
+                titleAdornment={
+                    currentSubmissionDeadlineAt ? (
+                        <InfoTooltip
+                            title="Fecha límite de presentación"
+                            label="Ver fecha límite de presentación"
+                            side="bottom"
+                            align="start"
+                            size="sm"
+                        >
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    color: "text.secondary",
+                                    lineHeight: 1.6,
+                                }}
+                            >
+                                La fecha límite para realizar la
+                                presentación inicial de candidatos
+                                es{" "}
+                                <Box
+                                    component="span"
+                                    sx={{
+                                        color: "text.primary",
+                                        fontWeight: 700,
+                                    }}
+                                >
+                                    {formatDate(
+                                        currentSubmissionDeadlineAt
+                                    )}
+                                </Box>
+                                .
+                            </Typography>
+                        </InfoTooltip>
+                    ) : undefined
+                }
             >
                 <Stack spacing={2.5}>
                     {/* Estado, contador y acciones principales. */}
@@ -273,7 +382,8 @@ const PersonnelRequisitionCandidatesSection = ({
                                                     xs: "column",
                                                     sm: "row",
                                                 },
-                                                justifyContent: "flex-end",
+                                                justifyContent:
+                                                    "flex-end",
                                                 gap: 1,
                                             }}
                                         >
@@ -321,7 +431,9 @@ const PersonnelRequisitionCandidatesSection = ({
                                                     actionType="unlock"
                                                     tooltip="Reabrir cargue para realizar ajustes"
                                                     fullWidthOnMobile
-                                                    loading={loadingReopen}
+                                                    loading={
+                                                        loadingReopen
+                                                    }
                                                     loadingText="Reabriendo..."
                                                     onClick={
                                                         openReopenCandidatesDialog
@@ -335,29 +447,28 @@ const PersonnelRequisitionCandidatesSection = ({
                             </Box>
                         )}
 
-
-                    {/* Información de cierre visible únicamente para el Auxiliar. */}
-                    {!isSubmissionOpen &&
-                        isCandidateManager &&
-                        currentSubmissionClosedAt && (
-                            <Alert severity="info">
-                                El cargue de
-                                candidatos fue cerrado
-                                el{" "}
-                                {formatDate(
-                                    currentSubmissionClosedAt
-                                )}
-                                . Los candidatos se encuentran bloqueados para modificaciones. Si necesitas realizar ajustes, puedes reabrir el cargue.
-                            </Alert>
-                        )}
+                    {/* Justificación del retraso del primer cierre. */}
+                    {currentSubmissionLateReason && (
+                        <Alert severity="warning">
+                            <Box
+                                component="span"
+                                sx={{
+                                    fontWeight: 700,
+                                }}
+                            >
+                                Justificación del retraso:
+                            </Box>{" "}
+                            {currentSubmissionLateReason}
+                        </Alert>
+                    )}
 
                     {/* Aviso de límite máximo. */}
                     {maximumCandidatesReached &&
                         isSubmissionOpen && (
                             <Alert severity="warning">
-                                La requisición alcanzó
-                                el máximo permitido de
-                                cinco candidatos.
+                                La requisición alcanzó el
+                                máximo permitido de 10
+                                candidatos.
                             </Alert>
                         )}
 
@@ -373,9 +484,10 @@ const PersonnelRequisitionCandidatesSection = ({
                     {!loadingCandidates &&
                         isRestrictedWhileOpen && (
                             <Alert severity="info">
-                                El cargue de candidatos está siendo
-                                gestionado por Talento Humano. Las hojas
-                                de vida estarán disponibles cuando el
+                                El cargue de candidatos está
+                                siendo gestionado por Talento
+                                Humano. Las hojas de vida
+                                estarán disponibles cuando el
                                 proceso sea cerrado.
                             </Alert>
                         )}
@@ -409,8 +521,7 @@ const PersonnelRequisitionCandidatesSection = ({
                         candidates.length > 0 && (
                             <Box
                                 sx={{
-                                    display:
-                                        "grid",
+                                    display: "grid",
                                     gridTemplateColumns:
                                     {
                                         xs: "1fr",
@@ -420,9 +531,7 @@ const PersonnelRequisitionCandidatesSection = ({
                                 }}
                             >
                                 {candidates.map(
-                                    (
-                                        candidate
-                                    ) => (
+                                    (candidate) => (
                                         <PersonnelRequisitionCandidateCard
                                             key={
                                                 candidate.id
@@ -446,6 +555,94 @@ const PersonnelRequisitionCandidatesSection = ({
                         )}
                 </Stack>
             </SectionCard>
+
+            {/* Historial de reaperturas y cierres posteriores. */}
+            {!loadingHistory &&
+                submissionHistory.length > 0 && (
+                    <SectionCard
+                        title="Historial del cargue"
+                        subtitle="Movimientos realizados después de la presentación inicial."
+                    >
+                        <Stack spacing={1.5}>
+                            {submissionHistory.map(
+                                (historyItem) => (
+                                    <Box
+                                        key={historyItem.id}
+                                        sx={{
+                                            p: 1.5,
+                                            border: 1,
+                                            borderColor:
+                                                "divider",
+                                            borderRadius: 1,
+                                        }}
+                                    >
+                                        <Stack
+                                            direction={{
+                                                xs: "column",
+                                                sm: "row",
+                                            }}
+                                            spacing={1}
+                                            sx={{
+                                                alignItems: {
+                                                    xs: "flex-start",
+                                                    sm: "center",
+                                                },
+                                            }}
+                                        >
+                                            <CustomChip
+                                                label={
+                                                    historyItem.action ===
+                                                        "REAPERTURA"
+                                                        ? "Reapertura"
+                                                        : "Cierre"
+                                                }
+                                                color={
+                                                    historyItem.action ===
+                                                        "REAPERTURA"
+                                                        ? "warning"
+                                                        : "success"
+                                                }
+                                                variant="outlined"
+                                            />
+
+                                            <Typography variant="body2">
+                                                {formatDate(
+                                                    historyItem.performedAt
+                                                )}
+                                                {" · "}
+                                                {
+                                                    historyItem
+                                                        .performedBy
+                                                        .name
+                                                }
+                                            </Typography>
+                                        </Stack>
+
+                                        {historyItem.reason && (
+                                            <Typography
+                                                variant="body2"
+                                                color="text.secondary"
+                                                sx={{ mt: 1 }}
+                                            >
+                                                <Box
+                                                    component="span"
+                                                    sx={{
+                                                        fontWeight: 700,
+                                                    }}
+                                                >
+                                                    Motivo:
+                                                </Box>{" "}
+                                                {
+                                                    historyItem.reason
+                                                }
+                                            </Typography>
+                                        )}
+                                    </Box>
+                                )
+                            )}
+                        </Stack>
+                    </SectionCard>
+                )}
 
             {/* Formulario para crear o editar un candidato. */}
             <PersonnelRequisitionCandidateDialog
@@ -498,14 +695,11 @@ const PersonnelRequisitionCandidatesSection = ({
                         <Box
                             component="span"
                             sx={{
-                                color:
-                                    "text.primary",
+                                color: "text.primary",
                                 fontWeight: 700,
                             }}
                         >
-                            {candidateToDelete
-                                ?.name ??
-                                ""}
+                            {candidateToDelete?.name ?? ""}
                         </Box>
                         , junto con su hoja de vida
                         almacenada. Esta acción no se
@@ -528,16 +722,50 @@ const PersonnelRequisitionCandidatesSection = ({
             <ConfirmActionDialog
                 open={openCloseDialog}
                 title="Cerrar cargue de candidatos"
-                message="Después de cerrar el cargue no se podrán registrar, actualizar ni eliminar candidatos."
+                message={
+                    <Stack spacing={2}>
+                        <Typography variant="body2">
+                            Después de cerrar el cargue
+                            no se podrán registrar,
+                            actualizar ni eliminar
+                            candidatos.
+                        </Typography>
+
+                        {isLateFirstClosure && (
+                            <TextField
+                                label="Motivo del retraso"
+                                value={lateReason}
+                                onChange={(event) =>
+                                    handleLateReasonChange(
+                                        event.target.value
+                                    )
+                                }
+                                error={Boolean(
+                                    lateReasonError
+                                )}
+                                helperText={
+                                    lateReasonError ||
+                                    "Indica por qué la presentación inicial se realiza después del plazo establecido."
+                                }
+                                multiline
+                                minRows={3}
+                                fullWidth
+                                slotProps={{
+                                    htmlInput: {
+                                        maxLength: 500,
+                                    },
+                                }}
+                            />
+                        )}
+                    </Stack>
+                }
                 actionType="lock"
                 confirmText="Cerrar cargue"
                 loading={loadingClose}
                 loadingText="Cerrando..."
                 infoSeverity="warning"
                 infoContent={
-                    <Typography
-                        variant="body2"
-                    >
+                    <Typography variant="body2">
                         Actualmente existen{" "}
                         <Box
                             component="span"
@@ -562,20 +790,45 @@ const PersonnelRequisitionCandidatesSection = ({
             <ConfirmActionDialog
                 open={openReopenDialog}
                 title="Reabrir cargue de candidatos"
-                message="El cargue volverá a estar disponible para realizar ajustes en los candidatos registrados."
+                message={
+                    <Stack spacing={2}>
+                        <Typography variant="body2">
+                            El cargue volverá a estar
+                            disponible para realizar
+                            ajustes en los candidatos
+                            registrados.
+                        </Typography>
+
+                        <TextField
+                            label="Motivo de reapertura"
+                            value={reopenReason}
+                            onChange={(event) =>
+                                handleReopenReasonChange(
+                                    event.target.value
+                                )
+                            }
+                            error={Boolean(
+                                reopenReasonError
+                            )}
+                            helperText={
+                                reopenReasonError ||
+                                "Indica por qué es necesario reabrir el cargue."
+                            }
+                            multiline
+                            minRows={3}
+                            fullWidth
+                            slotProps={{
+                                htmlInput: {
+                                    maxLength: 500,
+                                },
+                            }}
+                        />
+                    </Stack>
+                }
                 actionType="unlock"
                 confirmText="Reabrir cargue"
                 loading={loadingReopen}
                 loadingText="Reabriendo..."
-                infoSeverity="info"
-                infoContent={
-                    <Typography variant="body2">
-                        Podrás registrar, editar o
-                        eliminar candidatos nuevamente
-                        mientras el cargue permanezca
-                        abierto.
-                    </Typography>
-                }
                 onClose={
                     closeReopenCandidatesDialog
                 }

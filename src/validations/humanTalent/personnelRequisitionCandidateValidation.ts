@@ -102,3 +102,30 @@ export const updatePersonnelRequisitionCandidateSchema =
         // Al editar puede conservarse la hoja de vida actual.
         file: candidateFileSchema,
     });
+
+// Validación del motivo de retraso en el primer cierre.
+export const closePersonnelRequisitionCandidatesSchema =
+    Yup.object({
+        lateReason: Yup.string()
+            .trim()
+            .max(500, "Máximo 500 caracteres.")
+            .test(
+                "minimumLength",
+                "Mínimo 3 caracteres.",
+                (value) => {
+                    if (!value) return true;
+
+                    return value.length >= 3;
+                }
+            ),
+    });
+
+// Validación del motivo requerido para reabrir el cargue.
+export const reopenPersonnelRequisitionCandidatesSchema =
+    Yup.object({
+        reason: Yup.string()
+            .trim()
+            .required("El motivo de reapertura es obligatorio.")
+            .min(3, "Mínimo 3 caracteres.")
+            .max(500, "Máximo 500 caracteres."),
+    });

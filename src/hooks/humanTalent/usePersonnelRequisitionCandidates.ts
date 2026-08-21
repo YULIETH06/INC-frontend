@@ -10,6 +10,7 @@ import {
     closePersonnelRequisitionCandidates,
     createPersonnelRequisitionCandidate,
     deletePersonnelRequisitionCandidate,
+    getPersonnelCandidateSubmissionHistory,
     getPersonnelRequisitionCandidates,
     reopenPersonnelRequisitionCandidates,
     updatePersonnelRequisitionCandidate,
@@ -20,7 +21,9 @@ import {
 } from "../../services/common/identificationTypeService";
 
 import {
+    closePersonnelRequisitionCandidatesSchema,
     createPersonnelRequisitionCandidateSchema,
+    reopenPersonnelRequisitionCandidatesSchema,
     updatePersonnelRequisitionCandidateSchema,
 } from "../../validations/humanTalent/personnelRequisitionCandidateValidation";
 
@@ -30,6 +33,7 @@ import type { MessageType } from "../../interfaces/common/message.interface";
 
 import type {
     CandidateSubmissionStatus,
+    PersonnelCandidateSubmissionHistory,
     PersonnelRequisitionCandidate,
     PersonnelRequisitionCandidateForm,
     PersonnelRequisitionCandidateFormErrors,
@@ -41,12 +45,16 @@ import type { IdentificationType } from "../../interfaces/common/identificationT
 interface CandidateSubmissionUpdate {
     candidateSubmissionStatus: CandidateSubmissionStatus;
     candidateSubmissionClosedAt: string | null;
+    candidateSubmissionDeadlineAt?: string | null;
+    candidateSubmissionLateReason?: string | null;
 }
 
 // Propiedades recibidas por el hook.
 interface UsePersonnelRequisitionCandidatesProps {
     requisitionId: number;
     enabled?: boolean;
+    candidateSubmissionDeadlineAt?: string | null;
+    candidateSubmissionClosedAt?: string | null;
     onSubmissionClosed?: (
         requisition: CandidateSubmissionUpdate
     ) => void | Promise<void>;
@@ -78,6 +86,8 @@ const initialFormErrors: PersonnelRequisitionCandidateFormErrors = {
 export const usePersonnelRequisitionCandidates = ({
     requisitionId,
     enabled = true,
+    candidateSubmissionDeadlineAt = null,
+    candidateSubmissionClosedAt = null,
     onSubmissionClosed,
     onSubmissionReopened,
 }: UsePersonnelRequisitionCandidatesProps) => {
@@ -135,6 +145,23 @@ export const usePersonnelRequisitionCandidates = ({
 
     // Controla la confirmación para reabrir el cargue.
     const [openReopenDialog, setOpenReopenDialog] =
+        useState(false);
+
+    // Motivo del retraso cuando el primer cierre está vencido.
+    const [lateReason, setLateReason] = useState("");
+    const [lateReasonError, setLateReasonError] =
+        useState("");
+
+    // Motivo obligatorio de reapertura.
+    const [reopenReason, setReopenReason] = useState("");
+    const [reopenReasonError, setReopenReasonError] =
+        useState("");
+
+    // Historial de reaperturas y cierres posteriores.
+    const [submissionHistory, setSubmissionHistory] =
+        useState<PersonnelCandidateSubmissionHistory[]>([]);
+
+    const [loadingHistory, setLoadingHistory] =
         useState(false);
 
     // Controla la carga del listado.
@@ -243,6 +270,34 @@ export const usePersonnelRequisitionCandidates = ({
             );
         } finally {
             setLoadingCandidates(false);
+        }
+    }, [enabled, requisitionId]);
+
+    // Consulta el historial del cargue de candidatos.
+    const loadSubmissionHistory = useCallback(async () => {
+        if (
+            !enabled ||
+            !Number.isInteger(requisitionId) ||
+            requisitionId <= 0
+        ) {
+            setSubmissionHistory([]);
+            return;
+        }
+
+        try {
+            setLoadingHistory(true);
+
+            const response =
+                await getPersonnelCandidateSubmissionHistory(
+                    requisitionId
+                );
+
+            setSubmissionHistory(response.history);
+        } catch (error: unknown) {
+            console.error(error);
+            setSubmissionHistory([]);
+        } finally {
+            setLoadingHistory(false);
         }
     }, [enabled, requisitionId]);
 
@@ -385,6 +440,8 @@ export const usePersonnelRequisitionCandidates = ({
 
     // Abre la confirmación para cerrar el cargue.
     const openCloseCandidatesDialog = () => {
+        setLateReason("");
+        setLateReasonError("");
         setOpenCloseDialog(true);
     };
 
@@ -399,6 +456,8 @@ export const usePersonnelRequisitionCandidates = ({
 
     // Abre la confirmación para reabrir el cargue.
     const openReopenCandidatesDialog = () => {
+        setReopenReason("");
+        setReopenReasonError("");
         setOpenReopenDialog(true);
     };
 
@@ -409,6 +468,31 @@ export const usePersonnelRequisitionCandidates = ({
         }
 
         setOpenReopenDialog(false);
+    };
+
+    // Determina si el primer cierre se está realizando fuera del plazo.
+    const deadlineTime = candidateSubmissionDeadlineAt
+        ? new Date(candidateSubmissionDeadlineAt).getTime()
+        : null;
+
+    // Es verdadero solo cuando aún no existe un primer cierre,
+    // hay una fecha límite válida y el plazo ya fue superado.
+    const isLateFirstClosure =
+        candidateSubmissionClosedAt === null &&
+        deadlineTime !== null &&
+        !Number.isNaN(deadlineTime) &&
+        Date.now() > deadlineTime;
+
+    // Actualiza el motivo del retraso.
+    const handleLateReasonChange = (value: string) => {
+        setLateReason(value);
+        setLateReasonError("");
+    };
+
+    // Actualiza el motivo de reapertura.
+    const handleReopenReasonChange = (value: string) => {
+        setReopenReason(value);
+        setReopenReasonError("");
     };
 
     // Cierra el mensaje visual.
@@ -607,17 +691,39 @@ export const usePersonnelRequisitionCandidates = ({
 
     // Cierra el proceso de cargue de candidatos.
     const handleCloseCandidates = async () => {
+        const cleanLateReason = lateReason.trim();
+
         try {
+            if (isLateFirstClosure && !cleanLateReason) {
+                setLateReasonError(
+                    "El motivo del retraso es obligatorio."
+                );
+                return;
+            }
+
+            await closePersonnelRequisitionCandidatesSchema.validate({
+                lateReason: cleanLateReason || undefined,
+            });
+
             setLoadingClose(true);
             setMessage("");
             setOpenMessage(false);
 
             const response =
                 await closePersonnelRequisitionCandidates(
-                    requisitionId
+                    requisitionId,
+                    cleanLateReason
+                        ? {
+                            lateReason: cleanLateReason,
+                        }
+                        : {}
                 );
 
             setOpenCloseDialog(false);
+            setLateReason("");
+            setLateReasonError("");
+
+            await loadSubmissionHistory();
 
             setMessage(
                 response.message ||
@@ -628,13 +734,16 @@ export const usePersonnelRequisitionCandidates = ({
             setOpenMessage(true);
 
             if (onSubmissionClosed) {
-                // Envía al componente el estado y la fecha
-                // de cierre devueltos por el backend.
                 await onSubmissionClosed(
                     response.requisition
                 );
             }
         } catch (error: unknown) {
+            if (error instanceof ValidationError) {
+                setLateReasonError(error.message);
+                return;
+            }
+
             console.error(error);
 
             setMessage(
@@ -653,17 +762,30 @@ export const usePersonnelRequisitionCandidates = ({
 
     // Reabre el proceso de cargue de candidatos.
     const handleReopenCandidates = async () => {
+        const cleanReason = reopenReason.trim();
+
         try {
+            await reopenPersonnelRequisitionCandidatesSchema.validate({
+                reason: cleanReason,
+            });
+
             setLoadingReopen(true);
             setMessage("");
             setOpenMessage(false);
 
             const response =
                 await reopenPersonnelRequisitionCandidates(
-                    requisitionId
+                    requisitionId,
+                    {
+                        reason: cleanReason,
+                    }
                 );
 
             setOpenReopenDialog(false);
+            setReopenReason("");
+            setReopenReasonError("");
+
+            await loadSubmissionHistory();
 
             setMessage(
                 response.message ||
@@ -674,13 +796,16 @@ export const usePersonnelRequisitionCandidates = ({
             setOpenMessage(true);
 
             if (onSubmissionReopened) {
-                // Envía al componente el nuevo estado del cargue
-                // y la fecha actualizada devueltos por el backend.
                 await onSubmissionReopened(
                     response.requisition
                 );
             }
         } catch (error: unknown) {
+            if (error instanceof ValidationError) {
+                setReopenReasonError(error.message);
+                return;
+            }
+
             console.error(error);
 
             setMessage(
@@ -726,10 +851,24 @@ export const usePersonnelRequisitionCandidates = ({
         loadCandidates();
     }, [loadCandidates]);
 
+    useEffect(() => {
+        loadSubmissionHistory();
+    }, [loadSubmissionHistory]);
+
     return {
         candidates,
         isCandidateManager,
         identificationTypes,
+
+        submissionHistory,
+        loadingHistory,
+
+        lateReason,
+        lateReasonError,
+        reopenReason,
+        reopenReasonError,
+
+        isLateFirstClosure,
 
         form,
         formErrors,
@@ -758,6 +897,7 @@ export const usePersonnelRequisitionCandidates = ({
         hasFormChanges,
 
         loadCandidates,
+        loadSubmissionHistory,
 
         handleIdentificationTypeChange,
         handleIdentificationNumberChange,
@@ -780,6 +920,9 @@ export const usePersonnelRequisitionCandidates = ({
         openReopenCandidatesDialog,
         closeReopenCandidatesDialog,
         handleReopenCandidates,
+
+        handleLateReasonChange,
+        handleReopenReasonChange,
 
         handleSubmitCandidate,
         closeMessage,

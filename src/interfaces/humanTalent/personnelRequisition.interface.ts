@@ -41,6 +41,11 @@ export type CandidateSubmissionStatus =
     | "ABIERTA"
     | "CERRADA";
 
+// Acciones registradas en el historial del cargue de candidatos.
+export type CandidateSubmissionHistoryAction =
+    | "REAPERTURA"
+    | "CIERRE";
+
 // Estados de la confirmación final de contratación.
 export type HiringConfirmationStatus =
     | "PENDIENTE_APROBACION"
@@ -230,7 +235,9 @@ export interface PersonnelRequisition {
     status: RequisitionStatus;
 
     candidateSubmissionStatus: CandidateSubmissionStatus;
+    candidateSubmissionDeadlineAt: string | null;
     candidateSubmissionClosedAt: string | null;
+    candidateSubmissionLateReason: string | null;
 
     createdById: number;
     createdBy?: RequisitionUser;
@@ -361,6 +368,36 @@ export interface PersonnelRequisitionCandidatesResponse {
     isCandidateManager: boolean;
 }
 
+// Movimiento registrado después del primer cierre del cargue.
+export interface PersonnelCandidateSubmissionHistory {
+    id: number;
+    requisitionId: number;
+
+    action: CandidateSubmissionHistoryAction;
+    reason: string | null;
+
+    performedById: number;
+    performedAt: string;
+
+    performedBy: RequisitionUser;
+}
+
+// Respuesta al consultar el historial del cargue de candidatos.
+export interface PersonnelCandidateSubmissionHistoryResponse {
+    message: string;
+    history: PersonnelCandidateSubmissionHistory[];
+}
+
+// Datos enviados para cerrar el cargue.
+export interface ClosePersonnelRequisitionCandidatesData {
+    lateReason?: string;
+}
+
+// Datos enviados para reabrir el cargue.
+export interface ReopenPersonnelRequisitionCandidatesData {
+    reason: string;
+}
+
 // Respuesta al cambiar el estado del cargue de candidatos.
 export interface PersonnelRequisitionCandidateSubmissionResponse {
     message: string;
@@ -373,9 +410,14 @@ export interface PersonnelRequisitionCandidateSubmissionResponse {
         // según la acción realizada sobre el cargue.
         candidateSubmissionStatus: CandidateSubmissionStatus;
 
-        // Contiene la fecha del cierre cuando está CERRADA
-        // y vuelve a null cuando el cargue se reabre.
+        // Conserva siempre la fecha del primer cierre.
         candidateSubmissionClosedAt: string | null;
+
+        // Se devuelve actualmente en la respuesta del cierre.
+        candidateSubmissionDeadlineAt?: string | null;
+
+        // Se devuelve actualmente en la respuesta del cierre.
+        candidateSubmissionLateReason?: string | null;
 
         updatedAt: string;
 

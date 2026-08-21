@@ -1,6 +1,9 @@
 import api from "../../api/axios";
 import type {
+    ClosePersonnelRequisitionCandidatesData,
+    PersonnelCandidateSubmissionHistoryResponse,
     PersonnelRequisitionCandidateSubmissionResponse,
+    ReopenPersonnelRequisitionCandidatesData,
     CreatePersonnelHiringConfirmationData,
     CreatePersonnelHiringConfirmationResponse,
     CreatePersonnelRequisitionData,
@@ -191,11 +194,13 @@ export const deletePersonnelRequisitionCandidate = async (
 
 // Cierra el proceso de cargue de candidatos.
 export const closePersonnelRequisitionCandidates = async (
-    requisitionId: number
+    requisitionId: number,
+    data: ClosePersonnelRequisitionCandidatesData = {}
 ): Promise<PersonnelRequisitionCandidateSubmissionResponse> => {
     const response =
         await api.patch<PersonnelRequisitionCandidateSubmissionResponse>(
-            `/human-talent/requisitions/${requisitionId}/candidates/close`
+            `/human-talent/requisitions/${requisitionId}/candidates/close`,
+            data
         );
 
     return response.data;
@@ -203,11 +208,25 @@ export const closePersonnelRequisitionCandidates = async (
 
 // Reabre el proceso de cargue de candidatos.
 export const reopenPersonnelRequisitionCandidates = async (
-    requisitionId: number
+    requisitionId: number,
+    data: ReopenPersonnelRequisitionCandidatesData
 ): Promise<PersonnelRequisitionCandidateSubmissionResponse> => {
     const response =
         await api.patch<PersonnelRequisitionCandidateSubmissionResponse>(
-            `/human-talent/requisitions/${requisitionId}/candidates/reopen`
+            `/human-talent/requisitions/${requisitionId}/candidates/reopen`,
+            data
+        );
+
+    return response.data;
+};
+
+// Obtiene el historial de reaperturas y cierres posteriores del cargue.
+export const getPersonnelCandidateSubmissionHistory = async (
+    requisitionId: number
+): Promise<PersonnelCandidateSubmissionHistoryResponse> => {
+    const response =
+        await api.get<PersonnelCandidateSubmissionHistoryResponse>(
+            `/human-talent/requisitions/${requisitionId}/candidates/history`
         );
 
     return response.data;

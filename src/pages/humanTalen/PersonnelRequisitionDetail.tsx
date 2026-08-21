@@ -137,12 +137,14 @@ const PersonnelRequisitionDetail = () => {
                             onClick={
                                 handleRequisitions
                             }
-                        />
+                        >
+                            Volver
+                        </ActionButton>
 
                         <ActionButton
                             actionType="view"
                             tooltip="Generar formato"
-                            fullWidthOnMobile
+                            iconOnlyOnMobile
                             onClick={handlePrint}
                         >
                             Ver formato imprimible
@@ -426,8 +428,14 @@ const PersonnelRequisitionDetail = () => {
                             candidateSubmissionStatus={
                                 requisition.candidateSubmissionStatus
                             }
+                            candidateSubmissionDeadlineAt={
+                                requisition.candidateSubmissionDeadlineAt
+                            }
                             candidateSubmissionClosedAt={
                                 requisition.candidateSubmissionClosedAt
+                            }
+                            candidateSubmissionLateReason={
+                                requisition.candidateSubmissionLateReason
                             }
                         />
                     )}

@@ -172,26 +172,26 @@ export const menuItems = [
           },
         ],
       },
-      {
-        name: "Validación de postulantes",
-        roles: ["ADMIN", "USER"],
-        positionCodes: [
-          "DPC-TH-0003", // Jefe de Talento Humano
-          "DPC-TH-0080", // Auxiliar de Talento Humano
-        ],
+      // {
+      //   name: "Validación de postulantes",
+      //   roles: ["ADMIN", "USER"],
+      //   positionCodes: [
+      //     "DPC-TH-0003", // Jefe de Talento Humano
+      //     "DPC-TH-0080", // Auxiliar de Talento Humano
+      //   ],
 
-        options: [
-          {
-            label: "Validación de cargo y postulante",
-            path: "/dashboard/human-talent/candidate-validations",
-            roles: ["ADMIN", "USER"],
-            positionCodes: [
-              "DPC-TH-0003", // Jefe de Talento Humano
-              "DPC-TH-0080", // Auxiliar de Talento Humano
-            ],
-          },
-        ],
-      },
+      //   options: [
+      //     {
+      //       label: "Validación de cargo y postulante",
+      //       path: "/dashboard/human-talent/candidate-validations",
+      //       roles: ["ADMIN", "USER"],
+      //       positionCodes: [
+      //         "DPC-TH-0003", // Jefe de Talento Humano
+      //         "DPC-TH-0080", // Auxiliar de Talento Humano
+      //       ],
+      //     },
+      //   ],
+      // },
     ],
   },
 

@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import CloseIcon from "@mui/icons-material/Close";
 
 import { useTheme } from "@mui/material/styles";
 
@@ -73,8 +74,8 @@ const InfoTooltip = ({
 
     const [open, setOpen] = useState(false);
 
-    // Convierte las propiedades side y align al formato
-    // utilizado por el componente Popper de Material UI.
+    // Convierte side y align al formato
+    // utilizado por Popper de Material UI.
     const placement = useMemo<PopperPlacementType>(() => {
         if (align === "center") {
             return side;
@@ -86,23 +87,32 @@ const InfoTooltip = ({
     const iconButtonSize = size === "sm" ? 28 : 34;
     const iconSize = size === "sm" ? 18 : 21;
 
+    // Abre o cierra el panel informativo.
     const handleToggle = () => {
         setOpen((previousOpen) => !previousOpen);
     };
 
+    // Cierra el panel.
     const handleClose = () => {
         setOpen(false);
     };
 
-    // Cierra el panel con Escape y devuelve el foco
-    // al botón que abrió la información.
+    // Cierra el panel con Escape y devuelve
+    // el foco al botón que lo abrió.
     useEffect(() => {
         if (!open) return;
 
-        const handleEscape = (event: KeyboardEvent) => {
-            if (event.key !== "Escape") return;
+        const handleEscape = (
+            event: KeyboardEvent
+        ) => {
+            if (
+                event.key !== "Escape"
+            ) {
+                return;
+            }
 
             setOpen(false);
+
             anchorRef.current?.focus();
         };
 
@@ -127,90 +137,122 @@ const InfoTooltip = ({
                 alignItems: "center",
             }}
         >
+            {/* Botón que abre la información. */}
             <IconButton
                 ref={anchorRef}
                 type="button"
                 size="small"
                 aria-label={label}
                 aria-expanded={open}
-                aria-controls={open ? panelId : undefined}
+                aria-controls={
+                    open
+                        ? panelId
+                        : undefined
+                }
                 aria-haspopup="dialog"
                 onClick={handleToggle}
                 sx={{
-                    width: iconButtonSize,
-                    height: iconButtonSize,
-                    color: "text.secondary",
-                    backgroundColor: "action.hover",
-                    border: "1px solid",
-                    borderColor: "divider",
-                    transition: theme.transitions.create(
-                        [
-                            "color",
-                            "background-color",
-                            "border-color",
-                            "transform",
-                        ],
-                        {
-                            duration:
-                                theme.transitions.duration.shorter,
-                        }
-                    ),
+                    width:
+                        iconButtonSize,
+                    height:
+                        iconButtonSize,
+
+                    color: open
+                        ? "primary.main"
+                        : "text.secondary",
+
+                    backgroundColor: open
+                        ? "primary.50"
+                        : "transparent",
+
+                    borderRadius: "50%",
+
+                    transition:
+                        theme.transitions.create(
+                            [
+                                "color",
+                                "background-color",
+                                "transform",
+                            ],
+                            {
+                                duration:
+                                    theme
+                                        .transitions
+                                        .duration
+                                        .shorter,
+                            }
+                        ),
 
                     "&:hover": {
-                        color: "primary.main",
-                        backgroundColor: "primary.50",
-                        borderColor: "primary.main",
-                        transform: "translateY(-1px)",
+                        color:
+                            "primary.main",
+                        backgroundColor:
+                            "primary.50",
+                        transform:
+                            "scale(1.06)",
                     },
 
-                    "&.Mui-focusVisible": {
-                        color: "primary.main",
-                        borderColor: "primary.main",
-                        outline: `3px solid ${theme.palette.primary.main}33`,
+                    "&.Mui-focusVisible":
+                    {
+                        color:
+                            "primary.main",
+                        backgroundColor:
+                            "primary.50",
+                        outline: `3px solid ${theme.palette.primary.main}26`,
                         outlineOffset: 2,
                     },
                 }}
             >
                 <InfoOutlinedIcon
                     sx={{
-                        fontSize: iconSize,
+                        fontSize:
+                            iconSize,
                     }}
                 />
             </IconButton>
 
+            {/* Panel flotante. */}
             <Popper
                 open={open}
-                anchorEl={anchorRef.current}
+                anchorEl={
+                    anchorRef.current
+                }
                 placement={placement}
                 transition
                 modifiers={[
                     {
                         name: "offset",
                         options: {
-                            offset: [0, 10],
+                            offset: [
+                                0,
+                                10,
+                            ],
                         },
                     },
                     {
                         name: "arrow",
                         enabled: true,
                         options: {
-                            element: arrowElement,
+                            element:
+                                arrowElement,
                         },
                     },
                     {
                         name: "flip",
                         enabled: true,
                         options: {
-                            fallbackPlacements: [
-                                "top",
-                                "bottom",
-                                "right",
-                                "left",
-                            ],
+                            fallbackPlacements:
+                                [
+                                    "top",
+                                    "bottom",
+                                    "right",
+                                    "left",
+                                ],
                         },
                     },
                     {
-                        name: "preventOverflow",
+                        name:
+                            "preventOverflow",
                         enabled: true,
                         options: {
                             padding: 12,
@@ -218,25 +260,33 @@ const InfoTooltip = ({
                     },
                 ]}
                 sx={{
-                    zIndex: theme.zIndex.tooltip,
+                    zIndex:
+                        theme.zIndex
+                            .tooltip,
                 }}
             >
-                {({ TransitionProps }) => (
+                {({
+                    TransitionProps,
+                }) => (
                     <Fade
                         {...TransitionProps}
                         timeout={160}
                     >
                         <Box
                             sx={{
-                                position: "relative",
+                                position:
+                                    "relative",
 
                                 "&[data-popper-placement^='bottom'] .InfoTooltip-arrow":
                                 {
                                     top: -5,
 
-                                    "&::before": {
-                                        borderRight: 0,
-                                        borderBottom: 0,
+                                    "&::before":
+                                    {
+                                        borderRight:
+                                            0,
+                                        borderBottom:
+                                            0,
                                     },
                                 },
 
@@ -244,9 +294,12 @@ const InfoTooltip = ({
                                 {
                                     bottom: -5,
 
-                                    "&::before": {
-                                        borderLeft: 0,
-                                        borderTop: 0,
+                                    "&::before":
+                                    {
+                                        borderLeft:
+                                            0,
+                                        borderTop:
+                                            0,
                                     },
                                 },
 
@@ -254,9 +307,12 @@ const InfoTooltip = ({
                                 {
                                     left: -5,
 
-                                    "&::before": {
-                                        borderRight: 0,
-                                        borderTop: 0,
+                                    "&::before":
+                                    {
+                                        borderRight:
+                                            0,
+                                        borderTop:
+                                            0,
                                     },
                                 },
 
@@ -264,44 +320,60 @@ const InfoTooltip = ({
                                 {
                                     right: -5,
 
-                                    "&::before": {
-                                        borderLeft: 0,
-                                        borderBottom: 0,
+                                    "&::before":
+                                    {
+                                        borderLeft:
+                                            0,
+                                        borderBottom:
+                                            0,
                                     },
                                 },
                             }}
                         >
+                            {/* Flecha que conecta el panel con el botón. */}
                             <Box
-                                ref={setArrowElement}
+                                ref={
+                                    setArrowElement
+                                }
                                 component="span"
                                 className="InfoTooltip-arrow"
                                 sx={{
-                                    position: "absolute",
+                                    position:
+                                        "absolute",
                                     width: 10,
                                     height: 10,
 
-                                    "&::before": {
-                                        content: '""',
-                                        display: "block",
+                                    "&::before":
+                                    {
+                                        content:
+                                            '""',
+                                        display:
+                                            "block",
                                         width: 10,
                                         height: 10,
                                         backgroundColor:
                                             "background.paper",
-                                        border: "1px solid",
-                                        borderColor: "divider",
-                                        transform: "rotate(45deg)",
-                                        boxSizing: "border-box",
+                                        border:
+                                            "1px solid",
+                                        borderColor:
+                                            "divider",
+                                        transform:
+                                            "rotate(45deg)",
+                                        boxSizing:
+                                            "border-box",
                                     },
                                 }}
                             />
 
                             <ClickAwayListener
-                                onClickAway={(event) => {
+                                onClickAway={(
+                                    event
+                                ) => {
                                     const clickedElement =
                                         event.target as Node;
 
-                                    // Evita que ClickAway cierre el panel
-                                    // antes de que el botón pueda alternarlo.
+                                    // Evita que el clic en el botón
+                                    // cierre el panel antes de alternarlo.
                                     if (
                                         anchorRef.current?.contains(
                                             clickedElement
@@ -314,7 +386,9 @@ const InfoTooltip = ({
                                 }}
                             >
                                 <Paper
-                                    id={panelId}
+                                    id={
+                                        panelId
+                                    }
                                     role="dialog"
                                     aria-modal="false"
                                     aria-labelledby={
@@ -322,53 +396,134 @@ const InfoTooltip = ({
                                             ? titleId
                                             : undefined
                                     }
-                                    elevation={0}
+                                    elevation={
+                                        0
+                                    }
                                     sx={{
-                                        width: "max-content",
-                                        minWidth: 220,
-                                        maxWidth: {
+                                        width:
+                                            "max-content",
+                                        minWidth:
+                                            260,
+                                        maxWidth:
+                                        {
                                             xs: "calc(100vw - 32px)",
-                                            sm: 340,
+                                            sm: 360,
                                         },
-                                        p: 1.8,
-                                        border: "1px solid",
-                                        borderColor: "divider",
-                                        borderRadius: 2.5,
+
+                                        overflow:
+                                            "hidden",
+
+                                        border:
+                                            "1px solid",
+                                        borderColor:
+                                            "divider",
+
+                                        borderRadius:
+                                            2,
+
                                         backgroundColor:
                                             "background.paper",
+
                                         boxShadow:
-                                            theme.shadows[6],
+                                            "0 8px 28px rgba(15, 23, 42, 0.14)",
                                     }}
                                 >
+                                    {/* Encabezado del panel. */}
                                     {title && (
-                                        <Typography
-                                            id={titleId}
-                                            variant="subtitle2"
+                                        <Box
                                             sx={{
-                                                mb: 0.8,
-                                                color: "text.primary",
-                                                fontWeight: 700,
+                                                display:
+                                                    "flex",
+                                                alignItems:
+                                                    "center",
+                                                justifyContent:
+                                                    "space-between",
+                                                gap: 1.5,
+
+                                                px: 2,
+                                                py: 1.4,
+
+                                                borderBottom:
+                                                    "1px solid",
+                                                borderColor:
+                                                    "divider",
                                             }}
                                         >
-                                            {title}
-                                        </Typography>
+                                            <Typography
+                                                id={titleId}
+                                                variant="subtitle2"
+                                                sx={{
+                                                    color: "text.primary",
+                                                    fontWeight: 700,
+                                                }}
+                                            >
+                                                {title}
+                                            </Typography>
+
+                                            <IconButton
+                                                type="button"
+                                                size="small"
+                                                aria-label="Cerrar información"
+                                                onClick={
+                                                    handleClose
+                                                }
+                                                sx={{
+                                                    width:
+                                                        28,
+                                                    height:
+                                                        28,
+                                                    flexShrink:
+                                                        0,
+                                                    color:
+                                                        "text.secondary",
+
+                                                    "&:hover":
+                                                    {
+                                                        color:
+                                                            "text.primary",
+                                                        backgroundColor:
+                                                            "action.hover",
+                                                    },
+                                                }}
+                                            >
+                                                <CloseIcon
+                                                    sx={{
+                                                        fontSize:
+                                                            18,
+                                                    }}
+                                                />
+                                            </IconButton>
+                                        </Box>
                                     )}
 
+                                    {/* Contenido informativo. */}
                                     <Box
                                         sx={{
-                                            color: "text.secondary",
+                                            px: 2,
+                                            py: 1.7,
 
-                                            "& p": {
-                                                margin: 0,
+                                            color:
+                                                "text.secondary",
+
+                                            backgroundColor:
+                                                "background.paper",
+
+                                            "& p":
+                                            {
+                                                margin:
+                                                    0,
                                             },
 
-                                            "& ul, & ol": {
+                                            "& ul, & ol":
+                                            {
                                                 my: 0.5,
                                                 pl: 2.5,
                                             },
                                         }}
                                     >
-                                        {children}
+                                        {
+                                            children
+                                        }
                                     </Box>
                                 </Paper>
                             </ClickAwayListener>

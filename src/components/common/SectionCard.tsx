@@ -10,6 +10,7 @@ interface SectionCardProps {
     title?: string;
     subtitle?: string;
     actions?: ReactNode;
+    titleAdornment?: ReactNode;
     children: ReactNode;
 }
 
@@ -17,12 +18,14 @@ const SectionCard = ({
     title,
     subtitle,
     actions,
+    titleAdornment,
     children,
 }: SectionCardProps) => {
     const hasHeader =
         Boolean(title) ||
         Boolean(subtitle) ||
-        Boolean(actions);
+        Boolean(actions) ||
+        Boolean(titleAdornment);
 
     return (
         <Paper
@@ -50,26 +53,48 @@ const SectionCard = ({
                         gap: 2,
                     }}
                 >
-                    <Box>
-                        {title && (
-                            <Typography
-                                variant="h6"
-                                sx={{
-                                    fontWeight: 700,
-                                }}
-                            >
-                                {title}
-                            </Typography>
-                        )}
+                    <Box
+                        sx={{
+                            minWidth: 0,
+                        }}
+                    >
+                        {(title ||
+                            titleAdornment) && (
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        alignItems:
+                                            "center",
+                                        gap: 1,
+                                        flexWrap:
+                                            "wrap",
+                                    }}
+                                >
+                                    {title && (
+                                        <Typography
+                                            variant="h6"
+                                            sx={{
+                                                fontWeight: 700,
+                                            }}
+                                        >
+                                            {title}
+                                        </Typography>
+                                    )}
+
+                                    {titleAdornment}
+                                </Box>
+                            )}
 
                         {subtitle && (
                             <Typography
                                 variant="body2"
                                 color="text.secondary"
                                 sx={{
-                                    mt: title
-                                        ? 0.5
-                                        : 0,
+                                    mt:
+                                        title ||
+                                            titleAdornment
+                                            ? 0.5
+                                            : 0,
                                 }}
                             >
                                 {subtitle}
