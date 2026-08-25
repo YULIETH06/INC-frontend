@@ -23,6 +23,7 @@ src/
 ├── context/
 ├── data/
 ├── hooks/
+├── icons/
 ├── interfaces/
 ├── pages/
 ├── routes/
@@ -134,6 +135,7 @@ components/
 │   ├── Header.tsx
 │   ├── InfoItem.tsx
 │   ├── InfoTooltip.tsx
+│   ├── IconActionButton.tsx
 │   ├── LoadingBox.tsx
 │   ├── NotificationBell.tsx
 │   ├── PageContainer.tsx
@@ -207,7 +209,7 @@ Estos componentes no pertenecen exclusivamente a un módulo, por lo tanto, puede
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `BulkUploadDialog.tsx`    | Componente reutilizable para mostrar un modal de carga masiva de archivos. Permite seleccionar o cargar archivos, mostrar información del proceso y ejecutar acciones relacionadas con importaciones.                                                                                                                                                                                                                                                                                                                                                                      | Puede utilizarse en usuarios, PQR, reportes u otros módulos que requieran carga masiva de datos.                                                                                                       |
 | `ClearableSelect.tsx`     | Componente reutilizable de selección que permite escoger una opción y también limpiar el valor seleccionado.                                                                                                                                                                                                                                                                                                                                                                                                                                                               | Puede utilizarse en filtros, formularios, búsquedas avanzadas o selección de estados, roles y tipos de PQR.                                                                                            |
-| `ActionButton.tsx`        | Componente reutilizable para representar las acciones principales del sistema mediante botones con estilos, íconos y comportamientos consistentes. Permite configurar acciones como guardar, editar, aprobar, rechazar, cancelar, eliminar, visualizar, abrir archivos, cargar archivos, cerrar. También controla estados de carga, texto de ayuda, reemplazo de íconos y adaptación para dispositivos móviles. | Puede utilizarse en formularios, listados, páginas de detalle, diálogos, cargas de archivos y procesos de cualquier módulo.                                         |
+| `ActionButton.tsx`        | Componente reutilizable para representar las acciones principales del sistema mediante botones con estilos, íconos y comportamientos consistentes. Obtiene los íconos predeterminados desde el catálogo central `appIcons.ts`, manteniendo una representación uniforme para acciones como guardar, editar, aprobar, rechazar, cancelar, eliminar, visualizar, abrir, crear, cerrar o reabrir. También controla estados de carga, texto de ayuda y adaptación para dispositivos móviles. | Puede utilizarse en formularios, listados, páginas de detalle, diálogos, cargas de archivos y procesos de cualquier módulo. |
 | `ConfirmActionDialog.tsx` | Componente reutilizable que muestra un diálogo de confirmación antes de ejecutar una acción importante. Permite recibir mensajes de texto o contenido React, información adicional mediante alertas configurables, tipos de acción como eliminar, cerrar o reabrir, texto personalizado durante la carga y botones consistentes mediante `ActionButton`.                                                     | Puede utilizarse para aprobar, rechazar, cancelar, eliminar, guardar, cerrar, reabrir o confirmar acciones dentro de Talento Humano, PQR, usuarios y otros módulos.                           |
 | `CustomAccordion.tsx`    | Componente reutilizable basado en `Accordion` de Material UI. Permite mostrar contenido expandible mediante un título, un indicador visual opcional y contenido personalizado recibido mediante `children`. Cada instancia administra de manera independiente su estado de expansión, por lo que varios elementos pueden permanecer abiertos al mismo tiempo. | Puede utilizarse en historiales, detalles agrupados, configuraciones, reportes u otros módulos que necesiten organizar información desplegable sin ocupar espacio permanente en la interfaz. |
 | `CustomChip.tsx`          | Componente reutilizable basado en `Chip` de Material UI. Permite mostrar etiquetas, estados o categorías utilizando colores estándar del tema o colores personalizados mediante propiedades como `customColor`, `backgroundColor`, `textColor` y `borderColor`. Conserva además propiedades como tamaño, variante, ícono, eliminación y estilos adicionales.                                                                                                                                                                                                               | Puede utilizarse para mostrar estados de requisiciones, PQR, préstamos, usuarios, roles, prioridades, categorías o cualquier valor que necesite una identificación visual compacta.                    |
@@ -219,6 +221,7 @@ Estos componentes no pertenecen exclusivamente a un módulo, por lo tanto, puede
 | `Header.tsx`              | Componente reutilizable que representa el encabezado superior de las vistas protegidas. Permite controlar la apertura del menú lateral y mostrar elementos globales como la información del usuario autenticado, las notificaciones y el menú de configuración.                                                                                                                                                                                                                                                                                                            | Se utiliza dentro de `DashboardLayout.tsx` para mantener un encabezado consistente en las páginas internas del sistema.                                                                                |
 | `InfoItem.tsx`            | Componente reutilizable para mostrar un dato compuesto por una etiqueta y un valor. Solo se renderiza cuando el valor contiene información y admite texto, componentes, íconos, enlaces o cualquier otro elemento de React.                                                                                                                                                                                                                                                                                                                                                | Puede utilizarse en páginas de detalle de requisiciones, usuarios, préstamos, PQR, reportes y otros módulos que necesiten presentar información en formato etiqueta-valor.                             |
 | `InfoTooltip.tsx`         | Componente reutilizable para mostrar información adicional dentro de un panel flotante. Utiliza un botón con ícono informativo y permite configurar título, contenido, posición, alineación, tamaño y etiqueta accesible. Se abre mediante clic o teclado y se cierra al hacer clic afuera, presionar Escape o volver a seleccionar el botón.                                                                                                                                                                                                                              | Puede utilizarse para mostrar motivos de rechazo, explicaciones de campos, ayudas contextuales, aclaraciones, instrucciones o información complementaria sin ocupar espacio permanente en la interfaz. |
+| `IconActionButton.tsx`    | Componente reutilizable para representar acciones secundarias o compactas mediante un botón de ícono. Recibe el nombre semántico del ícono, lo obtiene desde `appIcons.ts` y permite mostrar tooltip, estado de carga, estado activo y deshabilitado. | Puede utilizarse para acciones compactas como consultar historiales, visualizar información, actualizar o ejecutar acciones secundarias sin recargar visualmente la interfaz. |
 | `LoadingBox.tsx`          | Componente reutilizable para mostrar un indicador de carga centrado. Permite configurar la altura mínima del contenedor y el tamaño del indicador según el espacio disponible.                                                                                                                                                                                                                                                                                                                                                                                             | Puede utilizarse en tablas, formularios, secciones, vistas de detalle o cualquier módulo que cargue datos.                                                                                             |
 | `NotificationBell.tsx`    | Componente reutilizable que muestra la campana de notificaciones, el contador de notificaciones no leídas y el listado de notificaciones del usuario autenticado.                                                                                                                                                                                                                                                                                                                                                                                                          | Se utiliza dentro de `Header.tsx` para mostrar novedades de módulos como PQR y Talento Humano.                                                                                                         |
 | `PageContainer.tsx`       | Componente reutilizable que sirve como contenedor general para organizar el contenido de una página. Ayuda a mantener márgenes, espaciados y estructura visual consistente.                                                                                                                                                                                                                                                                                                                                                                                                | Puede utilizarse en páginas como usuarios, PQR, dashboard, reportes y demás vistas internas.                                                                                                           |
@@ -261,7 +264,7 @@ Estos componentes dependen directamente de las requisiciones de personal, sus ap
 | `PersonnelCandidateSubmissionHistorySection.tsx` | Sección visual encargada de mostrar los movimientos posteriores a la presentación inicial del cargue. Presenta las acciones `REAPERTURA` y `CIERRE`, la fecha, el usuario responsable y el motivo cuando existe. No renderiza contenido mientras se está cargando o cuando no hay movimientos registrados. | Se utiliza desde `PersonnelRequisitionCandidatesSection.tsx` para mostrar la trazabilidad operativa posterior al primer cierre. |
 | `PersonnelRequisitionCandidateCard.tsx`     | Componente encargado de mostrar la información de un candidato registrado. Presenta nombre, identificación, fecha, observación, hoja de vida, tamaño del archivo y usuario que realizó el cargue. También muestra el estado temporal **Elegido** antes de confirmar una preselección y el estado permanente **Preseleccionado**, incluyendo usuario y fecha de preselección. Mantiene las acciones de editar y eliminar durante un cargue abierto cuando el usuario tiene permiso, y muestra **Seleccionar** o **Quitar** al creador de la requisición durante la etapa de preselección. | Se utiliza dentro de la sección de candidatos en el detalle de una requisición. |
 | `PersonnelRequisitionCandidateDialog.tsx`   | Diálogo utilizado para registrar o actualizar candidatos. Permite seleccionar el tipo de identificación, diligenciar el número de identificación, nombre, observación opcional y seleccionar o reemplazar la hoja de vida. Muestra errores de validación, archivo actual o seleccionado y estados de carga. | Se utiliza desde la sección de candidatos cuando el cargue se encuentra abierto y el usuario tiene permiso para gestionarlo. |
-| `PersonnelRequisitionCandidatesSection.tsx` | Componente coordinador del proceso de candidatos de una requisición. Consulta y presenta candidatos, administra el estado visual del cargue y coordina permisos, cierre, reapertura, selección temporal, confirmación de preselección y acceso al historial de cargues. Reutiliza `PersonnelRequisitionCandidateCard`, `PersonnelRequisitionCandidateDialog`, `PersonnelCandidateSubmissionHistorySection`, `PersonnelCandidateSubmissionBatchesDialog`, `ConfirmActionDialog`, `ActionButton` y otros componentes comunes. | Se integra en `PersonnelRequisitionDetail.tsx` cuando el proceso de candidatos ya fue iniciado y actúa como coordinador visual del cargue, la preselección y la trazabilidad. |
+| `PersonnelRequisitionCandidatesSection.tsx` | Componente coordinador del proceso de candidatos de una requisición. Consulta y presenta candidatos, administra el estado visual del cargue y coordina permisos, cierre, reapertura, selección temporal, confirmación de preselección y acceso al historial de cargues. Reutiliza `PersonnelRequisitionCandidateCard`, `PersonnelRequisitionCandidateDialog`, `PersonnelCandidateSubmissionHistorySection`, `PersonnelCandidateSubmissionBatchesDialog`, `ConfirmActionDialog`, `ActionButton`, `IconActionButton` y otros componentes comunes. | Se integra en `PersonnelRequisitionDetail.tsx` cuando el proceso de candidatos ya fue iniciado y actúa como coordinador visual del cargue, la preselección y la trazabilidad. |
 | `PersonnelRequisitionListItem.tsx`          | Componente encargado de mostrar una requisición en formato de tarjeta o elemento de lista. Presenta cargo, estado, área, ciudad, salario, tipo de contratación, fecha, solicitante, responsable actual y acciones disponibles según los permisos del usuario.                                                                                                                                                                                                                                                                                                                                                                                        | Se utiliza en el listado general de requisiciones para consultar, aprobar, rechazar, confirmar contratación o ingresar al detalle.       |
 | `PersonnelRequisitionStatusBadge.tsx`       | Componente encargado de mostrar el estado general de una requisición mediante un `CustomChip`. Cuando el estado es rechazado o cancelado y existe un comentario, muestra también un `InfoTooltip` con el motivo correspondiente.                                                                                                                                                                                                                                                                                                                                                                                                                     | Se utiliza junto al título de la página de detalle para identificar rápidamente el estado general de la requisición.                     |
 
@@ -425,6 +428,7 @@ Estos componentes no se ubican en `components/common/` porque su uso está relac
 Si el componente puede usarse en varias vistas, debe ir en components/common.
 Si el componente solo pertenece a un módulo específico, debe ir en components/nombreModulo.
 Si el componente define la estructura visual general de una página, debe ir en components/layouts.
+Los íconos asociados con acciones comunes deben obtenerse desde el catálogo central ubicado en icons/appIcons.ts.
 ```
 
 Esta organización permite que el proyecto sea más limpio, escalable y fácil de mantener, ya que cada componente tiene una responsabilidad clara y una ubicación lógica dentro de la estructura del frontend.
@@ -773,6 +777,61 @@ hooks/users/
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `useAdminUsers.ts`    | Maneja la lógica relacionada con la administración de usuarios. Controla la consulta de usuarios, cambio de roles, selección de archivos para carga masiva, procesamiento de resultados y mensajes de respuesta.                                             | Se utiliza en la página de administración de usuarios.                                                                                               |
 | `useUserSignature.ts` | Maneja la lógica relacionada con el registro o actualización de la firma del usuario autenticado. Controla la selección del archivo, validación de formato, vista previa, estado de carga, envío mediante `multipart/form-data` y mensajes de éxito o error. | Se utiliza en `UserSignatureUploader.tsx` para permitir que el usuario configure la firma que será utilizada en aprobaciones y formatos del sistema. |
+
+---
+
+### `src/icons/`
+
+Esta carpeta centraliza los íconos utilizados para representar acciones comunes del sistema.
+
+Su objetivo es evitar que los componentes dependan directamente de un ícono específico de Material UI. De esta forma, si en el futuro se desea cambiar la representación visual de una acción, el cambio puede realizarse desde un único archivo.
+
+#### Estructura
+
+```txt
+icons/
+└── appIcons.ts
+```
+
+#### `appIcons.ts`
+
+El archivo `appIcons.ts` contiene el catálogo central de íconos asociados con acciones comunes del sistema.
+
+```txt
+save
+edit
+cancel
+approve
+reject
+delete
+view
+open
+create
+send
+clear
+back
+print
+file
+upload
+lock
+unlock
+history
+```
+
+También define el tipo `AppIconName`, utilizado para limitar los nombres de íconos permitidos en los componentes que consumen este catálogo.
+
+| Archivo | Descripción | Uso dentro del proyecto |
+| ------- | ----------- | ----------------------- |
+| `appIcons.ts` | Centraliza la relación entre cada acción semántica del sistema y el ícono que la representa. | Se utiliza principalmente desde componentes reutilizables como `ActionButton.tsx` e `IconActionButton.tsx`. |
+
+**Responsabilidad principal:**
+
+```txt
+Centralizar los íconos asociados con acciones comunes del sistema.
+Permitir cambiar un ícono desde un único lugar.
+Evitar importar repetidamente los mismos íconos dentro de los componentes reutilizables.
+Mantener una representación visual consistente de las acciones.
+```
 
 ---
 
@@ -2217,4 +2276,4 @@ Inicializar la aplicación.
 Esta estructura permite que el proyecto crezca de forma organizada, clara y profesional.
 Al separar páginas, componentes, servicios, hooks, datos, validaciones y utilidades, el código se vuelve más fácil de mantener, reutilizar y escalar.
 
-Además, el enfoque de componentes reutilizables permite que elementos como tablas, encabezados, mensajes y estados vacíos puedan usarse en diferentes módulos sin repetir código.
+Además, el enfoque de componentes reutilizables permite que elementos como tablas, encabezados, botones, mensajes y estados vacíos puedan usarse en diferentes módulos sin repetir código. La centralización de íconos en `appIcons.ts` permite mantener una representación visual consistente y facilita futuros cambios desde un único punto.

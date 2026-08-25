@@ -19,6 +19,7 @@ import EmptyState from "../../common/EmptyState";
 import LoadingBox from "../../common/LoadingBox";
 import InfoTooltip from "../../common/InfoTooltip";
 import SectionCard from "../../common/SectionCard";
+import IconActionButton from "../../common/IconActionButton";
 
 import PersonnelCandidateSubmissionBatchesDialog from "./PersonnelCandidateSubmissionBatchesDialog";
 import PersonnelCandidateSubmissionHistorySection from "./PersonnelCandidateSubmissionHistorySection";
@@ -525,16 +526,16 @@ const PersonnelRequisitionCandidatesSection = ({
                                             {/* Consulta de las fotografías históricas de los cargues. */}
                                             {!loadingBatches &&
                                                 hasSubmissionBatches && (
-                                                    <ActionButton
-                                                        actionType="view"
-                                                        tooltip="Consultar las fotografías históricas de los cargues"
-                                                        fullWidthOnMobile
+                                                    <IconActionButton
+                                                        icon="history"
+                                                        tooltip="Ver historial de cargues"
+                                                        active={
+                                                            openSubmissionBatchesDialog
+                                                        }
                                                         onClick={
                                                             openSubmissionBatchesHistoryDialog
                                                         }
-                                                    >
-                                                        Ver historial de cargues
-                                                    </ActionButton>
+                                                    />
                                                 )}
                                         </Box>
                                     )}

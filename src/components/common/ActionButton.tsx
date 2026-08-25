@@ -5,46 +5,22 @@ import {
     useMediaQuery,
 } from "@mui/material";
 
-import type { ButtonProps } from "@mui/material";
+import type {
+    ButtonProps,
+} from "@mui/material";
 
 import { useTheme } from "@mui/material/styles";
 
-import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
-import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
-import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutlineOutlined";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import OpenInNewOutlinedIcon from "@mui/icons-material/OpenInNewOutlined";
-import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
-import RestartAltOutlinedIcon from "@mui/icons-material/RestartAltOutlined";
-import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
-import PrintOutlinedIcon from "@mui/icons-material/PrintOutlined";
-import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
-import UploadFileOutlinedIcon from "@mui/icons-material/UploadFileOutlined";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
+import {
+    appIcons,
+} from "../../icons/appIcons";
+
+import type {
+    AppIconName,
+} from "../../icons/appIcons";
 
 type ActionButtonType =
-    | "save"
-    | "edit"
-    | "cancel"
-    | "approve"
-    | "reject"
-    | "delete"
-    | "view"
-    | "open"
-    | "create"
-    | "send"
-    | "clear"
-    | "back"
-    | "print"
-    | "file"
-    | "upload"
-    | "lock"
-    | "unlock"
+    | AppIconName
     | "custom";
 
 interface ActionButtonProps extends ButtonProps {
@@ -86,79 +62,14 @@ const ActionButton = ({
             return startIcon;
         }
 
-        if (actionType === "save") {
-            return <SaveOutlinedIcon />;
+        if (actionType === "custom") {
+            return undefined;
         }
 
-        if (actionType === "edit") {
-            return <EditOutlinedIcon />;
-        }
+        const IconComponent =
+            appIcons[actionType];
 
-        if (actionType === "cancel") {
-            return <CloseOutlinedIcon />;
-        }
-
-        if (actionType === "approve") {
-            return (
-                <CheckCircleOutlineOutlinedIcon />
-            );
-        }
-
-        if (actionType === "reject") {
-            return <CancelOutlinedIcon />;
-        }
-
-        if (actionType === "delete") {
-            return <DeleteOutlineOutlinedIcon />;
-        }
-
-        if (actionType === "view") {
-            return <VisibilityOutlinedIcon />;
-        }
-
-        if (actionType === "open") {
-            return <OpenInNewOutlinedIcon />;
-        }
-
-        if (actionType === "create") {
-            return (
-                <AddCircleOutlineOutlinedIcon />
-            );
-        }
-
-        if (actionType === "send") {
-            return <SendOutlinedIcon />;
-        }
-
-        if (actionType === "clear") {
-            return <RestartAltOutlinedIcon />;
-        }
-
-        if (actionType === "back") {
-            return <ArrowBackOutlinedIcon />;
-        }
-
-        if (actionType === "print") {
-            return <PrintOutlinedIcon />;
-        }
-
-        if (actionType === "file") {
-            return <DescriptionOutlinedIcon />;
-        }
-
-        if (actionType === "upload") {
-            return <UploadFileOutlinedIcon />;
-        }
-
-        if (actionType === "lock") {
-            return <LockOutlinedIcon />;
-        }
-
-        if (actionType === "unlock") {
-            return <LockOpenOutlinedIcon />;
-        }
-
-        return undefined;
+        return <IconComponent />;
     };
 
     // Retorna el color correspondiente al tipo de acción.
@@ -231,7 +142,10 @@ const ActionButton = ({
             size={size}
             variant={getDefaultVariant()}
             color={getDefaultColor()}
-            disabled={disabled || loading}
+            disabled={
+                disabled ||
+                loading
+            }
             startIcon={
                 loading ? (
                     <CircularProgress
@@ -280,9 +194,11 @@ const ActionButton = ({
 
     if (
         tooltip ||
-        (iconOnlyOnMobile &&
+        (
+            iconOnlyOnMobile &&
             isMobile &&
-            children)
+            children
+        )
     ) {
         return (
             <Tooltip
