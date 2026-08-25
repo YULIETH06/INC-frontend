@@ -96,6 +96,11 @@ export interface PersonnelRequisitionCandidate {
     uploadedById: number;
     uploadedBy?: RequisitionUser;
 
+    isPreselected: boolean;
+    preselectedAt: string | null;
+    preselectedById: number | null;
+    preselectedBy?: RequisitionUser | null;
+
     createdAt: string;
     updatedAt: string;
 }
@@ -385,6 +390,66 @@ export interface PersonnelCandidateSubmissionHistory {
 export interface PersonnelCandidateSubmissionHistoryResponse {
     message: string;
     history: PersonnelCandidateSubmissionHistory[];
+}
+
+// Candidato almacenado dentro de una fotografía histórica del cargue.
+export interface PersonnelCandidateSubmissionBatchItem {
+    id: number;
+    itemNumber: number;
+
+    candidateId: number | null;
+
+    candidateName: string;
+    identificationTypeCode: string;
+    identificationNumber: string;
+}
+
+// Fotografía histórica generada cada vez que se cierra el cargue.
+export interface PersonnelCandidateSubmissionBatch {
+    id: number;
+    requisitionId: number;
+
+    submissionNumber: number;
+
+    closedById: number;
+    closedAt: string;
+
+    closedBy: RequisitionUser;
+
+    candidates: PersonnelCandidateSubmissionBatchItem[];
+}
+
+// Respuesta al consultar las fotografías históricas de los cargues.
+export interface PersonnelCandidateSubmissionBatchesResponse {
+    message: string;
+    batches: PersonnelCandidateSubmissionBatch[];
+}
+
+// Datos enviados para confirmar la preselección de candidatos.
+export interface PreselectPersonnelRequisitionCandidatesData {
+    candidateIds: number[];
+}
+
+// Candidato devuelto después de confirmar su preselección.
+export interface PersonnelPreselectedCandidate {
+    id: number;
+    requisitionId: number;
+
+    name: string;
+
+    identificationNumber: string;
+    identificationType: IdentificationType;
+
+    isPreselected: boolean;
+    preselectedAt: string | null;
+    preselectedById: number | null;
+    preselectedBy: RequisitionUser | null;
+}
+
+// Respuesta al confirmar la preselección de candidatos.
+export interface PreselectPersonnelRequisitionCandidatesResponse {
+    message: string;
+    candidates: PersonnelPreselectedCandidate[];
 }
 
 // Datos enviados para cerrar el cargue.

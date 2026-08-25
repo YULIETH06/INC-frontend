@@ -20,10 +20,14 @@ import LoadingBox from "../../common/LoadingBox";
 import InfoTooltip from "../../common/InfoTooltip";
 import SectionCard from "../../common/SectionCard";
 
+import PersonnelCandidateSubmissionBatchesDialog from "./PersonnelCandidateSubmissionBatchesDialog";
+import PersonnelCandidateSubmissionHistorySection from "./PersonnelCandidateSubmissionHistorySection";
 import PersonnelRequisitionCandidateCard from "./PersonnelRequisitionCandidateCard";
 import PersonnelRequisitionCandidateDialog from "./PersonnelRequisitionCandidateDialog";
 
 import { usePersonnelRequisitionCandidates } from "../../../hooks/humanTalent/requisitions/usePersonnelRequisitionCandidates";
+
+import { useAuth } from "../../../context/AuthContext";
 
 import { formatDate } from "../../../utils/common/dateUtils";
 
@@ -37,6 +41,7 @@ interface PersonnelRequisitionCandidatesSectionProps {
     candidateSubmissionDeadlineAt: string | null;
     candidateSubmissionClosedAt: string | null;
     candidateSubmissionLateReason: string | null;
+    createdById: number;
 }
 
 // Sección encargada de mostrar y gestionar los candidatos de una requisición.
@@ -46,7 +51,11 @@ const PersonnelRequisitionCandidatesSection = ({
     candidateSubmissionDeadlineAt,
     candidateSubmissionClosedAt,
     candidateSubmissionLateReason,
+    createdById,
 }: PersonnelRequisitionCandidatesSectionProps) => {
+    // Usuario autenticado.
+    const { user } = useAuth();
+
     // Estado local del cargue para reflejar los cambios sin recargar la página.
     const [
         currentSubmissionStatus,
@@ -87,6 +96,13 @@ const PersonnelRequisitionCandidatesSection = ({
         submissionHistory,
         loadingHistory,
 
+        submissionBatches,
+        loadingBatches,
+
+        selectedCandidateIds,
+        selectedCandidates,
+        hasSelectedCandidates,
+
         lateReason,
         lateReasonError,
         reopenReason,
@@ -104,12 +120,15 @@ const PersonnelRequisitionCandidatesSection = ({
         openDeleteDialog,
         openCloseDialog,
         openReopenDialog,
+        openPreselectionDialog,
+        openSubmissionBatchesDialog,
 
         loadingReopen,
         loadingCandidates,
         loadingSubmit,
         loadingDelete,
         loadingClose,
+        loadingPreselection,
 
         loadError,
 
@@ -129,6 +148,10 @@ const PersonnelRequisitionCandidatesSection = ({
         handleObservationChange,
         handleFileChange,
 
+        selectCandidate,
+        unselectCandidate,
+        cancelCandidateSelection,
+
         openCreateCandidateDialog,
         openEditCandidateDialog,
         closeCandidateDialog,
@@ -144,6 +167,13 @@ const PersonnelRequisitionCandidatesSection = ({
         openReopenCandidatesDialog,
         closeReopenCandidatesDialog,
         handleReopenCandidates,
+
+        openPreselectionConfirmDialog,
+        closePreselectionConfirmDialog,
+        handleConfirmPreselection,
+
+        openSubmissionBatchesHistoryDialog,
+        closeSubmissionBatchesHistoryDialog,
 
         handleSubmitCandidate,
         closeMessage,
@@ -271,6 +301,18 @@ const PersonnelRequisitionCandidatesSection = ({
         !loadingCandidates &&
         !loadError;
 
+    // Solo el creador de la requisición puede realizar
+    // la preselección cuando el cargue está cerrado.
+    const canSelectCandidates =
+        isSubmissionClosed &&
+        user?.id === createdById &&
+        !loadingCandidates &&
+        !loadError;
+
+    // Indica si existen fotografías históricas disponibles.
+    const hasSubmissionBatches =
+        submissionBatches.length > 0;
+
     // Indica que el cargue está abierto, pero el usuario
     // no tiene permiso para consultar o gestionar candidatos.
     const isRestrictedWhileOpen =
@@ -342,8 +384,7 @@ const PersonnelRequisitionCandidatesSection = ({
                                     direction="row"
                                     spacing={1}
                                     sx={{
-                                        alignItems:
-                                            "center",
+                                        alignItems: "center",
                                         flexWrap: "wrap",
                                     }}
                                 >
@@ -372,9 +413,12 @@ const PersonnelRequisitionCandidatesSection = ({
                                     />
                                 </Stack>
 
-                                {/* Acciones disponibles según el estado del cargue. */}
+                                {/* Acciones disponibles según el estado y permisos del usuario. */}
                                 {(canManageCandidates ||
-                                    canReopenCandidates) && (
+                                    canReopenCandidates ||
+                                    canSelectCandidates ||
+                                    (!loadingBatches &&
+                                        hasSubmissionBatches)) && (
                                         <Box
                                             sx={{
                                                 display: "flex",
@@ -384,10 +428,11 @@ const PersonnelRequisitionCandidatesSection = ({
                                                 },
                                                 justifyContent:
                                                     "flex-end",
+                                                flexWrap: "wrap",
                                                 gap: 1,
                                             }}
                                         >
-                                            {/* Acciones disponibles únicamente mientras el cargue está abierto. */}
+                                            {/* Acciones del Auxiliar mientras el cargue está abierto. */}
                                             {canManageCandidates && (
                                                 <>
                                                     <ActionButton
@@ -425,7 +470,7 @@ const PersonnelRequisitionCandidatesSection = ({
                                                 </>
                                             )}
 
-                                            {/* Acción disponible únicamente cuando el cargue está cerrado. */}
+                                            {/* Acción del Auxiliar cuando el cargue está cerrado. */}
                                             {canReopenCandidates && (
                                                 <ActionButton
                                                     actionType="unlock"
@@ -442,6 +487,55 @@ const PersonnelRequisitionCandidatesSection = ({
                                                     Reabrir cargue
                                                 </ActionButton>
                                             )}
+
+                                            {/* Acciones del creador durante la preselección. */}
+                                            {canSelectCandidates && (
+                                                <>
+                                                    <ActionButton
+                                                        actionType="cancel"
+                                                        tooltip="Cancelar la selección actual"
+                                                        fullWidthOnMobile
+                                                        onClick={
+                                                            cancelCandidateSelection
+                                                        }
+                                                        disabled={
+                                                            !hasSelectedCandidates ||
+                                                            loadingPreselection
+                                                        }
+                                                    >
+                                                        Cancelar selección
+                                                    </ActionButton>
+
+                                                    <ActionButton
+                                                        actionType="approve"
+                                                        tooltip="Confirmar candidatos seleccionados"
+                                                        fullWidthOnMobile
+                                                        onClick={
+                                                            openPreselectionConfirmDialog
+                                                        }
+                                                        disabled={
+                                                            !hasSelectedCandidates
+                                                        }
+                                                    >
+                                                        Confirmar selección
+                                                    </ActionButton>
+                                                </>
+                                            )}
+
+                                            {/* Consulta de las fotografías históricas de los cargues. */}
+                                            {!loadingBatches &&
+                                                hasSubmissionBatches && (
+                                                    <ActionButton
+                                                        actionType="view"
+                                                        tooltip="Consultar las fotografías históricas de los cargues"
+                                                        fullWidthOnMobile
+                                                        onClick={
+                                                            openSubmissionBatchesHistoryDialog
+                                                        }
+                                                    >
+                                                        Ver historial de cargues
+                                                    </ActionButton>
+                                                )}
                                         </Box>
                                     )}
                             </Box>
@@ -522,8 +616,7 @@ const PersonnelRequisitionCandidatesSection = ({
                             <Box
                                 sx={{
                                     display: "grid",
-                                    gridTemplateColumns:
-                                    {
+                                    gridTemplateColumns: {
                                         xs: "1fr",
                                         lg: "repeat(2, minmax(0, 1fr))",
                                     },
@@ -542,11 +635,33 @@ const PersonnelRequisitionCandidatesSection = ({
                                             canManage={
                                                 canManageCandidates
                                             }
+                                            canSelect={
+                                                canSelectCandidates
+                                            }
+                                            isSelected={
+                                                selectedCandidateIds.includes(
+                                                    candidate.id
+                                                )
+                                            }
                                             onEdit={
                                                 openEditCandidateDialog
                                             }
                                             onDelete={
                                                 openDeleteCandidateDialog
+                                            }
+                                            onSelect={(
+                                                selectedCandidate
+                                            ) =>
+                                                selectCandidate(
+                                                    selectedCandidate.id
+                                                )
+                                            }
+                                            onUnselect={(
+                                                selectedCandidate
+                                            ) =>
+                                                unselectCandidate(
+                                                    selectedCandidate.id
+                                                )
                                             }
                                         />
                                     )
@@ -557,92 +672,86 @@ const PersonnelRequisitionCandidatesSection = ({
             </SectionCard>
 
             {/* Historial de reaperturas y cierres posteriores. */}
-            {!loadingHistory &&
-                submissionHistory.length > 0 && (
-                    <SectionCard
-                        title="Historial del cargue"
-                        subtitle="Movimientos realizados después de la presentación inicial."
-                    >
-                        <Stack spacing={1.5}>
-                            {submissionHistory.map(
-                                (historyItem) => (
+            <PersonnelCandidateSubmissionHistorySection
+                history={submissionHistory}
+                loading={loadingHistory}
+            />
+
+            {/* Confirmación definitiva de la preselección. */}
+            <ConfirmActionDialog
+                open={openPreselectionDialog}
+                title="Confirmar selección"
+                message={
+                    <Stack spacing={2}>
+                        <Typography variant="body2">
+                            Se confirmará la preselección de
+                            los siguientes candidatos:
+                        </Typography>
+
+                        <Stack spacing={1}>
+                            {selectedCandidates.map(
+                                (candidate) => (
                                     <Box
-                                        key={historyItem.id}
+                                        key={candidate.id}
                                         sx={{
-                                            p: 1.5,
+                                            p: 1.25,
                                             border: 1,
                                             borderColor:
                                                 "divider",
                                             borderRadius: 1,
+                                            bgcolor:
+                                                "background.default",
                                         }}
                                     >
-                                        <Stack
-                                            direction={{
-                                                xs: "column",
-                                                sm: "row",
-                                            }}
-                                            spacing={1}
+                                        <Typography
+                                            variant="body2"
                                             sx={{
-                                                alignItems: {
-                                                    xs: "flex-start",
-                                                    sm: "center",
-                                                },
+                                                fontWeight: 600,
                                             }}
                                         >
-                                            <CustomChip
-                                                label={
-                                                    historyItem.action ===
-                                                        "REAPERTURA"
-                                                        ? "Reapertura"
-                                                        : "Cierre"
-                                                }
-                                                color={
-                                                    historyItem.action ===
-                                                        "REAPERTURA"
-                                                        ? "warning"
-                                                        : "success"
-                                                }
-                                                variant="outlined"
-                                            />
-
-                                            <Typography variant="body2">
-                                                {formatDate(
-                                                    historyItem.performedAt
-                                                )}
-                                                {" · "}
-                                                {
-                                                    historyItem
-                                                        .performedBy
-                                                        .name
-                                                }
-                                            </Typography>
-                                        </Stack>
-
-                                        {historyItem.reason && (
-                                            <Typography
-                                                variant="body2"
-                                                color="text.secondary"
-                                                sx={{ mt: 1 }}
-                                            >
-                                                <Box
-                                                    component="span"
-                                                    sx={{
-                                                        fontWeight: 700,
-                                                    }}
-                                                >
-                                                    Motivo:
-                                                </Box>{" "}
-                                                {
-                                                    historyItem.reason
-                                                }
-                                            </Typography>
-                                        )}
+                                            {candidate.identificationType
+                                                ?.code ??
+                                                candidate
+                                                    .identificationType
+                                                    ?.name ??
+                                                "Documento"}{" "}
+                                            {
+                                                candidate.identificationNumber
+                                            }{" "}
+                                            - {candidate.name}
+                                        </Typography>
                                     </Box>
                                 )
                             )}
                         </Stack>
-                    </SectionCard>
-                )}
+                    </Stack>
+                }
+                actionType="approve"
+                confirmText="Confirmar"
+                loading={loadingPreselection}
+                loadingText="Confirmando..."
+                infoSeverity="warning"
+                infoContent="Esta acción no se podrá deshacer. Una vez confirmados, los candidatos quedarán registrados como preseleccionados."
+                onClose={
+                    closePreselectionConfirmDialog
+                }
+                onConfirm={
+                    handleConfirmPreselection
+                }
+            />
+
+            {/* Fotografías históricas generadas en cada cierre. */}
+            <PersonnelCandidateSubmissionBatchesDialog
+                open={
+                    openSubmissionBatchesDialog
+                }
+                batches={
+                    submissionBatches
+                }
+                onClose={
+                    closeSubmissionBatchesHistoryDialog
+                }
+            />
 
             {/* Formulario para crear o editar un candidato. */}
             <PersonnelRequisitionCandidateDialog
@@ -655,7 +764,9 @@ const PersonnelRequisitionCandidatesSection = ({
                 editingCandidate={
                     editingCandidate
                 }
-                isEditing={isEditing}
+                isEditing={
+                    isEditing
+                }
                 hasFormChanges={
                     hasFormChanges
                 }

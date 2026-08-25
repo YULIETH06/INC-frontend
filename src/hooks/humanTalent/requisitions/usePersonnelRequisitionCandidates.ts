@@ -10,8 +10,10 @@ import {
     closePersonnelRequisitionCandidates,
     createPersonnelRequisitionCandidate,
     deletePersonnelRequisitionCandidate,
+    getPersonnelCandidateSubmissionBatches,
     getPersonnelCandidateSubmissionHistory,
     getPersonnelRequisitionCandidates,
+    preselectPersonnelRequisitionCandidates,
     reopenPersonnelRequisitionCandidates,
     updatePersonnelRequisitionCandidate,
 } from "../../../services/humanTalent/requisitions/personnelRequisitionService";
@@ -33,6 +35,7 @@ import type { MessageType } from "../../../interfaces/common/message.interface";
 
 import type {
     CandidateSubmissionStatus,
+    PersonnelCandidateSubmissionBatch,
     PersonnelCandidateSubmissionHistory,
     PersonnelRequisitionCandidate,
     PersonnelRequisitionCandidateForm,
@@ -163,6 +166,36 @@ export const usePersonnelRequisitionCandidates = ({
 
     const [loadingHistory, setLoadingHistory] =
         useState(false);
+
+    // Fotografías históricas generadas en cada cierre del cargue.
+    const [submissionBatches, setSubmissionBatches] =
+        useState<PersonnelCandidateSubmissionBatch[]>([]);
+
+    // Controla la consulta de las fotografías históricas.
+    const [loadingBatches, setLoadingBatches] =
+        useState(false);
+
+    // Candidatos elegidos temporalmente antes de confirmar la preselección.
+    const [selectedCandidateIds, setSelectedCandidateIds] =
+        useState<number[]>([]);
+
+    // Controla el diálogo de confirmación de la preselección.
+    const [
+        openPreselectionDialog,
+        setOpenPreselectionDialog,
+    ] = useState(false);
+
+    // Controla el diálogo del historial de cargues.
+    const [
+        openSubmissionBatchesDialog,
+        setOpenSubmissionBatchesDialog,
+    ] = useState(false);
+
+    // Controla la confirmación de la preselección.
+    const [
+        loadingPreselection,
+        setLoadingPreselection,
+    ] = useState(false);
 
     // Controla la carga del listado.
     const [loadingCandidates, setLoadingCandidates] =
@@ -298,6 +331,34 @@ export const usePersonnelRequisitionCandidates = ({
             setSubmissionHistory([]);
         } finally {
             setLoadingHistory(false);
+        }
+    }, [enabled, requisitionId]);
+
+    // Consulta las fotografías históricas generadas en cada cierre.
+    const loadSubmissionBatches = useCallback(async () => {
+        if (
+            !enabled ||
+            !Number.isInteger(requisitionId) ||
+            requisitionId <= 0
+        ) {
+            setSubmissionBatches([]);
+            return;
+        }
+
+        try {
+            setLoadingBatches(true);
+
+            const response =
+                await getPersonnelCandidateSubmissionBatches(
+                    requisitionId
+                );
+
+            setSubmissionBatches(response.batches);
+        } catch (error: unknown) {
+            console.error(error);
+            setSubmissionBatches([]);
+        } finally {
+            setLoadingBatches(false);
         }
     }, [enabled, requisitionId]);
 
@@ -493,6 +554,126 @@ export const usePersonnelRequisitionCandidates = ({
     const handleReopenReasonChange = (value: string) => {
         setReopenReason(value);
         setReopenReasonError("");
+    };
+
+    // Selecciona temporalmente un candidato para la preselección.
+    const selectCandidate = (candidateId: number) => {
+        const candidate = candidates.find(
+            (currentCandidate) =>
+                currentCandidate.id === candidateId
+        );
+
+        if (
+            !candidate ||
+            candidate.isPreselected
+        ) {
+            return;
+        }
+
+        setSelectedCandidateIds((previous) => {
+            if (previous.includes(candidateId)) {
+                return previous;
+            }
+
+            return [
+                ...previous,
+                candidateId,
+            ];
+        });
+    };
+
+    // Quita un candidato de la selección temporal.
+    const unselectCandidate = (candidateId: number) => {
+        setSelectedCandidateIds((previous) =>
+            previous.filter(
+                (currentCandidateId) =>
+                    currentCandidateId !== candidateId
+            )
+        );
+    };
+
+    // Cancela toda la selección temporal actual.
+    const cancelCandidateSelection = () => {
+        setSelectedCandidateIds([]);
+    };
+
+    // Abre la confirmación de la preselección.
+    const openPreselectionConfirmDialog = () => {
+        if (selectedCandidateIds.length === 0) {
+            return;
+        }
+
+        setOpenPreselectionDialog(true);
+    };
+
+    // Cierra la confirmación de la preselección.
+    const closePreselectionConfirmDialog = () => {
+        if (loadingPreselection) {
+            return;
+        }
+
+        setOpenPreselectionDialog(false);
+    };
+
+    // Abre el historial de fotografías de los cargues.
+    const openSubmissionBatchesHistoryDialog = () => {
+        setOpenSubmissionBatchesDialog(true);
+    };
+
+    // Cierra el historial de fotografías de los cargues.
+    const closeSubmissionBatchesHistoryDialog = () => {
+        setOpenSubmissionBatchesDialog(false);
+    };
+
+    // Confirma definitivamente los candidatos seleccionados.
+    const handleConfirmPreselection = async () => {
+        if (selectedCandidateIds.length === 0) {
+            return;
+        }
+
+        try {
+            setLoadingPreselection(true);
+            setMessage("");
+            setOpenMessage(false);
+
+            const response =
+                await preselectPersonnelRequisitionCandidates(
+                    requisitionId,
+                    {
+                        candidateIds:
+                            selectedCandidateIds,
+                    }
+                );
+
+            setSelectedCandidateIds([]);
+            setOpenPreselectionDialog(false);
+
+            // Consulta nuevamente los candidatos para obtener
+            // la información completa de la preselección.
+            await loadCandidates();
+
+            setMessage(
+                response.message ||
+                "Candidatos preseleccionados correctamente."
+            );
+
+            setMessageSeverity("success");
+            setOpenMessage(true);
+        } catch (error: unknown) {
+            console.error(error);
+
+            setMessage(
+                getErrorMessage(
+                    error,
+                    "Error al confirmar la preselección de candidatos."
+                )
+            );
+
+            setMessageSeverity("error");
+            setOpenMessage(true);
+        } finally {
+            setLoadingPreselection(false);
+        }
     };
 
     // Cierra el mensaje visual.
@@ -723,7 +904,10 @@ export const usePersonnelRequisitionCandidates = ({
             setLateReason("");
             setLateReasonError("");
 
-            await loadSubmissionHistory();
+            await Promise.all([
+                loadSubmissionHistory(),
+                loadSubmissionBatches(),
+            ]);
 
             setMessage(
                 response.message ||
@@ -822,6 +1006,20 @@ export const usePersonnelRequisitionCandidates = ({
         }
     };
 
+    // Candidatos elegidos temporalmente antes de confirmar.
+    const selectedCandidates =
+        candidates.filter(
+            (candidate) =>
+                selectedCandidateIds.includes(
+                    candidate.id
+                ) &&
+                !candidate.isPreselected
+        );
+
+    // Indica si existe por lo menos un candidato seleccionado.
+    const hasSelectedCandidates =
+        selectedCandidateIds.length > 0;
+
     // Indica si se está editando un candidato.
     const isEditing = Boolean(editingCandidate);
 
@@ -855,6 +1053,10 @@ export const usePersonnelRequisitionCandidates = ({
         loadSubmissionHistory();
     }, [loadSubmissionHistory]);
 
+    useEffect(() => {
+        loadSubmissionBatches();
+    }, [loadSubmissionBatches]);
+
     return {
         candidates,
         isCandidateManager,
@@ -862,6 +1064,13 @@ export const usePersonnelRequisitionCandidates = ({
 
         submissionHistory,
         loadingHistory,
+
+        submissionBatches,
+        loadingBatches,
+
+        selectedCandidateIds,
+        selectedCandidates,
+        hasSelectedCandidates,
 
         lateReason,
         lateReasonError,
@@ -880,12 +1089,15 @@ export const usePersonnelRequisitionCandidates = ({
         openDeleteDialog,
         openCloseDialog,
         openReopenDialog,
+        openPreselectionDialog,
+        openSubmissionBatchesDialog,
 
         loadingReopen,
         loadingCandidates,
         loadingSubmit,
         loadingDelete,
         loadingClose,
+        loadingPreselection,
 
         loadError,
 
@@ -898,12 +1110,17 @@ export const usePersonnelRequisitionCandidates = ({
 
         loadCandidates,
         loadSubmissionHistory,
+        loadSubmissionBatches,
 
         handleIdentificationTypeChange,
         handleIdentificationNumberChange,
         handleNameChange,
         handleObservationChange,
         handleFileChange,
+
+        selectCandidate,
+        unselectCandidate,
+        cancelCandidateSelection,
 
         openCreateCandidateDialog,
         openEditCandidateDialog,
@@ -920,6 +1137,13 @@ export const usePersonnelRequisitionCandidates = ({
         openReopenCandidatesDialog,
         closeReopenCandidatesDialog,
         handleReopenCandidates,
+
+        openPreselectionConfirmDialog,
+        closePreselectionConfirmDialog,
+        handleConfirmPreselection,
+
+        openSubmissionBatchesHistoryDialog,
+        closeSubmissionBatchesHistoryDialog,
 
         handleLateReasonChange,
         handleReopenReasonChange,

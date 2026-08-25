@@ -437,6 +437,9 @@ const PersonnelRequisitionDetail = () => {
                             candidateSubmissionLateReason={
                                 requisition.candidateSubmissionLateReason
                             }
+                            createdById={
+                                requisition.createdById
+                            }
                         />
                     )}
             </Stack>

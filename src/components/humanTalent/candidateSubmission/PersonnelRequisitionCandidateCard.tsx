@@ -8,9 +8,11 @@ import {
     Typography,
 } from "@mui/material";
 
+import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutlineOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 
 import ActionButton from "../../common/ActionButton";
+import CustomChip from "../../common/CustomChip";
 import InfoItem from "../../common/InfoItem";
 
 import { getInitials } from "../../../utils/common/avatarUtils";
@@ -24,7 +26,15 @@ import type {
 
 interface PersonnelRequisitionCandidateCardProps {
     candidate: PersonnelRequisitionCandidate;
+
+    // Permite editar y eliminar mientras el cargue esté abierto.
     canManage?: boolean;
+
+    // Permite seleccionar candidatos cuando el cargue esté cerrado.
+    canSelect?: boolean;
+
+    // Indica si el candidato fue elegido temporalmente.
+    isSelected?: boolean;
 
     onEdit: (
         candidate: PersonnelRequisitionCandidate
@@ -33,14 +43,26 @@ interface PersonnelRequisitionCandidateCardProps {
     onDelete: (
         candidate: PersonnelRequisitionCandidate
     ) => void;
+
+    onSelect?: (
+        candidate: PersonnelRequisitionCandidate
+    ) => void;
+
+    onUnselect?: (
+        candidate: PersonnelRequisitionCandidate
+    ) => void;
 }
 
 // Tarjeta para mostrar la información de un candidato.
 const PersonnelRequisitionCandidateCard = ({
     candidate,
     canManage = false,
+    canSelect = false,
+    isSelected = false,
     onEdit,
     onDelete,
+    onSelect,
+    onUnselect,
 }: PersonnelRequisitionCandidateCardProps) => {
     // Abre la hoja de vida almacenada en el backend.
     const handleOpenResume = () => {
@@ -95,7 +117,7 @@ const PersonnelRequisitionCandidateCard = ({
                         direction="row"
                         spacing={1.5}
                         sx={{
-                            alignItems: "center",
+                            alignItems: "flex-start",
                             minWidth: 0,
                         }}
                     >
@@ -105,6 +127,7 @@ const PersonnelRequisitionCandidateCard = ({
                                 color:
                                     "primary.contrastText",
                                 fontWeight: 700,
+                                flexShrink: 0,
                             }}
                         >
                             {getInitials(
@@ -115,23 +138,65 @@ const PersonnelRequisitionCandidateCard = ({
                         <Box
                             sx={{
                                 minWidth: 0,
+                                flex: 1,
                             }}
                         >
-                            <Typography
-                                variant="subtitle1"
-                                noWrap
+                            <Stack
+                                direction={{
+                                    xs: "column",
+                                    sm: "row",
+                                }}
+                                spacing={1}
                                 sx={{
-                                    fontWeight: 700,
+                                    alignItems: {
+                                        xs: "flex-start",
+                                        sm: "center",
+                                    },
+                                    justifyContent:
+                                        "space-between",
                                 }}
                             >
-                                {candidate.name}
-                            </Typography>
+                                <Typography
+                                    variant="subtitle1"
+                                    noWrap
+                                    sx={{
+                                        fontWeight: 700,
+                                        minWidth: 0,
+                                    }}
+                                >
+                                    {candidate.name}
+                                </Typography>
+
+                                {/* Estado permanente de preselección. */}
+                                {candidate.isPreselected && (
+                                    <CustomChip
+                                        label="Preseleccionado"
+                                        color="success"
+                                        icon={
+                                            <CheckCircleOutlineOutlinedIcon />
+                                        }
+                                    />
+                                )}
+
+                                {/* Estado temporal antes de confirmar. */}
+                                {!candidate.isPreselected &&
+                                    isSelected && (
+                                        <CustomChip
+                                            label="Elegido"
+                                            color="primary"
+                                            icon={
+                                                <CheckCircleOutlineOutlinedIcon />
+                                            }
+                                        />
+                                    )}
+                            </Stack>
 
                             <Typography
                                 variant="body2"
                                 sx={{
                                     color:
                                         "text.secondary",
+                                    mt: 0.25,
                                 }}
                             >
                                 Registrado el{" "}
@@ -143,7 +208,8 @@ const PersonnelRequisitionCandidateCard = ({
                             <Typography
                                 variant="body2"
                                 sx={{
-                                    color: "text.secondary",
+                                    color:
+                                        "text.secondary",
                                 }}
                             >
                                 {candidate.identificationType?.code ??
@@ -268,6 +334,40 @@ const PersonnelRequisitionCandidateCard = ({
                         }
                     />
 
+                    {/* Información permanente de preselección. */}
+                    {candidate.isPreselected && (
+                        <>
+                            <InfoItem
+                                label="Preseleccionado por"
+                                value={
+                                    <Typography
+                                        variant="body2"
+                                        sx={{
+                                            whiteSpace:
+                                                "pre-wrap",
+                                            overflowWrap:
+                                                "anywhere",
+                                        }}
+                                    >
+                                        {candidate.preselectedBy?.name ??
+                                            "Usuario no disponible"}
+                                    </Typography>
+                                }
+                            />
+
+                            <InfoItem
+                                label="Fecha de preselección"
+                                value={
+                                    candidate.preselectedAt
+                                        ? formatDate(
+                                            candidate.preselectedAt
+                                        )
+                                        : "No disponible"
+                                }
+                            />
+                        </>
+                    )}
+
                     {/* Acciones disponibles mientras el cargue esté abierto. */}
                     {canManage && (
                         <>
@@ -278,6 +378,7 @@ const PersonnelRequisitionCandidateCard = ({
                                 spacing={1}
                                 sx={{
                                     justifyContent: "flex-end",
+                                    flexWrap: "wrap",
                                 }}
                             >
                                 <ActionButton
@@ -304,6 +405,52 @@ const PersonnelRequisitionCandidateCard = ({
                             </Stack>
                         </>
                     )}
+
+                    {/* Acciones temporales de selección antes de confirmar. */}
+                    {canSelect &&
+                        !candidate.isPreselected && (
+                            <>
+                                <Divider />
+
+                                <Stack
+                                    direction="row"
+                                    spacing={1}
+                                    sx={{
+                                        justifyContent:
+                                            "flex-end",
+                                        flexWrap: "wrap",
+                                    }}
+                                >
+                                    {isSelected ? (
+                                        <ActionButton
+                                            actionType="cancel"
+                                            tooltip="Quitar candidato de la selección"
+                                            fullWidthOnMobile
+                                            onClick={() =>
+                                                onUnselect?.(
+                                                    candidate
+                                                )
+                                            }
+                                        >
+                                            Quitar
+                                        </ActionButton>
+                                    ) : (
+                                        <ActionButton
+                                            actionType="approve"
+                                            tooltip="Seleccionar candidato"
+                                            fullWidthOnMobile
+                                            onClick={() =>
+                                                onSelect?.(
+                                                    candidate
+                                                )
+                                            }
+                                        >
+                                            Seleccionar
+                                        </ActionButton>
+                                    )}
+                                </Stack>
+                            </>
+                        )}
                 </Stack>
             </CardContent>
         </Card>

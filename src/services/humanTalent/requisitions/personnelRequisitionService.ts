@@ -1,8 +1,11 @@
 import api from "../../../api/axios";
 import type {
     ClosePersonnelRequisitionCandidatesData,
+    PersonnelCandidateSubmissionBatchesResponse,
     PersonnelCandidateSubmissionHistoryResponse,
     PersonnelRequisitionCandidateSubmissionResponse,
+    PreselectPersonnelRequisitionCandidatesData,
+    PreselectPersonnelRequisitionCandidatesResponse,
     ReopenPersonnelRequisitionCandidatesData,
     CreatePersonnelHiringConfirmationData,
     CreatePersonnelHiringConfirmationResponse,
@@ -227,6 +230,32 @@ export const getPersonnelCandidateSubmissionHistory = async (
     const response =
         await api.get<PersonnelCandidateSubmissionHistoryResponse>(
             `/human-talent/requisitions/${requisitionId}/candidates/history`
+        );
+
+    return response.data;
+};
+
+// Obtiene las fotografías históricas generadas en cada cierre del cargue.
+export const getPersonnelCandidateSubmissionBatches = async (
+    requisitionId: number
+): Promise<PersonnelCandidateSubmissionBatchesResponse> => {
+    const response =
+        await api.get<PersonnelCandidateSubmissionBatchesResponse>(
+            `/human-talent/requisitions/${requisitionId}/candidates/batches`
+        );
+
+    return response.data;
+};
+
+// Confirma la preselección de uno o varios candidatos.
+export const preselectPersonnelRequisitionCandidates = async (
+    requisitionId: number,
+    data: PreselectPersonnelRequisitionCandidatesData
+): Promise<PreselectPersonnelRequisitionCandidatesResponse> => {
+    const response =
+        await api.patch<PreselectPersonnelRequisitionCandidatesResponse>(
+            `/human-talent/requisitions/${requisitionId}/candidates/preselect`,
+            data
         );
 
     return response.data;
