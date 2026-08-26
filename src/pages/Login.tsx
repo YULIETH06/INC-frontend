@@ -1,14 +1,16 @@
 import {
   Alert,
   Box,
-  Button,
-  CircularProgress,
   Link,
-  TextField,
   Typography,
 } from "@mui/material";
+
 import { useTheme } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
+
+import TextInput from "../components/common/inputs/TextInput";
+import PasswordInput from "../components/common/inputs/PasswordInput";
+import ActionButton from "../components/common/ActionButton";
 
 import { useLogin } from "../hooks/auth/useLogin";
 import { appBrand } from "../data/appBrand";
@@ -36,6 +38,7 @@ const Login = () => {
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
+      padding: 2,
 
       background: `linear-gradient(
         135deg,
@@ -45,7 +48,8 @@ const Login = () => {
     },
 
     form: {
-      width: "420px",
+      width: "100%",
+      maxWidth: "420px",
       minHeight: "430px",
 
       display: "flex",
@@ -66,25 +70,6 @@ const Login = () => {
       height: "auto",
       objectFit: "contain",
       marginBottom: "0.5rem",
-    },
-
-    input: {
-      width: "100%",
-    },
-
-    button: {
-      width: "100%",
-      height: "45px",
-
-      textTransform: "none",
-
-      backgroundColor: theme.palette.primary.main,
-
-      fontWeight: 600,
-
-      "&:hover": {
-        backgroundColor: theme.palette.primary.dark,
-      },
     },
 
     link: {
@@ -126,45 +111,40 @@ const Login = () => {
           </Alert>
         )}
 
-        <TextField
+        <TextInput
           label="Correo electrónico"
           value={email}
-          onChange={(event) => handleEmailChange(event.target.value)}
-          sx={style.input}
-          fullWidth
+          onChange={handleEmailChange}
           required
           disabled={loading}
-          error={!!formErrors.email}
+          error={Boolean(formErrors.email)}
           helperText={formErrors.email}
+          autoComplete="email"
         />
 
-        <TextField
+        <PasswordInput
           label="Contraseña"
-          type="password"
           value={password}
-          onChange={(event) => handlePasswordChange(event.target.value)}
-          sx={style.input}
-          fullWidth
+          onChange={handlePasswordChange}
           required
           disabled={loading}
-          error={!!formErrors.password}
+          error={Boolean(formErrors.password)}
           helperText={formErrors.password}
+          autoComplete="current-password"
         />
 
-        <Button
+        <ActionButton
+          actionType="custom"
           type="submit"
-          variant="contained"
-          sx={style.button}
-          disabled={loading}
+          loading={loading}
+          loadingText="Ingresando..."
+          size="large"
+          fullWidth
         >
-          {loading ? (
-            <CircularProgress size={24} color="inherit" />
-          ) : (
-            "Iniciar sesión"
-          )}
-        </Button>
+          Iniciar sesión
+        </ActionButton>
 
-        <Link sx={style.link}>¿Olvidaste tu contraseña?</Link>
+        {/* <Link sx={style.link}>¿Olvidaste tu contraseña?</Link> */}
 
         <Typography
           sx={{

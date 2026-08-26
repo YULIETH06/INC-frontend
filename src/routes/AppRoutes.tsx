@@ -20,6 +20,7 @@ import PersonnelCandidateValidationDetail from "../pages/humanTalen/candidateVal
 import PersonnelCandidateValidations from "../pages/humanTalen/candidateValidation/PersonnelCandidateValidations";
 
 import UserSignature from "../pages/users/UserSignature";
+import ChangePassword from "../pages/users/ChangePassword";
 import PositionProfileRevisions from "../pages/positionManagement/PositionProfileRevisions";
 import PositionProfileRevisionDetail from "../pages/positionManagement/PositionProfileRevisionDetail";
 
@@ -85,9 +86,15 @@ const AppRoutes = () => {
 
           {/* Usuario */}
           <Route path="/users" element={<AdminUser />} />
+
           <Route
-            path="my-signature"
+            path="/my-signature"
             element={<UserSignature />}
+          />
+
+          <Route
+            path="/change-password"
+            element={<ChangePassword />}
           />
 
         </Route>

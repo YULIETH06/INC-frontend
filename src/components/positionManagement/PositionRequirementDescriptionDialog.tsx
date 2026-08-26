@@ -1,4 +1,6 @@
-import type { FormEvent } from "react";
+import type {
+    FormEvent,
+} from "react";
 
 import {
     Box,
@@ -7,17 +9,15 @@ import {
     DialogContent,
     DialogTitle,
     Divider,
-    IconButton,
     Stack,
-    TextField,
     Typography,
 } from "@mui/material";
 
-import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
-import CloseIcon from "@mui/icons-material/Close";
-import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
-
 import ActionButton from "../common/ActionButton";
+import IconActionButton from "../common/IconActionButton";
+import TextAreaInput from "../common/inputs/TextAreaInput";
+
+import { appIcons } from "../../icons/appIcons";
 
 import type {
     PositionRequirementDescriptionForm,
@@ -58,6 +58,9 @@ const PositionRequirementDescriptionDialog = ({
     onSubmit,
     onClose,
 }: PositionRequirementDescriptionDialogProps) => {
+    const SaveIcon = appIcons.save;
+    const CreateIcon = appIcons.create;
+
     // Evita cerrar el diálogo mientras se procesa el formulario.
     const handleDialogClose = () => {
         if (loadingSubmit) {
@@ -96,9 +99,9 @@ const PositionRequirementDescriptionDialog = ({
                         }}
                     >
                         {isEditing ? (
-                            <SaveOutlinedIcon color="primary" />
+                            <SaveIcon color="primary" />
                         ) : (
-                            <AddCircleOutlineOutlinedIcon color="primary" />
+                            <CreateIcon color="primary" />
                         )}
 
                         <Box>
@@ -126,13 +129,12 @@ const PositionRequirementDescriptionDialog = ({
                         </Box>
                     </Stack>
 
-                    <IconButton
+                    <IconActionButton
+                        icon="cancel"
+                        tooltip="Cerrar formulario"
                         onClick={handleDialogClose}
                         disabled={loadingSubmit}
-                        aria-label="Cerrar formulario"
-                    >
-                        <CloseIcon />
-                    </IconButton>
+                    />
                 </DialogTitle>
 
                 <Divider />
@@ -175,28 +177,27 @@ const PositionRequirementDescriptionDialog = ({
                             </Typography>
                         </Box>
 
-                        <TextField
+                        <TextAreaInput
                             label="Descripción"
                             value={form.description}
-                            onChange={(event) =>
-                                onDescriptionChange(
-                                    event.target.value
-                                )
-                            }
+                            onChange={onDescriptionChange}
+                            rows={4}
+                            required
+                            disabled={loadingSubmit}
+                            placeholder="Escribe la formación, experiencia o conocimiento requerido."
                             error={Boolean(
                                 formErrors.description
                             )}
                             helperText={
-                                formErrors.description ||
-                                `${form.description.length}/500`
+                                formErrors.description
+                                    ? formErrors.description
+                                    : `${form.description.length}/500`
                             }
-                            multiline
-                            minRows={4}
-                            maxRows={8}
-                            fullWidth
-                            required
-                            disabled={loadingSubmit}
-                            placeholder="Escribe la formación, experiencia o conocimiento requerido."
+                            slotProps={{
+                                htmlInput: {
+                                    maxLength: 500,
+                                },
+                            }}
                         />
                     </Stack>
                 </DialogContent>

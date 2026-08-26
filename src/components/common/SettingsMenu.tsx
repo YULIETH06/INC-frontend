@@ -13,9 +13,7 @@ import {
 import { alpha, useTheme } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 
-import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
-import DrawOutlinedIcon from "@mui/icons-material/DrawOutlined";
-import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
+import { appIcons } from "../../icons/appIcons";
 
 // Menú de configuración del header.
 const SettingsMenu = () => {
@@ -25,6 +23,12 @@ const SettingsMenu = () => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
     const open = Boolean(anchorEl);
+
+    // const SettingsIcon = appIcons.settings;
+    const SettingsIcon = appIcons.settings;
+    const CloseIcon = appIcons.cancel;
+    const SignatureIcon = appIcons.signature;
+    const ChangePasswordIcon = appIcons.changePassword;
 
     // Abre el menú de configuración.
     const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -40,6 +44,12 @@ const SettingsMenu = () => {
     const goToMySignature = () => {
         handleCloseMenu();
         navigate("/my-signature");
+    };
+
+    // Navega a la página de cambio de contraseña.
+    const goToChangePassword = () => {
+        handleCloseMenu();
+        navigate("/change-password");
     };
 
     const style = {
@@ -124,8 +134,9 @@ const SettingsMenu = () => {
             borderRadius: 2.5,
             color: theme.palette.text.primary,
             transition: "all 0.18s ease",
+            border: "1px solid transparent",
             "&:hover": {
-                 border: `1px solid ${theme.palette.primary.main}`,
+                border: `1px solid ${theme.palette.primary.main}`,
                 color: theme.palette.primary.main,
             },
         },
@@ -150,7 +161,7 @@ const SettingsMenu = () => {
                     onClick={handleOpenMenu}
                     sx={open ? style.activeSettingsButton : style.settingsButton}
                 >
-                    <SettingsOutlinedIcon />
+                    <SettingsIcon />
                 </IconButton>
             </Tooltip>
 
@@ -183,19 +194,36 @@ const SettingsMenu = () => {
                             onClick={handleCloseMenu}
                             sx={style.smallIconButton}
                         >
-                            <CloseOutlinedIcon fontSize="small" />
+                            <CloseIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
                 </Box>
 
                 <Box sx={style.menuContent}>
-                    <MenuItem onClick={goToMySignature} sx={style.menuItem}>
+                    <MenuItem
+                        onClick={goToMySignature}
+                        sx={style.menuItem}
+                    >
                         <ListItemIcon sx={style.menuIcon}>
-                            <DrawOutlinedIcon fontSize="small" />
+                            <SignatureIcon fontSize="small" />
                         </ListItemIcon>
 
                         <ListItemText
                             primary="Mi firma"
+                            sx={style.menuText}
+                        />
+                    </MenuItem>
+
+                    <MenuItem
+                        onClick={goToChangePassword}
+                        sx={style.menuItem}
+                    >
+                        <ListItemIcon sx={style.menuIcon}>
+                            <ChangePasswordIcon fontSize="small" />
+                        </ListItemIcon>
+
+                        <ListItemText
+                            primary="Cambiar contraseña"
                             sx={style.menuText}
                         />
                     </MenuItem>

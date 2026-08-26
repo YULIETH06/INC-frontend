@@ -5,14 +5,19 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
-    FormControl,
-    InputLabel,
-    MenuItem,
-    Select,
-    TextField,
 } from "@mui/material";
 
 import ActionButton from "../../common/ActionButton";
+import ClearableSelect from "../../common/ClearableSelect";
+
+import NumberInput from "../../common/inputs/NumberInput";
+import MoneyInput from "../../common/inputs/MoneyInput";
+
+import {
+    contractTypeOptions,
+    directContractTypeOptions,
+    internContractTypeOptions,
+} from "../../../data/humanTalentOptions";
 
 import type {
     PersonnelRequisition,
@@ -32,7 +37,12 @@ interface PersonnelHiringConfirmationDialogProps {
     requisition: PersonnelRequisition | null;
     form: HiringConfirmationForm;
     isValid: boolean;
-    onChange: (field: keyof HiringConfirmationForm, value: string) => void;
+
+    onChange: (
+        field: keyof HiringConfirmationForm,
+        value: string
+    ) => void;
+
     onClose: () => void;
     onConfirm: () => void;
 }
@@ -48,6 +58,19 @@ const PersonnelHiringConfirmationDialog = ({
     onClose,
     onConfirm,
 }: PersonnelHiringConfirmationDialogProps) => {
+    const showDirectContractType =
+        form.contractType === "DIRECTO";
+
+    const showContractDuration =
+        form.contractType === "TEMPORAL" ||
+        (
+            form.contractType === "DIRECTO" &&
+            form.directContractType === "FIJO"
+        );
+
+    const showInternContractType =
+        form.contractType === "PRACTICANTE";
+
     return (
         <Dialog
             open={open}
@@ -65,7 +88,12 @@ const PersonnelHiringConfirmationDialog = ({
 
             <DialogContent>
                 {requisition && (
-                    <Alert severity="info" sx={{ mb: 2 }}>
+                    <Alert
+                        severity="info"
+                        sx={{
+                            mb: 2,
+                        }}
+                    >
                         {requisition.position.name} -{" "}
                         {requisition.department.name}
                     </Alert>
@@ -74,94 +102,92 @@ const PersonnelHiringConfirmationDialog = ({
                 <Box
                     sx={{
                         display: "grid",
+                        gridTemplateColumns: "1fr",
                         gap: 2,
                         mt: 1,
                     }}
                 >
-                    <FormControl fullWidth>
-                        <InputLabel>Tipo de contrato</InputLabel>
-                        <Select
-                            label="Tipo de contrato"
-                            value={form.contractType}
-                            onChange={(event) =>
+                    <ClearableSelect
+                        label="Tipo de contrato"
+                        value={form.contractType}
+                        required
+                        clearable
+                        disabled={loading}
+                        options={contractTypeOptions}
+                        onChange={(value) =>
+                            onChange(
+                                "contractType",
+                                value
+                            )
+                        }
+                    />
+
+                    {showDirectContractType && (
+                        <ClearableSelect
+                            label="Tipo de contrato directo"
+                            value={form.directContractType}
+                            required
+                            clearable
+                            disabled={loading}
+                            options={
+                                directContractTypeOptions
+                            }
+                            onChange={(value) =>
                                 onChange(
-                                    "contractType",
-                                    String(event.target.value)
+                                    "directContractType",
+                                    value
                                 )
                             }
-                        >
-                            <MenuItem value="DIRECTO">Directo</MenuItem>
-                            <MenuItem value="TEMPORAL">Temporal</MenuItem>
-                            <MenuItem value="PRACTICANTE">
-                                Practicante
-                            </MenuItem>
-                        </Select>
-                    </FormControl>
-
-                    {form.contractType === "DIRECTO" && (
-                        <FormControl fullWidth>
-                            <InputLabel>Tipo contrato directo</InputLabel>
-                            <Select
-                                label="Tipo contrato directo"
-                                value={form.directContractType}
-                                onChange={(event) =>
-                                    onChange(
-                                        "directContractType",
-                                        String(event.target.value)
-                                    )
-                                }
-                            >
-                                <MenuItem value="INDEFINIDO">
-                                    Indefinido
-                                </MenuItem>
-                                <MenuItem value="FIJO">Fijo</MenuItem>
-                            </Select>
-                        </FormControl>
+                        />
                     )}
 
-                    {(form.contractType === "TEMPORAL" ||
-                        (form.contractType === "DIRECTO" &&
-                            form.directContractType === "FIJO")) && (
-                            <TextField
-                                label="Duración en meses"
-                                value={form.contractDurationMonths}
-                                onChange={(event) =>
-                                    onChange(
-                                        "contractDurationMonths",
-                                        event.target.value
-                                    )
-                                }
-                                fullWidth
-                            />
-                        )}
-
-                    {form.contractType === "PRACTICANTE" && (
-                        <FormControl fullWidth>
-                            <InputLabel>Tipo de practicante</InputLabel>
-                            <Select
-                                label="Tipo de practicante"
-                                value={form.internContractType}
-                                onChange={(event) =>
-                                    onChange(
-                                        "internContractType",
-                                        String(event.target.value)
-                                    )
-                                }
-                            >
-                                <MenuItem value="APRENDIZ">Aprendiz</MenuItem>
-                                <MenuItem value="PASANTE">Pasante</MenuItem>
-                                <MenuItem value="ROTANTE">Rotante</MenuItem>
-                            </Select>
-                        </FormControl>
+                    {showContractDuration && (
+                        <NumberInput
+                            label="Duración en meses"
+                            value={
+                                form.contractDurationMonths
+                            }
+                            required
+                            disabled={loading}
+                            onChange={(value) =>
+                                onChange(
+                                    "contractDurationMonths",
+                                    value
+                                )
+                            }
+                        />
                     )}
 
-                    <TextField
+                    {showInternContractType && (
+                        <ClearableSelect
+                            label="Tipo de practicante"
+                            value={form.internContractType}
+                            required
+                            clearable
+                            disabled={loading}
+                            options={
+                                internContractTypeOptions
+                            }
+                            onChange={(value) =>
+                                onChange(
+                                    "internContractType",
+                                    value
+                                )
+                            }
+                        />
+                    )}
+
+                    <MoneyInput
                         label="Salario aprobado"
                         value={form.approvedSalary}
-                        onChange={(event) =>
-                            onChange("approvedSalary", event.target.value)
+                        required
+                        disabled={loading}
+                        onChange={(value) =>
+                            onChange(
+                                "approvedSalary",
+                                value
+                            )
                         }
-                        fullWidth
                     />
                 </Box>
             </DialogContent>

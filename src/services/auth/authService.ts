@@ -1,5 +1,7 @@
 import api from "../../api/axios";
 import type {
+    ChangePasswordData,
+    ChangePasswordResponse,
     LoginData,
     LoginResponse,
     RegisterData,
@@ -20,6 +22,18 @@ export const registerUser = async (
     data: RegisterData
 ): Promise<RegisterResponse> => {
     const response = await api.post<RegisterResponse>("/auth/register", data);
+
+    return response.data;
+};
+
+// Cambia la contraseña del usuario autenticado.
+export const changePassword = async (
+    data: ChangePasswordData
+): Promise<ChangePasswordResponse> => {
+    const response = await api.patch<ChangePasswordResponse>(
+        "/auth/password",
+        data
+    );
 
     return response.data;
 };

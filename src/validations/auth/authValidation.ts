@@ -35,3 +35,27 @@ export const registerSchema = yup.object({
         .required("Campo obligatorio")
         .min(6, "Mínimo 6 caracteres."),
 });
+
+// Validación del formulario de cambio de contraseña.
+export const changePasswordSchema = yup.object({
+    currentPassword: yup
+        .string()
+        .required("Campo obligatorio"),
+
+    newPassword: yup
+        .string()
+        .required("Campo obligatorio")
+        .min(6, "Mínimo 6 caracteres.")
+        .notOneOf(
+            [yup.ref("currentPassword")],
+            "La nueva contraseña debe ser diferente a la actual."
+        ),
+
+    confirmPassword: yup
+        .string()
+        .required("Campo obligatorio")
+        .oneOf(
+            [yup.ref("newPassword")],
+            "Las contraseñas no coinciden."
+        ),
+});

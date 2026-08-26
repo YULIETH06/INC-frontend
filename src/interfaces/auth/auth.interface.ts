@@ -56,3 +56,21 @@ export interface RegisterFormErrors {
     email: string;
     password: string;
 }
+
+// Datos necesarios para cambiar la contraseña.
+export interface ChangePasswordData {
+    currentPassword: string;
+    newPassword: string;
+}
+
+// Respuesta del cambio de contraseña.
+export interface ChangePasswordResponse {
+    message: string;
+}
+
+// Errores de validación YUP del formulario de cambio de contraseña.
+export interface ChangePasswordFormErrors {
+    currentPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+}

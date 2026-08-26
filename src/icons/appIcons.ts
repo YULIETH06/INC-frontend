@@ -6,6 +6,7 @@ import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutli
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
 import OpenInNewOutlinedIcon from "@mui/icons-material/OpenInNewOutlined";
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 import RestartAltOutlinedIcon from "@mui/icons-material/RestartAltOutlined";
@@ -16,6 +17,12 @@ import UploadFileOutlinedIcon from "@mui/icons-material/UploadFileOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
+import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
+import DrawOutlinedIcon from "@mui/icons-material/DrawOutlined";
+import KeyOutlinedIcon from "@mui/icons-material/KeyOutlined";
+import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
+import FilterListOutlinedIcon from "@mui/icons-material/FilterListOutlined";
+import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
 
 export const appIcons = {
     save: SaveOutlinedIcon,
@@ -25,6 +32,7 @@ export const appIcons = {
     reject: CancelOutlinedIcon,
     delete: DeleteOutlineOutlinedIcon,
     view: VisibilityOutlinedIcon,
+    hide: VisibilityOffOutlinedIcon,
     open: OpenInNewOutlinedIcon,
     create: AddCircleOutlineOutlinedIcon,
     send: SendOutlinedIcon,
@@ -36,6 +44,12 @@ export const appIcons = {
     lock: LockOutlinedIcon,
     unlock: LockOpenOutlinedIcon,
     history: HistoryOutlinedIcon,
+    settings: SettingsOutlinedIcon,
+    signature: DrawOutlinedIcon,
+    changePassword: KeyOutlinedIcon,
+    search: SearchOutlinedIcon,
+    filter: FilterListOutlinedIcon,
+    refresh: RefreshOutlinedIcon,
 };
 
 export type AppIconName =

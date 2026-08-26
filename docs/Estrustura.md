@@ -136,6 +136,13 @@ components/
 │   ├── InfoItem.tsx
 │   ├── InfoTooltip.tsx
 │   ├── IconActionButton.tsx
+│   ├── inputs/
+│   │   ├── FileInput.tsx
+│   │   ├── MoneyInput.tsx
+│   │   ├── NumberInput.tsx
+│   │   ├── PasswordInput.tsx
+│   │   ├── TextAreaInput.tsx
+│   │   └── TextInput.tsx
 │   ├── LoadingBox.tsx
 │   ├── NotificationBell.tsx
 │   ├── PageContainer.tsx
@@ -229,10 +236,33 @@ Estos componentes no pertenecen exclusivamente a un módulo, por lo tanto, puede
 | `ProcessStepper.tsx`      | Componente reutilizable para representar procesos por etapas mediante `Stepper`. Permite definir pasos completados, deshabilitados, etapa activa y navegación controlada entre pasos.                                                                                                                                                                                                                                                                                                                                                         | Puede utilizarse en flujos secuenciales como validaciones, aprobaciones, configuraciones guiadas u otros procesos por etapas.                                                                           |
 | `RadioOptionGroup.tsx`    | Componente reutilizable para seleccionar una única opción mediante botones de radio. Permite configurar opciones, valor, estado deshabilitado, mensaje de error, orientación y un `label` opcional.                                                                                                                                                                                                                                                                            | Puede utilizarse en formularios y etapas que necesiten elecciones exclusivas como Sí/No, tipo de cargo, concepto de aplicación u otras opciones cerradas.                                               |
 | `SectionCard.tsx`         | Componente reutilizable para agrupar contenido dentro de una tarjeta visual. Admite título, subtítulo, acciones opcionales y contenido adicional mediante `titleAdornment`, permitiendo ubicar junto al título estados, chips o ayudas informativas sin mezclarlos con las acciones del encabezado. Cuando no se requiere encabezado puede utilizarse únicamente como contenedor visual del contenido. | Puede utilizarse en detalles de requisición, formularios, configuraciones, perfiles y reportes.|
-| `SettingsMenu.tsx`        | Componente reutilizable encargado de mostrar las opciones personales y de configuración del usuario autenticado mediante un menú desplegable. Centraliza accesos relacionados con el perfil, la firma del usuario y otras configuraciones que puedan agregarse posteriormente.                                                                                                                                                                                                                                                                                             | Se utiliza normalmente desde `Header.tsx` para permitir que el usuario acceda a sus configuraciones sin ocupar espacio permanente dentro del encabezado.                                               |
+| `SettingsMenu.tsx`        | Componente reutilizable encargado de mostrar las opciones personales y de configuración del usuario autenticado mediante un menú desplegable. Centraliza accesos como la firma del usuario y el cambio de contraseña.                                                                                                                                                                                                                                                                                             | Se utiliza normalmente desde `Header.tsx` para permitir que el usuario acceda a sus configuraciones sin ocupar espacio permanente dentro del encabezado.                                               |
 | `SidebarMenu.tsx`         | Componente reutilizable que representa el menú lateral del sistema. Permite mostrar opciones de navegación según los módulos disponibles y el rol del usuario.                                                                                                                                                                                                                                                                                                                                                                                                             | Se utiliza dentro del layout principal para navegar entre las secciones del sistema.                                                                                                                   |
 | `StatsSummary.tsx`        | Componente reutilizable para mostrar tarjetas de resumen con un ícono, una etiqueta y un valor numérico o textual. Permite presentar indicadores importantes de una vista de forma clara y compacta.                                                                                                                                                                                                                                                                                                                                                                       | Puede utilizarse en módulos como PQR, usuarios, dashboard o reportes para mostrar conteos como total de registros, pendientes, cerrados, asignados o por calificar.                                    |
 | `ViewToggleButtons.tsx`   | Componente reutilizable para mostrar botones de cambio de vista. Recibe opciones con etiqueta, valor, ícono y contador opcional, permitiendo alternar entre diferentes estados o secciones de una página.                                                                                                                                                                                                                                                                                                                                                                  | Puede utilizarse en vistas que necesiten cambiar entre categorías, por ejemplo PQR disponibles y PQR asignadas, registros activos e inactivos, o diferentes tipos de listado.                          |
+
+##### `src/components/common/inputs/`
+
+Esta subcarpeta agrupa los campos de entrada reutilizables del sistema y mantiene un comportamiento visual consistente en los formularios.
+
+```txt
+components/common/inputs/
+├── FileInput.tsx
+├── MoneyInput.tsx
+├── NumberInput.tsx
+├── PasswordInput.tsx
+├── TextAreaInput.tsx
+└── TextInput.tsx
+```
+
+| Componente | Uso principal |
+| ---------- | ------------- |
+| `FileInput.tsx` | Selección y visualización de archivos, incluyendo nombre, tamaño, eliminación, error y texto de ayuda. |
+| `MoneyInput.tsx` | Captura valores monetarios y presenta el valor con formato numérico. |
+| `NumberInput.tsx` | Captura valores numéricos enteros evitando caracteres no permitidos. |
+| `PasswordInput.tsx` | Captura contraseñas y permite mostrar u ocultar su contenido. |
+| `TextAreaInput.tsx` | Captura observaciones, motivos, comentarios y otros textos extensos. |
+| `TextInput.tsx` | Captura textos de una sola línea y permite mostrar información no editable mediante `readOnly`. |
 
 El objetivo de `components/common/` es centralizar todos los elementos visuales que pueden servir en varias partes del sistema. Por ejemplo, `DataTable.tsx` no debe ser una tabla exclusiva para usuarios, sino una tabla general que pueda adaptarse a usuarios, PQR, roles o cualquier otro listado.
 
@@ -603,6 +633,7 @@ En lugar de manejar toda la lógica directamente dentro de las páginas, los hoo
 hooks/
 │
 ├── auth/
+│   ├── useChangePassword.ts
 │   ├── useLogin.ts
 │   └── useRegister.ts
 │
@@ -652,14 +683,16 @@ Los hooks permiten que las páginas y componentes se enfoquen principalmente en 
 
 ```txt
 hooks/auth/
+├── useChangePassword.ts
 ├── useLogin.ts
 └── useRegister.ts
 ```
 
-| Hook             | Descripción                                                                                                                                                                                                                | Uso dentro del proyecto                 |
-| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
-| `useLogin.ts`    | Maneja la lógica del inicio de sesión. Controla los valores del formulario, validaciones, mensajes de error, estado de carga, almacenamiento de la sesión y redirección del usuario después de autenticarse correctamente. | Se utiliza en la página `Login.tsx`.    |
-| `useRegister.ts` | Maneja la lógica del registro de usuarios. Controla los campos del formulario, validaciones, mensajes de éxito o error, estado de carga y redirección al inicio de sesión después de completar el registro.                | Se utiliza en la página `Register.tsx`. |
+| Hook | Descripción | Uso dentro del proyecto |
+| ---- | ----------- | ----------------------- |
+| `useChangePassword.ts` | Maneja los campos, validaciones, carga y mensajes del cambio de contraseña del usuario autenticado. | Se utiliza en `ChangePassword.tsx`. |
+| `useLogin.ts` | Maneja la lógica del inicio de sesión, validaciones, errores, carga y autenticación del usuario. | Se utiliza en `Login.tsx`. |
+| `useRegister.ts` | Maneja los campos, validaciones, mensajes y estado de carga del registro de usuarios. | Se utiliza en `Register.tsx`. |
 
 ---
 
@@ -805,6 +838,7 @@ approve
 reject
 delete
 view
+hide
 open
 create
 send
@@ -816,9 +850,14 @@ upload
 lock
 unlock
 history
+settings
+signature
+changePassword
 ```
 
 También define el tipo `AppIconName`, utilizado para limitar los nombres de íconos permitidos en los componentes que consumen este catálogo.
+
+Convención actual: `save` se utiliza para acciones principales de guardar o enviar formularios, mientras que `create` se reserva para acciones de agregar nuevos elementos.
 
 | Archivo | Descripción | Uso dentro del proyecto |
 | ------- | ----------- | ----------------------- |
@@ -892,7 +931,7 @@ interfaces/auth/
 
 | Archivo             | Descripción                                                                                                                          | Uso dentro del proyecto                                                                       |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
-| `auth.interface.ts` | Define los tipos relacionados con autenticación, inicio de sesión, registro, respuestas del backend y datos del usuario autenticado. | Se utiliza en servicios, hooks, contexto y páginas relacionadas con login, registro y sesión. |
+| `auth.interface.ts` | Define los tipos relacionados con autenticación, inicio de sesión, registro, cambio de contraseña, respuestas del backend y datos del usuario autenticado. | Se utiliza en servicios, hooks, contexto y páginas relacionadas con autenticación y sesión. |
 
 ---
 
@@ -1038,6 +1077,7 @@ pages/
 │       └── MyPqrs.tsx
 │
 └── users/
+    ├── ChangePassword.tsx
     └── UserSignature.tsx
 ```
 
@@ -1170,14 +1210,16 @@ Las páginas del módulo de PQR se organizan según el tipo de usuario y las acc
 
 ```txt
 pages/users/
+├── ChangePassword.tsx
 └── UserSignature.tsx
 ```
 
-| Página              | Descripción                                                                                                                                                                                                                                             |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Página | Descripción |
+| ------ | ----------- |
+| `ChangePassword.tsx` | Muestra la configuración para cambiar la contraseña del usuario autenticado mediante `useChangePassword.ts` y los campos reutilizables de contraseña. |
 | `UserSignature.tsx` | Muestra la página de configuración de firma del usuario autenticado. Utiliza `UserSignatureUploader.tsx` y `useUserSignature.ts` para seleccionar, validar, previsualizar y cargar la imagen que será utilizada en aprobaciones y formatos del sistema. |
 
-La página se ubica en `pages/users/` porque la firma pertenece a la configuración del usuario y puede ser utilizada por diferentes módulos, no solamente por Talento Humano.
+Estas páginas se ubican en `pages/users/` porque corresponden a configuraciones personales del usuario y pueden utilizarse independientemente de los módulos funcionales del sistema.
 
 ---
 
@@ -1286,7 +1328,7 @@ services/auth/
 
 | Archivo          | Descripción                                                                                 | Uso dentro del proyecto                                                                                  |
 | ---------------- | ------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `authService.ts` | Contiene las funciones HTTP relacionadas con el inicio de sesión y el registro de usuarios. | Se utiliza desde los hooks de autenticación para enviar las credenciales y datos de registro al backend. |
+| `authService.ts` | Contiene las funciones HTTP relacionadas con inicio de sesión, registro y cambio de contraseña. | Se utiliza desde los hooks de autenticación para comunicarse con los endpoints correspondientes. |
 
 ---
 
@@ -1295,12 +1337,14 @@ services/auth/
 ```txt
 loginUser()
 registerUser()
+changePassword()
 ```
 
-| Función              | Descripción                                                                   |
-| -------------------- | ----------------------------------------------------------------------------- |
-| `loginUser(data)`    | Envía el correo y la contraseña al backend para iniciar sesión.               |
+| Función | Descripción |
+| ------- | ----------- |
+| `loginUser(data)` | Envía el correo y la contraseña al backend para iniciar sesión. |
 | `registerUser(data)` | Envía la información necesaria para registrar un nuevo usuario en el sistema. |
+| `changePassword(data)` | Envía la contraseña actual y la nueva contraseña del usuario autenticado al backend. |
 
 ---
 
@@ -2095,19 +2139,21 @@ validations/auth/
 
 Este archivo contiene las reglas de validación relacionadas con los formularios de autenticación del sistema.
 
-Se utiliza para validar los datos ingresados por el usuario antes de iniciar sesión o registrarse.
+Se utiliza para validar los datos ingresados por el usuario en los formularios de autenticación.
 
 ```txt
 loginSchema()
 registerSchema()
+changePasswordSchema()
 ```
 
-| Esquema            | Descripción                                                                                    | Uso dentro del proyecto         |
-| ------------------ | ---------------------------------------------------------------------------------------------- | ------------------------------- |
-| `loginSchema()`    | Valida los datos necesarios para iniciar sesión, como correo y contraseña.                     | Se utiliza en `useLogin.ts`.    |
-| `registerSchema()` | Valida los datos necesarios para registrar un nuevo usuario, como nombre, correo y contraseña. | Se utiliza en `useRegister.ts`. |
+| Esquema | Descripción | Uso dentro del proyecto |
+| ------- | ----------- | ----------------------- |
+| `loginSchema()` | Valida los datos necesarios para iniciar sesión, como correo y contraseña. | Se utiliza en `useLogin.ts`. |
+| `registerSchema()` | Valida nombre, correo y contraseña durante el registro. | Se utiliza en `useRegister.ts`. |
+| `changePasswordSchema()` | Valida la contraseña actual, la nueva contraseña y su confirmación antes de solicitar el cambio. | Se utiliza en `useChangePassword.ts`. |
 
-Este archivo permite mantener las reglas de autenticación centralizadas y evita repetir validaciones directamente en las páginas `Login.tsx` o `Register.tsx`.
+Este archivo mantiene centralizadas las reglas de los formularios de autenticación.
 
 ---
 

@@ -1,7 +1,4 @@
-import { Box, Button, TextField } from "@mui/material";
-
-import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
-import RestartAltOutlinedIcon from "@mui/icons-material/RestartAltOutlined";
+import { Box } from "@mui/material";
 
 import PageHeader from "../../../components/common/PageHeader";
 import FormSection from "../../../components/common/FormSection";
@@ -9,6 +6,13 @@ import FormGrid from "../../../components/common/FormGrid";
 import ClearableSelect from "../../../components/common/ClearableSelect";
 import CustomSnackbar from "../../../components/common/CustomSnackbar";
 import LoadingBox from "../../../components/common/LoadingBox";
+import ActionButton from "../../../components/common/ActionButton";
+import PageContainer from "../../../components/common/PageContainer";
+
+import TextAreaInput from "../../../components/common/inputs/TextAreaInput";
+import NumberInput from "../../../components/common/inputs/NumberInput";
+import MoneyInput from "../../../components/common/inputs/MoneyInput";
+import TextInput from "../../../components/common/inputs/TextInput";
 
 import { useCreatePersonnelRequisition } from "../../../hooks/humanTalent/requisitions/useCreatePersonnelRequisition";
 
@@ -18,8 +22,6 @@ import {
     internContractTypeOptions,
     requisitionReasonOptions,
 } from "../../../data/humanTalentOptions";
-
-import { formatNumberInput } from "../../../utils/common/numberUtils";
 
 // Página donde el usuario crea una requisición de personal.
 const CreatePersonnelRequisition = () => {
@@ -98,42 +100,33 @@ const CreatePersonnelRequisition = () => {
     }
 
     return (
-        <Box sx={{ width: "100%" }}>
+        <PageContainer>
             <PageHeader
                 title="Crear requisición de personal"
                 subtitle="Registra una solicitud de personal indicando el área, cargo, ciudad, motivo, tipo de contratación y salario propuesto."
                 actions={
                     <>
-                        <Button
-                            variant="outlined"
-                            startIcon={<RestartAltOutlinedIcon />}
+                        <ActionButton
+                            actionType="clear"
+                            tooltip="Limpiar formulario"
                             onClick={resetForm}
                             disabled={!hasFormChanges || loadingSubmit}
-                            sx={{
-                                borderRadius: "8px",
-                                fontWeight: 700,
-                                textTransform: "none",
-                            }}
+                            fullWidthOnMobile
                         >
                             Limpiar
-                        </Button>
+                        </ActionButton>
 
-                        <Button
+                        <ActionButton
+                            actionType="save"
                             type="submit"
                             form="create-personnel-requisition-form"
-                            variant="contained"
-                            startIcon={<SaveOutlinedIcon />}
-                            disabled={loadingSubmit}
-                            sx={{
-                                borderRadius: "8px",
-                                fontWeight: 700,
-                                textTransform: "none",
-                            }}
+                            loading={loadingSubmit}
+                            loadingText="Creando..."
+                            tooltip="Crear requisición"
+                            fullWidthOnMobile
                         >
-                            {loadingSubmit
-                                ? "Creando..."
-                                : "Crear requisición"}
-                        </Button>
+                            Crear requisición
+                        </ActionButton>
                     </>
                 }
             />
@@ -177,25 +170,25 @@ const CreatePersonnelRequisition = () => {
                             onChange={handlePositionChange}
                         />
 
-                        <TextField
-                            fullWidth
+                        <TextInput
                             label="Código del perfil de cargo"
                             value={selectedPosition?.code || ""}
-                            disabled
+                            readOnly
                         />
 
-                        <TextField
-                            fullWidth
+                        <TextInput
                             label="Revisión"
                             value={
                                 loadingPositionRevision
                                     ? "Consultando..."
-                                    : currentPositionRevision?.revisionNumber ?? ""
+                                    : String(
+                                        currentPositionRevision?.revisionNumber ?? ""
+                                    )
                             }
+                            readOnly
                             required
                             error={Boolean(formErrors.positionRevisionId)}
                             helperText={formErrors.positionRevisionId}
-                            disabled
                         />
 
                         <ClearableSelect
@@ -227,17 +220,17 @@ const CreatePersonnelRequisition = () => {
                             onChange={handleReasonChange}
                         />
 
-                        <TextField
-                            fullWidth
+                        <TextAreaInput
                             label="Descripción del motivo"
                             required
-                            multiline
-                            minRows={3}
                             value={otherReason}
+                            onChange={handleOtherReasonChange}
+                            rows={3}
                             error={Boolean(formErrors.otherReason)}
-                            helperText={formErrors.otherReason}
-                            onChange={(event) =>
-                                handleOtherReasonChange(event.target.value)
+                            helperText={
+                                formErrors.otherReason
+                                    ? formErrors.otherReason
+                                    : `${otherReason.length}/300`
                             }
                             slotProps={{
                                 htmlInput: {
@@ -279,20 +272,16 @@ const CreatePersonnelRequisition = () => {
                         )}
 
                         {showContractDuration && (
-                            <TextField
-                                fullWidth
+                            <NumberInput
                                 label="Duración en meses"
-                                type="number"
                                 required
                                 value={contractDurationMonths}
+                                onChange={handleContractDurationMonthsChange}
                                 error={Boolean(
                                     formErrors.contractDurationMonths
                                 )}
-                                helperText={formErrors.contractDurationMonths}
-                                onChange={(event) =>
-                                    handleContractDurationMonthsChange(
-                                        event.target.value
-                                    )
+                                helperText={
+                                    formErrors.contractDurationMonths
                                 }
                             />
                         )}
@@ -309,17 +298,13 @@ const CreatePersonnelRequisition = () => {
                             />
                         )}
 
-                        <TextField
-                            fullWidth
+                        <MoneyInput
                             label="Salario propuesto"
-                            type="text"
                             required
-                            value={formatNumberInput(proposedSalary)}
+                            value={proposedSalary}
+                            onChange={handleProposedSalaryChange}
                             error={Boolean(formErrors.proposedSalary)}
                             helperText={formErrors.proposedSalary}
-                            onChange={(event) =>
-                                handleProposedSalaryChange(event.target.value)
-                            }
                         />
                     </FormGrid>
                 </FormSection>
@@ -331,7 +316,7 @@ const CreatePersonnelRequisition = () => {
                 severity={error ? "error" : messageSeverity}
                 onClose={closeMessage}
             />
-        </Box>
+        </PageContainer>
     );
 };
 
