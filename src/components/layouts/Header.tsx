@@ -16,8 +16,8 @@ import MenuIcon from "@mui/icons-material/Menu";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
 
-import NotificationBell from "./NotificationBell";
-import SettingsMenu from "./SettingsMenu";
+import NotificationBell from "../common/NotificationBell";
+import SettingsMenu from "../users/SettingsMenu";
 
 import { getUserRoleLabel } from "../../utils/users/userRoleUtils";
 import { appBrand } from "../../data/appBrand";

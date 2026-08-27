@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 
-import Login from "../pages/Login";
-import Register from "../pages/Register";
+import Login from "../pages/auth/Login";
+import Register from "../pages/auth/Register";
 import Dashboard from "../pages/Dashboard";
 import PrivateRoute from "./PrivateRoute";
 import DashboardLayout from "../components/layouts/DashboardLayout";
@@ -9,15 +9,15 @@ import DashboardLayout from "../components/layouts/DashboardLayout";
 import CreatePqr from "../pages/pqrs/user/CreatePqr";
 import MyPqrs from "../pages/pqrs/user/MyPqrs";
 import AdminPqrs from "../pages/pqrs/admin/AdminPqrs";
-import AdminUser from "../pages/pqrs/admin/AdminUser";
+import AdminUsers from "../pages/users/AdminUsers";
 import AgentPqrs from "../pages/pqrs/agent/AgentPqrs";
 
-import CreatePersonnelRequisition from "../pages/humanTalen/requisitions/CreatePersonnelRequisition";
-import PersonnelRequisitions from "../pages/humanTalen/requisitions/PersonnelRequisitions";
-import PersonnelRequisitionDetail from "../pages/humanTalen/requisitions/PersonnelRequisitionDetail";
-import PersonnelRequisitionFormat from "../pages/humanTalen/requisitions/PersonnelRequisitionFormat";
-import PersonnelCandidateValidationDetail from "../pages/humanTalen/candidateValidation/PersonnelCandidateValidationDetail";
-import PersonnelCandidateValidations from "../pages/humanTalen/candidateValidation/PersonnelCandidateValidations";
+import CreatePersonnelRequisition from "../pages/humanTalent/requisitions/CreatePersonnelRequisition";
+import PersonnelRequisitions from "../pages/humanTalent/requisitions/PersonnelRequisitions";
+import PersonnelRequisitionDetail from "../pages/humanTalent/requisitions/PersonnelRequisitionDetail";
+import PersonnelRequisitionFormat from "../pages/humanTalent/requisitions/PersonnelRequisitionFormat";
+import PersonnelCandidateValidationDetail from "../pages/humanTalent/candidateValidation/PersonnelCandidateValidationDetail";
+import PersonnelCandidateValidations from "../pages/humanTalent/candidateValidation/PersonnelCandidateValidations";
 
 import UserSignature from "../pages/users/UserSignature";
 import ChangePassword from "../pages/users/ChangePassword";
@@ -85,7 +85,7 @@ const AppRoutes = () => {
           />
 
           {/* Usuario */}
-          <Route path="/users" element={<AdminUser />} />
+          <Route path="/users" element={<AdminUsers />} />
 
           <Route
             path="/my-signature"

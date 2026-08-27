@@ -29,7 +29,7 @@ src/
 ├── routes/
 ├── services/
 ├── styles/
-├── templates/
+├── template/
 ├── theme/
 ├── utils/
 ├── validations/
@@ -127,12 +127,12 @@ components/
 │   ├── ConfirmActionDialog.tsx
 │   ├── CustomAccordion.tsx
 │   ├── CustomChip.tsx
+│   ├── CustomDialog.tsx
 │   ├── CustomSnackbar.tsx
 │   ├── DataTable.tsx
 │   ├── EmptyState.tsx
 │   ├── FormGrid.tsx
 │   ├── FormSection.tsx
-│   ├── Header.tsx
 │   ├── InfoItem.tsx
 │   ├── InfoTooltip.tsx
 │   ├── IconActionButton.tsx
@@ -143,6 +143,7 @@ components/
 │   │   ├── PasswordInput.tsx
 │   │   ├── TextAreaInput.tsx
 │   │   └── TextInput.tsx
+│   ├── ListToolbar.tsx
 │   ├── LoadingBox.tsx
 │   ├── NotificationBell.tsx
 │   ├── PageContainer.tsx
@@ -150,8 +151,6 @@ components/
 │   ├── ProcessStepper.tsx
 │   ├── RadioOptionGroup.tsx
 │   ├── SectionCard.tsx
-│   ├── SettingsMenu
-│   ├── SidebarMenu.tsx
 │   ├── StatsSummary.tsx
 │   └── ViewToggleButtons.tsx
 │
@@ -192,7 +191,9 @@ components/
 │   └── PositionRequirementDescriptionDialog.tsx
 │
 ├── layouts/
-│   └── DashboardLayout.tsx
+│   ├── DashboardLayout.tsx
+│   ├── Header.tsx
+│   └── SidebarMenu.tsx
 │
 ├── pqrs/
 │   ├── PqrChatView.tsx
@@ -201,6 +202,7 @@ components/
 │
 └── users/
     ├── ChangeUserRoleDialog.tsx
+    ├── SettingsMenu.tsx
     ├── UserRoleChip.tsx
     └── UserSignatureUploader.tsx
 ```
@@ -218,6 +220,7 @@ Estos componentes no pertenecen exclusivamente a un módulo, por lo tanto, puede
 | `ClearableSelect.tsx`     | Componente reutilizable de selección que permite escoger una opción y también limpiar el valor seleccionado.                                                                                                                                                                                                                                                                                                                                                                                                                                                               | Puede utilizarse en filtros, formularios, búsquedas avanzadas o selección de estados, roles y tipos de PQR.                                                                                            |
 | `ActionButton.tsx`        | Componente reutilizable para representar las acciones principales del sistema mediante botones con estilos, íconos y comportamientos consistentes. Obtiene los íconos predeterminados desde el catálogo central `appIcons.ts`, manteniendo una representación uniforme para acciones como guardar, editar, aprobar, rechazar, cancelar, eliminar, visualizar, abrir, crear, cerrar o reabrir. También controla estados de carga, texto de ayuda y adaptación para dispositivos móviles. | Puede utilizarse en formularios, listados, páginas de detalle, diálogos, cargas de archivos y procesos de cualquier módulo. |
 | `ConfirmActionDialog.tsx` | Componente reutilizable que muestra un diálogo de confirmación antes de ejecutar una acción importante. Permite recibir mensajes de texto o contenido React, información adicional mediante alertas configurables, tipos de acción como eliminar, cerrar o reabrir, texto personalizado durante la carga y botones consistentes mediante `ActionButton`.                                                     | Puede utilizarse para aprobar, rechazar, cancelar, eliminar, guardar, cerrar, reabrir o confirmar acciones dentro de Talento Humano, PQR, usuarios y otros módulos.                           |
+| `CustomDialog.tsx`        | Componente reutilizable que centraliza la estructura base de los diálogos del sistema. Permite configurar tamaño, título, subtítulo, botón opcional de cierre, contenido, acciones y estilos específicos del contenido o del área de acciones. | Puede utilizarse en formularios, confirmaciones, detalles y procesos modales de cualquier módulo que requieran una estructura consistente. |
 | `CustomAccordion.tsx`    | Componente reutilizable basado en `Accordion` de Material UI. Permite mostrar contenido expandible mediante un título, un indicador visual opcional y contenido personalizado recibido mediante `children`. Cada instancia administra de manera independiente su estado de expansión, por lo que varios elementos pueden permanecer abiertos al mismo tiempo. | Puede utilizarse en historiales, detalles agrupados, configuraciones, reportes u otros módulos que necesiten organizar información desplegable sin ocupar espacio permanente en la interfaz. |
 | `CustomChip.tsx`          | Componente reutilizable basado en `Chip` de Material UI. Permite mostrar etiquetas, estados o categorías utilizando colores estándar del tema o colores personalizados mediante propiedades como `customColor`, `backgroundColor`, `textColor` y `borderColor`. Conserva además propiedades como tamaño, variante, ícono, eliminación y estilos adicionales.                                                                                                                                                                                                               | Puede utilizarse para mostrar estados de requisiciones, PQR, préstamos, usuarios, roles, prioridades, categorías o cualquier valor que necesite una identificación visual compacta.                    |
 | `CustomSnackbar.tsx`      | Componente reutilizable para mostrar mensajes temporales al usuario, como acciones exitosas, errores, advertencias o información.                                                                                                                                                                                                                                                                                                                                                                                                                                          | Puede utilizarse en cualquier vista que necesite notificar resultados de acciones realizadas.                                                                                                          |
@@ -225,19 +228,17 @@ Estos componentes no pertenecen exclusivamente a un módulo, por lo tanto, puede
 | `EmptyState.tsx`          | Componente reutilizable para mostrar un mensaje cuando no existen datos disponibles en una vista.                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | Puede utilizarse cuando no hay usuarios, PQR, resultados de búsqueda o registros para mostrar.                                                                                                         |
 | `FormGrid.tsx`            | Componente reutilizable que organiza campos de formularios mediante CSS Grid. Permite definir columnas responsivas según el tamaño de pantalla.                                                                                                                                                                                                                                                                                                                                                                                                                            | Puede utilizarse en formularios de PQR, Talento Humano, usuarios, reportes u otros módulos que requieran distribuir campos de manera ordenada.                                                         |
 | `FormSection.tsx`         | Componente reutilizable que agrupa campos dentro de una sección visual con título y contenedor.                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | Puede utilizarse para dividir formularios en secciones como información principal, motivo, contratación, datos adicionales o resultados.                                                               |
-| `Header.tsx`              | Componente reutilizable que representa el encabezado superior de las vistas protegidas. Permite controlar la apertura del menú lateral y mostrar elementos globales como la información del usuario autenticado, las notificaciones y el menú de configuración.                                                                                                                                                                                                                                                                                                            | Se utiliza dentro de `DashboardLayout.tsx` para mantener un encabezado consistente en las páginas internas del sistema.                                                                                |
 | `InfoItem.tsx`            | Componente reutilizable para mostrar un dato compuesto por una etiqueta y un valor. Solo se renderiza cuando el valor contiene información y admite texto, componentes, íconos, enlaces o cualquier otro elemento de React.                                                                                                                                                                                                                                                                                                                                                | Puede utilizarse en páginas de detalle de requisiciones, usuarios, préstamos, PQR, reportes y otros módulos que necesiten presentar información en formato etiqueta-valor.                             |
 | `InfoTooltip.tsx`         | Componente reutilizable para mostrar información adicional dentro de un panel flotante. Utiliza un botón con ícono informativo y permite configurar título, contenido, posición, alineación, tamaño y etiqueta accesible. Se abre mediante clic o teclado y se cierra al hacer clic afuera, presionar Escape o volver a seleccionar el botón.                                                                                                                                                                                                                              | Puede utilizarse para mostrar motivos de rechazo, explicaciones de campos, ayudas contextuales, aclaraciones, instrucciones o información complementaria sin ocupar espacio permanente en la interfaz. |
 | `IconActionButton.tsx`    | Componente reutilizable para representar acciones secundarias o compactas mediante un botón de ícono. Recibe el nombre semántico del ícono, lo obtiene desde `appIcons.ts` y permite mostrar tooltip, estado de carga, estado activo y deshabilitado. | Puede utilizarse para acciones compactas como consultar historiales, visualizar información, actualizar o ejecutar acciones secundarias sin recargar visualmente la interfaz. |
 | `LoadingBox.tsx`          | Componente reutilizable para mostrar un indicador de carga centrado. Permite configurar la altura mínima del contenedor y el tamaño del indicador según el espacio disponible.                                                                                                                                                                                                                                                                                                                                                                                             | Puede utilizarse en tablas, formularios, secciones, vistas de detalle o cualquier módulo que cargue datos.                                                                                             |
+| `ListToolbar.tsx`         | Componente reutilizable para encabezados de listados y tablas. Centraliza búsqueda, filtros, actualización y acciones adicionales, manteniendo una distribución responsiva y consistente. | Puede utilizarse en administración de usuarios, PQR, Talento Humano y otros listados que necesiten búsqueda, filtros o acciones rápidas. |
 | `NotificationBell.tsx`    | Componente reutilizable que muestra la campana de notificaciones, el contador de notificaciones no leídas y el listado de notificaciones del usuario autenticado.                                                                                                                                                                                                                                                                                                                                                                                                          | Se utiliza dentro de `Header.tsx` para mostrar novedades de módulos como PQR y Talento Humano.                                                                                                         |
 | `PageContainer.tsx`       | Componente reutilizable que sirve como contenedor general para organizar el contenido de una página. Ayuda a mantener márgenes, espaciados y estructura visual consistente.                                                                                                                                                                                                                                                                                                                                                                                                | Puede utilizarse en páginas como usuarios, PQR, dashboard, reportes y demás vistas internas.                                                                                                           |
 | `PageHeader.tsx`          | Componente reutilizable para mostrar el encabezado particular de una página. Recibe título, subtítulo, acciones principales y contenido adicional mediante `titleAdornment`, lo que permite colocar junto al título elementos como estados, chips, indicadores o ayudas informativas.                                                                                                                                                                                                                                                                                      | Puede utilizarse en listados, formularios y páginas de detalle, como el detalle de una requisición donde se muestra el estado general junto al título.                                                 |
 | `ProcessStepper.tsx`      | Componente reutilizable para representar procesos por etapas mediante `Stepper`. Permite definir pasos completados, deshabilitados, etapa activa y navegación controlada entre pasos.                                                                                                                                                                                                                                                                                                                                                         | Puede utilizarse en flujos secuenciales como validaciones, aprobaciones, configuraciones guiadas u otros procesos por etapas.                                                                           |
 | `RadioOptionGroup.tsx`    | Componente reutilizable para seleccionar una única opción mediante botones de radio. Permite configurar opciones, valor, estado deshabilitado, mensaje de error, orientación y un `label` opcional.                                                                                                                                                                                                                                                                            | Puede utilizarse en formularios y etapas que necesiten elecciones exclusivas como Sí/No, tipo de cargo, concepto de aplicación u otras opciones cerradas.                                               |
 | `SectionCard.tsx`         | Componente reutilizable para agrupar contenido dentro de una tarjeta visual. Admite título, subtítulo, acciones opcionales y contenido adicional mediante `titleAdornment`, permitiendo ubicar junto al título estados, chips o ayudas informativas sin mezclarlos con las acciones del encabezado. Cuando no se requiere encabezado puede utilizarse únicamente como contenedor visual del contenido. | Puede utilizarse en detalles de requisición, formularios, configuraciones, perfiles y reportes.|
-| `SettingsMenu.tsx`        | Componente reutilizable encargado de mostrar las opciones personales y de configuración del usuario autenticado mediante un menú desplegable. Centraliza accesos como la firma del usuario y el cambio de contraseña.                                                                                                                                                                                                                                                                                             | Se utiliza normalmente desde `Header.tsx` para permitir que el usuario acceda a sus configuraciones sin ocupar espacio permanente dentro del encabezado.                                               |
-| `SidebarMenu.tsx`         | Componente reutilizable que representa el menú lateral del sistema. Permite mostrar opciones de navegación según los módulos disponibles y el rol del usuario.                                                                                                                                                                                                                                                                                                                                                                                                             | Se utiliza dentro del layout principal para navegar entre las secciones del sistema.                                                                                                                   |
 | `StatsSummary.tsx`        | Componente reutilizable para mostrar tarjetas de resumen con un ícono, una etiqueta y un valor numérico o textual. Permite presentar indicadores importantes de una vista de forma clara y compacta.                                                                                                                                                                                                                                                                                                                                                                       | Puede utilizarse en módulos como PQR, usuarios, dashboard o reportes para mostrar conteos como total de registros, pendientes, cerrados, asignados o por calificar.                                    |
 | `ViewToggleButtons.tsx`   | Componente reutilizable para mostrar botones de cambio de vista. Recibe opciones con etiqueta, valor, ícono y contador opcional, permitiendo alternar entre diferentes estados o secciones de una página.                                                                                                                                                                                                                                                                                                                                                                  | Puede utilizarse en vistas que necesiten cambiar entre categorías, por ejemplo PQR disponibles y PQR asignadas, registros activos e inactivos, o diferentes tipos de listado.                          |
 
@@ -270,14 +271,22 @@ El objetivo de `components/common/` es centralizar todos los elementos visuales 
 
 #### `src/components/layouts/`
 
-En esta carpeta se ubican los componentes encargados de definir la estructura visual general de las páginas.
+En esta carpeta se ubican los componentes encargados de definir la estructura visual general y la navegación principal de las páginas internas del sistema.
 
-| Componente            | Descripción                                                                                                                                                                | Uso dentro del proyecto                                                                                       |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `DashboardLayout.tsx` | Define la estructura principal de las páginas internas del sistema. Organiza elementos como el header, el sidebar y el área donde se renderiza el contenido de cada vista. | Se utiliza para envolver páginas protegidas como Dashboard, Usuarios, PQR, Reportes u otros módulos internos. |
+```txt
+components/layouts/
+├── DashboardLayout.tsx
+├── Header.tsx
+└── SidebarMenu.tsx
+```
 
-El layout permite mantener una misma estructura visual en las páginas principales del sistema y evita repetir el mismo diseño en cada vista.
+| Componente | Descripción | Uso dentro del proyecto |
+| ---------- | ----------- | ----------------------- |
+| `DashboardLayout.tsx` | Define la estructura principal de las páginas internas del sistema y organiza el encabezado, el menú lateral y el área donde se renderiza el contenido de cada vista. | Se utiliza para envolver las páginas protegidas del sistema. |
+| `Header.tsx` | Representa el encabezado superior de las vistas protegidas. Controla la apertura del menú lateral y muestra elementos globales como la información del usuario autenticado, las notificaciones y el menú de configuración. | Se utiliza dentro de `DashboardLayout.tsx` para mantener un encabezado consistente en las páginas internas. |
+| `SidebarMenu.tsx` | Representa el menú lateral de navegación y muestra las opciones disponibles de acuerdo con los módulos y permisos del usuario. | Se utiliza dentro del layout principal para navegar entre las diferentes secciones del sistema. |
 
+Estos componentes se mantienen en `components/layouts/` porque forman parte de la estructura y navegación global de las vistas protegidas, y no corresponden a componentes comunes independientes.
 ---
 
 #### `src/components/humanTalent/`
@@ -440,16 +449,24 @@ Estos componentes se ubican en `components/pqrs/` porque dependen directamente d
 #### `src/components/users/`
 
 En esta carpeta se ubican los componentes específicos del módulo de usuarios.
-Estos componentes dependen directamente de la información, acciones o reglas relacionadas con los usuarios del sistema.
+Estos componentes dependen directamente de la información, acciones o configuraciones relacionadas con los usuarios del sistema.
 
-| Componente                  | Descripción                                                                                                                                                                                                                                                                                                            | Uso dentro del proyecto                                                                                                                                                                                       |
-| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ChangeUserRoleDialog.tsx`  | Componente que muestra un modal para cambiar el rol de un usuario seleccionado. Permite visualizar información del usuario y seleccionar un nuevo rol.                                                                                                                                                                 | Se utiliza en la administración de usuarios.                                                                                                                                                                  |
-| `UserRoleChip.tsx`          | Componente visual que muestra el rol de un usuario mediante una etiqueta o chip con color, texto e ícono.                                                                                                                                                                                                              | Se utiliza en tablas, listados o detalles donde se necesite mostrar el rol de un usuario.                                                                                                                     |
-| `UserSignatureUploader.tsx` | Componente encargado de registrar o actualizar la firma del usuario autenticado. Permite seleccionar una imagen, validar el archivo, mostrar una vista previa y enviarlo al backend mediante `multipart/form-data`. La firma guardada se utiliza posteriormente en aprobaciones, vistos buenos y formatos imprimibles. | Puede abrirse desde el menú de configuración del usuario y se utiliza para garantizar que el usuario tenga una firma registrada antes de aprobar, rechazar o cancelar pasos dentro de los flujos del sistema. |
+```txt
+components/users/
+├── ChangeUserRoleDialog.tsx
+├── SettingsMenu.tsx
+├── UserRoleChip.tsx
+└── UserSignatureUploader.tsx
+```
 
-Estos componentes no se ubican en `components/common/` porque su uso está relacionado directamente con el módulo de usuarios.
+| Componente | Descripción | Uso dentro del proyecto |
+| ---------- | ----------- | ----------------------- |
+| `ChangeUserRoleDialog.tsx` | Componente que muestra un modal para cambiar el rol de un usuario seleccionado. Permite visualizar información del usuario y seleccionar un nuevo rol. | Se utiliza en la administración de usuarios. |
+| `SettingsMenu.tsx` | Componente encargado de mostrar las opciones personales y de configuración del usuario autenticado mediante un menú desplegable. Centraliza accesos como la firma del usuario y el cambio de contraseña. | Se utiliza desde `Header.tsx` para acceder a configuraciones personales del usuario. |
+| `UserRoleChip.tsx` | Componente visual que muestra el rol de un usuario mediante una etiqueta o chip con color, texto e ícono. | Se utiliza en tablas, listados o detalles donde se necesite mostrar el rol de un usuario. |
+| `UserSignatureUploader.tsx` | Componente encargado de registrar o actualizar la firma del usuario autenticado. Permite seleccionar una imagen, validar el archivo, mostrar una vista previa y enviarlo al backend mediante `multipart/form-data`. La firma guardada se utiliza posteriormente en aprobaciones, vistos buenos y formatos imprimibles. | Se utiliza para configurar la firma que será usada en procesos de aprobación y formatos del sistema. |
 
+Estos componentes no se ubican en `components/common/` porque su responsabilidad está directamente relacionada con usuarios y sus configuraciones.
 ---
 
 #### Regla de organización de componentes
@@ -850,6 +867,9 @@ upload
 lock
 unlock
 history
+search
+filter
+refresh
 settings
 signature
 changePassword
@@ -1048,8 +1068,10 @@ Las páginas no deben realizar directamente peticiones HTTP ni concentrar lógic
 pages/
 │
 ├── Dashboard.tsx
-├── Login.tsx
-├── Register.tsx
+│
+├── auth/
+│   ├── Login.tsx
+│   └── Register.tsx
 │
 ├── humanTalent/
 │   ├── candidateValidation/
@@ -1066,10 +1088,9 @@ pages/
 │   ├── PositionProfileRevisionDetail.tsx
 │   └── PositionProfileRevisions.tsx
 │
-├── PQR/
+├── pqrs/
 │   ├── admin/
-│   │   ├── AdminPqrs.tsx
-│   │   └── AdminUser.tsx
+│   │   └── AdminPqrs.tsx
 │   ├── agent/
 │   │   └── AgentPqrs.tsx
 │   └── user/
@@ -1077,6 +1098,7 @@ pages/
 │       └── MyPqrs.tsx
 │
 └── users/
+    ├── AdminUsers.tsx
     ├── ChangePassword.tsx
     └── UserSignature.tsx
 ```
@@ -1105,17 +1127,29 @@ Mostrar estados de carga, errores y resultados vacíos.
 
 ```txt
 pages/
-├── Dashboard.tsx
+└── Dashboard.tsx
+```
+
+| Página | Descripción |
+| ------ | ----------- |
+| `Dashboard.tsx` | Representa la página principal de las vistas protegidas. Puede mostrar información general, accesos rápidos, indicadores o contenido relacionado con los módulos disponibles para el usuario. |
+
+---
+
+#### Páginas de autenticación
+
+```txt
+pages/auth/
 ├── Login.tsx
 └── Register.tsx
 ```
 
-| Página          | Descripción                                                                                                                                                                                   |
-| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Dashboard.tsx` | Representa la página principal de las vistas protegidas. Puede mostrar información general, accesos rápidos, indicadores o contenido relacionado con los módulos disponibles para el usuario. |
-| `Login.tsx`     | Muestra el formulario de inicio de sesión y utiliza `useLogin.ts` para manejar los datos, validaciones, carga, errores y autenticación del usuario.                                           |
-| `Register.tsx`  | Muestra el formulario de registro y utiliza `useRegister.ts` para manejar los campos, validaciones, envío de información y mensajes de respuesta.                                             |
+| Página | Descripción |
+| ------ | ----------- |
+| `Login.tsx` | Muestra el formulario de inicio de sesión y utiliza `useLogin.ts` para manejar los datos, validaciones, carga, errores y autenticación del usuario. |
+| `Register.tsx` | Muestra el formulario de registro y utiliza `useRegister.ts` para manejar los campos, validaciones, envío de información y mensajes de respuesta. |
 
+Las páginas de autenticación se agrupan en `pages/auth/` porque pertenecen al mismo dominio funcional y corresponden a rutas públicas del sistema.
 ---
 
 #### Páginas del módulo de Talento Humano
@@ -1167,8 +1201,7 @@ pages/positionManagement/
 ```txt
 pages/pqrs/
 ├── admin/
-│   ├── AdminPqrs.tsx
-│   └── AdminUser.tsx
+│   └── AdminPqrs.tsx
 ├── agent/
 │   └── AgentPqrs.tsx
 └── user/
@@ -1182,51 +1215,51 @@ Las páginas del módulo de PQR se organizan según el tipo de usuario y las acc
 
 ##### Páginas administrativas
 
-| Página          | Descripción                                                                                                                                                           |
-| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Página | Descripción |
+| ------ | ----------- |
 | `AdminPqrs.tsx` | Muestra las PQR disponibles para administración. Permite consultar solicitudes, modificar estados y prioridades, asignar agentes y ejecutar acciones administrativas. |
-| `AdminUser.tsx` | Muestra la administración de usuarios. Permite consultar usuarios, modificar roles y realizar procesos de carga masiva.                                               |
 
 ---
 
 ##### Páginas del agente
 
-| Página          | Descripción                                                                                                                               |
-| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Página | Descripción |
+| ------ | ----------- |
 | `AgentPqrs.tsx` | Muestra las PQR disponibles y asignadas al agente autenticado. Permite tomar solicitudes, gestionar casos y consultar novedades del chat. |
 
 ---
 
 ##### Páginas del usuario
 
-| Página          | Descripción                                                                                                                                                 |
-| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `CreatePqr.tsx` | Muestra el formulario para registrar una nueva PQR, incluyendo tipo de caso, descripción y archivo adjunto cuando corresponde.                              |
-| `MyPqrs.tsx`    | Muestra las PQR creadas por el usuario autenticado. Permite consultar detalles, acceder al chat y realizar la calificación del servicio cuando corresponde. |
-
+| Página | Descripción |
+| ------ | ----------- |
+| `CreatePqr.tsx` | Muestra el formulario para registrar una nueva PQR, incluyendo tipo de caso, descripción y archivo adjunto cuando corresponde. |
+| `MyPqrs.tsx` | Muestra las PQR creadas por el usuario autenticado. Permite consultar detalles, acceder al chat y realizar la calificación del servicio cuando corresponde. |
 ---
 
 #### Páginas del módulo de usuarios
 
 ```txt
 pages/users/
+├── AdminUsers.tsx
 ├── ChangePassword.tsx
 └── UserSignature.tsx
 ```
 
 | Página | Descripción |
 | ------ | ----------- |
+| `AdminUsers.tsx` | Muestra la administración de usuarios. Permite consultar usuarios, filtrar y buscar registros, modificar roles, actualizar el listado y realizar procesos de carga masiva. |
 | `ChangePassword.tsx` | Muestra la configuración para cambiar la contraseña del usuario autenticado mediante `useChangePassword.ts` y los campos reutilizables de contraseña. |
 | `UserSignature.tsx` | Muestra la página de configuración de firma del usuario autenticado. Utiliza `UserSignatureUploader.tsx` y `useUserSignature.ts` para seleccionar, validar, previsualizar y cargar la imagen que será utilizada en aprobaciones y formatos del sistema. |
 
-Estas páginas se ubican en `pages/users/` porque corresponden a configuraciones personales del usuario y pueden utilizarse independientemente de los módulos funcionales del sistema.
-
+Estas páginas se ubican en `pages/users/` porque corresponden a la administración o configuración de usuarios y se mantienen separadas de los módulos funcionales como PQR o Talento Humano.
 ---
 
 #### Regla de organización de páginas
 
 ```txt
-Las páginas generales se ubican directamente en pages.
+Las páginas generales sin un módulo específico se ubican directamente en pages.
+Las páginas de autenticación se ubican en pages/auth.
 Las páginas específicas de un módulo deben ubicarse en pages/nombreModulo.
 Las páginas organizadas por rol pueden dividirse en subcarpetas como admin, agent o user.
 Las páginas deben consumir hooks y componentes, evitando realizar directamente peticiones HTTP.
@@ -1768,7 +1801,7 @@ Centralizar la identidad visual del proyecto.
 
 ---
 
-### `src/templates/`
+### `src/template/`
 
 Esta carpeta contiene archivos encargados de generar plantillas descargables desde el frontend.
 
@@ -1777,7 +1810,7 @@ A diferencia de `utils/`, esta carpeta no se usa para guardar funciones auxiliar
 **Estructura:**
 
 ```txt
-templates/
+template/
 └── users/
     └── downloadBulkUsersTemplate.ts
 ```

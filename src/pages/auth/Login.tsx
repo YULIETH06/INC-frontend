@@ -8,45 +8,37 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 
-import TextInput from "../components/common/inputs/TextInput";
-import PasswordInput from "../components/common/inputs/PasswordInput";
-import ActionButton from "../components/common/ActionButton";
-import CustomSnackbar from "../components/common/CustomSnackbar";
+import TextInput from "../../components/common/inputs/TextInput";
+import PasswordInput from "../../components/common/inputs/PasswordInput";
+import ActionButton from "../../components/common/ActionButton";
 
-import { appBrand } from "../data/appBrand";
-import { useRegister } from "../hooks/auth/useRegister";
+import { useLogin } from "../../hooks/auth/useLogin";
+import { appBrand } from "../../data/appBrand";
 
-const Register = () => {
+const Login = () => {
   const navigate = useNavigate();
   const theme = useTheme();
 
   const {
-    name,
     email,
     password,
     loading,
 
-    message,
-    openMessage,
     error,
     formErrors,
 
-    handleNameChange,
     handleEmailChange,
     handlePasswordChange,
-    handleRegister,
-    closeMessage,
-  } = useRegister();
+    handleLogin,
+  } = useLogin();
 
   const style = {
     container: {
       minHeight: "100vh",
-
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-
-      p: 2,
+      padding: 2,
 
       background: `linear-gradient(
         135deg,
@@ -58,7 +50,7 @@ const Register = () => {
     form: {
       width: "100%",
       maxWidth: "420px",
-      minHeight: "480px",
+      minHeight: "430px",
 
       display: "flex",
       flexDirection: "column",
@@ -66,7 +58,7 @@ const Register = () => {
 
       backgroundColor: theme.palette.background.paper,
 
-      p: "2rem",
+      padding: "2rem",
       borderRadius: "12px",
       gap: "16px",
 
@@ -77,25 +69,25 @@ const Register = () => {
       width: "160px",
       height: "auto",
       objectFit: "contain",
-      mb: "0.5rem",
+      marginBottom: "0.5rem",
     },
 
     link: {
+      marginTop: "0.5rem",
+
       cursor: "pointer",
+
       textDecoration: "none",
+
       color: theme.palette.primary.main,
+
       fontWeight: 500,
     },
   };
 
   return (
     <Box sx={style.container}>
-      <Box
-        component="form"
-        onSubmit={handleRegister}
-        sx={style.form}
-        noValidate
-      >
+      <Box component="form" onSubmit={handleLogin} sx={style.form} noValidate>
         <Box
           component="img"
           src={appBrand.logo}
@@ -110,32 +102,14 @@ const Register = () => {
             fontSize: "1rem",
           }}
         >
-          Regístrate para acceder a App-INC
+          Bienvenido a tu plataforma de gestión
         </Typography>
 
-        {/* Mensaje para errores generales del backend. */}
         {error && (
-          <Alert
-            severity="error"
-            sx={{
-              width: "100%",
-              borderRadius: 2,
-            }}
-          >
+          <Alert severity="error" sx={{ width: "100%", borderRadius: 2 }}>
             {error}
           </Alert>
         )}
-
-        <TextInput
-          label="Nombre completo"
-          value={name}
-          onChange={handleNameChange}
-          required
-          disabled={loading}
-          error={Boolean(formErrors.name)}
-          helperText={formErrors.name}
-          autoComplete="name"
-        />
 
         <TextInput
           label="Correo electrónico"
@@ -156,20 +130,21 @@ const Register = () => {
           disabled={loading}
           error={Boolean(formErrors.password)}
           helperText={formErrors.password}
-          hint="Mínimo 6 caracteres."
-          autoComplete="new-password"
+          autoComplete="current-password"
         />
 
         <ActionButton
           actionType="custom"
           type="submit"
           loading={loading}
-          loadingText="Registrando..."
+          loadingText="Ingresando..."
           size="large"
           fullWidth
         >
-          Registrarse
+          Iniciar sesión
         </ActionButton>
+
+        {/* <Link sx={style.link}>¿Olvidaste tu contraseña?</Link> */}
 
         <Typography
           sx={{
@@ -177,29 +152,19 @@ const Register = () => {
             color: theme.palette.text.secondary,
           }}
         >
-          ¿Ya tienes cuenta?{" "}
-
+          ¿No tienes una cuenta?{" "}
           <Link
-            sx={style.link}
             onClick={() => {
-              if (!loading) {
-                navigate("/");
-              }
+              if (!loading) navigate("/register");
             }}
+            sx={style.link}
           >
-            Inicia sesión
+            Regístrate aquí
           </Link>
         </Typography>
       </Box>
-
-      <CustomSnackbar
-        open={openMessage}
-        message={message}
-        severity="success"
-        onClose={closeMessage}
-      />
     </Box>
   );
 };
 
-export default Register;
+export default Login;
