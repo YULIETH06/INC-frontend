@@ -52,7 +52,7 @@ export const useMyPqrs = () => {
       setPqrs(response.pqrs);
     } catch (error) {
       console.error(error);
-      setError("Error al cargar las PQR. Verifica que el usuario tenga el rol USER.");
+      setError("Error al cargar las PQR. Verifica que el usuario tenga el rol Usuario o Agente.");
     } finally {
       setLoading(false);
     }

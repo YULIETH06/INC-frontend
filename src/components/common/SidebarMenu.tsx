@@ -17,6 +17,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ArticleIcon from "@mui/icons-material/Article";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import { menuItems } from "../../data/menuItems";
+import type { MenuOption } from "../../data/menuItems";
 import { useAuth } from "../../context/AuthContext";
 
 interface SidebarMenuProps {
@@ -215,12 +216,12 @@ const SidebarMenu = ({ openSidebar, onClose }: SidebarMenuProps) => {
     // Códigos de cargos activos del usuario.
     const userPositionCodes = user?.positions?.map((position) => position.code) || [];
 
-    // Verifica si el rol del usuario tiene permiso.
+    // Verifica si el rol del usuario está permitido para una opción.
     const hasRole = (roles: string[]) => {
         return roles.includes(userRole);
     };
 
-    // Verifica si el usuario tiene alguno de los cargos permitidos.
+    // Verifica si el usuario tiene alguno de los cargos permitidos para la opción.
     const hasPosition = (positionCodes?: string[]) => {
         if (userRole === "ADMIN") {
             return true;
@@ -233,26 +234,20 @@ const SidebarMenu = ({ openSidebar, onClose }: SidebarMenuProps) => {
         return positionCodes.some((code) => userPositionCodes.includes(code));
     };
 
-    // Verifica si el usuario puede ver un módulo, submódulo u opción.
-    const canShowMenuItem = (item: {
-        roles: string[];
-        positionCodes?: string[];
-    }) => {
-        return hasRole(item.roles) && hasPosition(item.positionCodes);
+    // Los permisos se validan únicamente en las opciones finales del menú.
+    const canShowOption = (option: MenuOption) => {
+        return hasRole(option.roles) && hasPosition(option.positionCodes);
     };
 
-    // Filtra el menú según el rol y los cargos activos del usuario.
+    // Módulos y submódulos se muestran automáticamente cuando contienen
+    // al menos una opción permitida para el usuario.
     const filteredMenuItems = menuItems
-        .filter((module) => canShowMenuItem(module))
         .map((module) => ({
             ...module,
             submodules: module.submodules
-                .filter((submodule) => canShowMenuItem(submodule))
                 .map((submodule) => ({
                     ...submodule,
-                    options: submodule.options.filter((option) =>
-                        canShowMenuItem(option)
-                    ),
+                    options: submodule.options.filter(canShowOption),
                 }))
                 .filter((submodule) => submodule.options.length > 0),
         }))
