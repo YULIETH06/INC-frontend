@@ -565,7 +565,7 @@ const AdminUsers = () => {
         description="Sube un archivo Excel con los usuarios que deseas registrar en el sistema."
         requiredColumns={[
           "nombre",
-          "email",
+          "correo",
           "contraseña",
           "rol",
         ]}

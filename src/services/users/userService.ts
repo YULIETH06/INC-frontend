@@ -102,7 +102,7 @@ export const uploadUsersBulk = async (
   const response = await api.post<
     BulkUploadResponse<User>
   >(
-    "/auth/register/bulk",
+    "users/bulk",
     formData,
     {
       headers: {
