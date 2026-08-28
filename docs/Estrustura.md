@@ -201,6 +201,7 @@ components/
 │   └── PqrTicketCard.tsx
 │
 └── users/
+    ├── ChangeUserPasswordDialog.tsx
     ├── ChangeUserRoleDialog.tsx
     ├── SettingsMenu.tsx
     ├── UserRoleChip.tsx
@@ -217,7 +218,7 @@ Estos componentes no pertenecen exclusivamente a un módulo, por lo tanto, puede
 | Componente                | Descripción                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | Reutilización dentro del proyecto                                                                                                                                                                      |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `BulkUploadDialog.tsx`    | Componente reutilizable para mostrar un modal de carga masiva de archivos. Permite seleccionar o cargar archivos, mostrar información del proceso y ejecutar acciones relacionadas con importaciones.                                                                                                                                                                                                                                                                                                                                                                      | Puede utilizarse en usuarios, PQR, reportes u otros módulos que requieran carga masiva de datos.                                                                                                       |
-| `ClearableSelect.tsx`     | Componente reutilizable de selección que permite escoger una opción y también limpiar el valor seleccionado.                                                                                                                                                                                                                                                                                                                                                                                                                                                               | Puede utilizarse en filtros, formularios, búsquedas avanzadas o selección de estados, roles y tipos de PQR.                                                                                            |
+| `ClearableSelect.tsx`     | Componente reutilizable de selección que permite escoger una opción y, cuando `clearable` está habilitado, limpiar el valor seleccionado. También puede utilizarse como un selector normal manteniendo `clearable` desactivado. | Puede utilizarse en filtros, formularios, búsquedas avanzadas o selección de estados, roles y tipos de PQR. |
 | `ActionButton.tsx`        | Componente reutilizable para representar las acciones principales del sistema mediante botones con estilos, íconos y comportamientos consistentes. Obtiene los íconos predeterminados desde el catálogo central `appIcons.ts`, manteniendo una representación uniforme para acciones como guardar, editar, aprobar, rechazar, cancelar, eliminar, visualizar, abrir, crear, cerrar o reabrir. También controla estados de carga, texto de ayuda y adaptación para dispositivos móviles. | Puede utilizarse en formularios, listados, páginas de detalle, diálogos, cargas de archivos y procesos de cualquier módulo. |
 | `ConfirmActionDialog.tsx` | Componente reutilizable que muestra un diálogo de confirmación antes de ejecutar una acción importante. Permite recibir mensajes de texto o contenido React, información adicional mediante alertas configurables, tipos de acción como eliminar, cerrar o reabrir, texto personalizado durante la carga y botones consistentes mediante `ActionButton`.                                                     | Puede utilizarse para aprobar, rechazar, cancelar, eliminar, guardar, cerrar, reabrir o confirmar acciones dentro de Talento Humano, PQR, usuarios y otros módulos.                           |
 | `CustomDialog.tsx`        | Componente reutilizable que centraliza la estructura base de los diálogos del sistema. Permite configurar tamaño, título, subtítulo, botón opcional de cierre, contenido, acciones y estilos específicos del contenido o del área de acciones. | Puede utilizarse en formularios, confirmaciones, detalles y procesos modales de cualquier módulo que requieran una estructura consistente. |
@@ -453,6 +454,7 @@ Estos componentes dependen directamente de la información, acciones o configura
 
 ```txt
 components/users/
+├── ChangeUserPasswordDialog.tsx
 ├── ChangeUserRoleDialog.tsx
 ├── SettingsMenu.tsx
 ├── UserRoleChip.tsx
@@ -461,7 +463,8 @@ components/users/
 
 | Componente | Descripción | Uso dentro del proyecto |
 | ---------- | ----------- | ----------------------- |
-| `ChangeUserRoleDialog.tsx` | Componente que muestra un modal para cambiar el rol de un usuario seleccionado. Permite visualizar información del usuario y seleccionar un nuevo rol. | Se utiliza en la administración de usuarios. |
+| `ChangeUserPasswordDialog.tsx` | Diálogo utilizado por el administrador para restablecer la contraseña de un usuario. Muestra el usuario seleccionado, solicita la nueva contraseña y su confirmación, y presenta los errores de validación correspondientes. | Se utiliza desde `AdminUsers.tsx` para ejecutar el restablecimiento administrativo de contraseña sin mezclar la lógica del formulario dentro de la página. |
+| `ChangeUserRoleDialog.tsx` | Diálogo utilizado para cambiar el rol de un usuario seleccionado. | Se utiliza en la administración de usuarios. |
 | `SettingsMenu.tsx` | Componente encargado de mostrar las opciones personales y de configuración del usuario autenticado mediante un menú desplegable. Centraliza accesos como la firma del usuario y el cambio de contraseña. | Se utiliza desde `Header.tsx` para acceder a configuraciones personales del usuario. |
 | `UserRoleChip.tsx` | Componente visual que muestra el rol de un usuario mediante una etiqueta o chip con color, texto e ícono. | Se utiliza en tablas, listados o detalles donde se necesite mostrar el rol de un usuario. |
 | `UserSignatureUploader.tsx` | Componente encargado de registrar o actualizar la firma del usuario autenticado. Permite seleccionar una imagen, validar el archivo, mostrar una vista previa y enviarlo al backend mediante `multipart/form-data`. La firma guardada se utiliza posteriormente en aprobaciones, vistos buenos y formatos imprimibles. | Se utiliza para configurar la firma que será usada en procesos de aprobación y formatos del sistema. |
@@ -681,6 +684,7 @@ hooks/
 │
 └── users/
     ├── useAdminUsers.ts
+    ├── useChangeUserPassword.ts
     └── useUserSignature.ts
 ```
 
@@ -820,12 +824,14 @@ hooks/pqrs/
 ```txt
 hooks/users/
 ├── useAdminUsers.ts
+├── useChangeUserPassword.ts
 └── useUserSignature.ts
 ```
 
-| Hook                  | Descripción                                                                                                                                                                                                                                                  | Uso dentro del proyecto                                                                                                                              |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `useAdminUsers.ts`    | Maneja la lógica relacionada con la administración de usuarios. Controla la consulta de usuarios, cambio de roles, selección de archivos para carga masiva, procesamiento de resultados y mensajes de respuesta.                                             | Se utiliza en la página de administración de usuarios.                                                                                               |
+| Hook | Descripción | Uso dentro del proyecto |
+| ---- | ----------- | ----------------------- |
+| `useAdminUsers.ts` | Maneja la administración general de usuarios. Controla la consulta del listado, el cambio de roles, la carga masiva y los mensajes asociados con esas operaciones. | Se utiliza en `AdminUsers.tsx`. |
+| `useChangeUserPassword.ts` | Maneja el restablecimiento administrativo de contraseña. Controla el usuario seleccionado, apertura y cierre del diálogo, nueva contraseña, confirmación, errores Yup, estado de carga, mensajes y envío de la solicitud al servicio de usuarios. | Se utiliza en `AdminUsers.tsx` junto con `ChangeUserPasswordDialog.tsx`. |
 | `useUserSignature.ts` | Maneja la lógica relacionada con el registro o actualización de la firma del usuario autenticado. Controla la selección del archivo, validación de formato, vista previa, estado de carga, envío mediante `multipart/form-data` y mensajes de éxito o error. | Se utiliza en `UserSignatureUploader.tsx` para permitir que el usuario configure la firma que será utilizada en aprobaciones y formatos del sistema. |
 
 ---
@@ -1046,7 +1052,7 @@ interfaces/users/
 
 | Archivo                   | Descripción                                                                                                                          | Uso dentro del proyecto                                                                                                     |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| `user.interface.ts`       | Define los tipos relacionados con usuarios, roles, agentes, administradores y datos de perfil.                                       | Se utiliza en administración de usuarios, servicios, hooks, componentes relacionados con roles y contexto de autenticación. |
+| `user.interface.ts`       | Define los tipos e interfaces relacionados con los usuarios, sus roles y las operaciones asociadas con su administración. | Se utiliza en administración de usuarios, servicios, hooks, componentes relacionados con roles, restablecimiento de contraseña y contexto de autenticación. |
 | `bulkUpload.interface.ts` | Define los tipos relacionados con carga masiva de usuarios, archivos seleccionados, resultados del proceso y errores de importación. | Se utiliza en componentes, hooks y servicios relacionados con la carga masiva de usuarios.                                  |
 | `excel.interface.ts`      | Define los tipos relacionados con la estructura y manejo de archivos Excel dentro del frontend.                                      | Se utiliza en funciones o plantillas encargadas de generar, leer o preparar archivos de Excel.                              |
 
@@ -1248,7 +1254,7 @@ pages/users/
 
 | Página | Descripción |
 | ------ | ----------- |
-| `AdminUsers.tsx` | Muestra la administración de usuarios. Permite consultar usuarios, filtrar y buscar registros, modificar roles, actualizar el listado y realizar procesos de carga masiva. |
+| `AdminUsers.tsx` | Muestra la administración de usuarios del sistema. Permite consultar, buscar y filtrar registros, modificar roles, restablecer contraseñas, actualizar la información visible y realizar procesos de carga masiva. Su función principal es organizar la interfaz y coordinar las acciones disponibles para la gestión de usuarios. |
 | `ChangePassword.tsx` | Muestra la configuración para cambiar la contraseña del usuario autenticado mediante `useChangePassword.ts` y los campos reutilizables de contraseña. |
 | `UserSignature.tsx` | Muestra la página de configuración de firma del usuario autenticado. Utiliza `UserSignatureUploader.tsx` y `useUserSignature.ts` para seleccionar, validar, previsualizar y cargar la imagen que será utilizada en aprobaciones y formatos del sistema. |
 
@@ -1686,7 +1692,7 @@ services/users/
 
 | Archivo          | Descripción                                                                                                                                                                                              | Uso dentro del proyecto                                                                                                                                           |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `userService.ts` | Contiene las funciones HTTP relacionadas con la consulta y administración de usuarios, cambio de roles, registro de la firma del usuario autenticado y carga masiva de usuarios mediante archivos Excel. | Se utiliza desde los hooks y componentes del módulo de usuarios para consultar información, actualizar roles, cargar firmas y registrar usuarios de forma masiva. |
+| `userService.ts` | Contiene las funciones HTTP relacionadas con la consulta y administración de usuarios, cambio de roles, restablecimiento administrativo de contraseña, registro de la firma del usuario autenticado y carga masiva de usuarios mediante archivos Excel. | Se utiliza desde los hooks del módulo de usuarios para consultar información, actualizar roles, restablecer contraseñas, cargar firmas y registrar usuarios de forma masiva. |
 
 ---
 
@@ -1696,17 +1702,19 @@ services/users/
 getAllUsers()
 getAgents()
 updateUserRole()
+resetUserPassword()
 uploadUserSignature()
 uploadUsersBulk()
 ```
 
-| Función                        | Descripción                                                                                                   |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------- |
-| `getAllUsers()`                | Consulta todos los usuarios registrados en el sistema.                                                        |
-| `getAgents()`                  | Consulta únicamente los usuarios que tienen el rol `AGENT`.                                                   |
-| `updateUserRole(userId, role)` | Actualiza el rol de un usuario mediante su identificador.                                                     |
-| `uploadUserSignature(file)`    | Registra o actualiza la firma del usuario autenticado mediante un archivo enviado como `multipart/form-data`. |
-| `uploadUsersBulk(file)`        | Registra varios usuarios mediante la carga de un archivo Excel enviado como `multipart/form-data`.            |
+| Función | Descripción |
+| ------- | ----------- |
+| `getAllUsers()` | Consulta todos los usuarios registrados en el sistema. |
+| `getAgents()` | Consulta únicamente los usuarios que tienen el rol `AGENT`. |
+| `updateUserRole(userId, role)` | Actualiza el rol de un usuario mediante su identificador. |
+| `resetUserPassword(userId, data)` | Restablece la contraseña de un usuario mediante `PATCH /users/:id/password`. Recibe únicamente `newPassword`; la confirmación se valida en el frontend y no se envía al backend. |
+| `uploadUserSignature(file)` | Registra o actualiza la firma del usuario autenticado mediante un archivo enviado como `multipart/form-data`. |
+| `uploadUsersBulk(file)` | Registra varios usuarios mediante la carga de un archivo Excel enviado como `multipart/form-data`. |
 
 ---
 
@@ -2155,8 +2163,11 @@ validations/
 ├── positionManagement/
 │   └── positionProfileRevisionValidation.ts
 │
-└── pqrs/
-    └── pqrValidation.ts
+├── pqrs/
+│   └── pqrValidation.ts
+│
+└── users/
+    └── userValidation.ts
 ```
 
 ---
@@ -2310,6 +2321,27 @@ createPqrSchema()
 | `createPqrSchema()` | Valida los datos necesarios para crear una nueva PQR, como tipo de caso y descripción. | Se utiliza en hooks y páginas relacionadas con PQR. |
 
 Este archivo permite validar que la información ingresada por el usuario sea correcta antes de crear una solicitud PQR.
+
+---
+
+#### Validaciones del módulo de usuarios
+
+```txt
+validations/users/
+└── userValidation.ts
+```
+
+##### `userValidation.ts`
+
+Este archivo contiene las reglas Yup específicas de la administración de usuarios que no pertenecen al proceso de autenticación del usuario actual.
+
+```txt
+resetUserPasswordSchema()
+```
+
+| Esquema | Descripción | Uso dentro del proyecto |
+| ------- | ----------- | ----------------------- |
+| `resetUserPasswordSchema()` | Valida que la nueva contraseña sea obligatoria, tenga mínimo 6 caracteres y que la confirmación coincida con `newPassword`. No solicita la contraseña actual porque el flujo corresponde a un restablecimiento realizado por un administrador. | Se utiliza en `useChangeUserPassword.ts`. |
 
 ---
 

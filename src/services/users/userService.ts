@@ -1,6 +1,14 @@
 import api from "../../api/axios";
-import type { BulkUploadResponse } from "../../interfaces/users/bulkUpload.interface";
-import type { User, UserRole } from "../../interfaces/users/user.interface";
+
+import type {
+  BulkUploadResponse,
+} from "../../interfaces/users/bulkUpload.interface";
+
+import type {
+  ResetUserPasswordData,
+  User,
+  UserRole,
+} from "../../interfaces/users/user.interface";
 
 // Obtiene todos los usuarios del sistema. Endpoint usado por ADMIN.
 export const getAllUsers = async (): Promise<{
@@ -33,26 +41,51 @@ export const updateUserRole = async (
   userId: number,
   role: UserRole
 ) => {
-  const response = await api.patch(`/users/${userId}/role`, {
-    role,
-  });
+  const response = await api.patch(
+    `/users/${userId}/role`,
+    {
+      role,
+    }
+  );
+
+  return response.data;
+};
+
+// Restablece la contraseña de un usuario. Endpoint usado por ADMIN.
+export const resetUserPassword = async (
+  userId: number,
+  data: ResetUserPasswordData
+) => {
+  const response = await api.patch(
+    `/users/${userId}/password`,
+    data
+  );
 
   return response.data;
 };
 
 // Sube la firma del usuario autenticado.
-export const uploadUserSignature = async (file: File) => {
-    const formData = new FormData();
+export const uploadUserSignature = async (
+  file: File
+) => {
+  const formData = new FormData();
 
-    formData.append("signature", file);
+  formData.append(
+    "signature",
+    file
+  );
 
-    const response = await api.patch("/users/signature", formData, {
-        headers: {
-            "Content-Type": "multipart/form-data",
-        },
-    });
+  const response = await api.patch(
+    "/users/signature",
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
 
-    return response.data;
+  return response.data;
 };
 
 // Registra usuarios mediante carga masiva desde archivo Excel. Endpoint usado por ADMIN.
@@ -61,9 +94,14 @@ export const uploadUsersBulk = async (
 ): Promise<BulkUploadResponse<User>> => {
   const formData = new FormData();
 
-  formData.append("file", file);
+  formData.append(
+    "file",
+    file
+  );
 
-  const response = await api.post<BulkUploadResponse<User>>(
+  const response = await api.post<
+    BulkUploadResponse<User>
+  >(
     "/auth/register/bulk",
     formData,
     {

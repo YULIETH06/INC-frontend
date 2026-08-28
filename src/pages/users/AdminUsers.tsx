@@ -6,7 +6,6 @@ import {
 import {
   Alert,
   Box,
-  CircularProgress,
   MenuItem,
   Select,
   Typography,
@@ -27,6 +26,10 @@ import {
 } from "../../hooks/users/useAdminUsers";
 
 import {
+  useChangeUserPassword,
+} from "../../hooks/users/useChangeUserPassword";
+
+import {
   userRoles,
 } from "../../data/userRoles";
 
@@ -45,6 +48,7 @@ import BulkUploadDialog from "../../components/common/BulkUploadDialog";
 
 import UserRoleChip from "../../components/users/UserRoleChip";
 import ChangeUserRoleDialog from "../../components/users/ChangeUserRoleDialog";
+import ChangeUserPasswordDialog from "../../components/users/ChangeUserPasswordDialog";
 
 import {
   getFilterStyles,
@@ -58,7 +62,7 @@ import {
   downloadBulkUsersTemplate,
 } from "../../template/users/downloadBulkUsersTemplate";
 
-// Página principal para administrar usuarios y roles.
+// Página principal para administrar usuarios.
 const AdminUsers = () => {
   const theme = useTheme();
 
@@ -68,6 +72,7 @@ const AdminUsers = () => {
   const tableStyles =
     getTableStyles(theme);
 
+  // Administración general de usuarios.
   const {
     users,
     loading,
@@ -88,6 +93,7 @@ const AdminUsers = () => {
     bulkUploadResult,
 
     loadUsers,
+
     openChangeRoleDialog,
     closeChangeRoleDialog,
     changeSelectedRole,
@@ -103,6 +109,32 @@ const AdminUsers = () => {
     closeMessage,
   } = useAdminUsers();
 
+  // Restablecimiento administrativo de contraseña.
+  const {
+    selectedPasswordUser,
+
+    openPasswordDialog,
+
+    newPassword,
+    confirmPassword,
+
+    loading: passwordLoading,
+    formErrors: passwordFormErrors,
+
+    message: passwordMessage,
+    messageType: passwordMessageType,
+    openMessage: openPasswordMessage,
+
+    openChangePasswordDialog,
+    closeChangePasswordDialog,
+
+    handleNewPasswordChange,
+    handleConfirmPasswordChange,
+    handleChangePassword,
+
+    closeMessage: closePasswordMessage,
+  } = useChangeUserPassword();
+
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -111,9 +143,9 @@ const AdminUsers = () => {
   const [
     roleFilter,
     setRoleFilter,
-  ] = useState<"ALL" | UserRole>(
-    "ALL"
-  );
+  ] = useState<
+    "ALL" | UserRole
+  >("ALL");
 
   // Cambia la página actual de la tabla.
   const handleChangePage = (
@@ -128,7 +160,9 @@ const AdminUsers = () => {
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setRowsPerPage(
-      Number(event.target.value)
+      Number(
+        event.target.value
+      )
     );
 
     setPage(0);
@@ -205,8 +239,8 @@ const AdminUsers = () => {
     ]);
 
   // Define las columnas de la tabla de usuarios.
-  const columns: DataTableColumn<User>[] =
-    [
+  const columns:
+    DataTableColumn<User>[] = [
       {
         id: "number",
         label: "#",
@@ -255,18 +289,27 @@ const AdminUsers = () => {
       },
       {
         id: "action",
-        label: "Acción",
+        label: "Acciones",
         align: "center",
-        render: (user) =>
-          updatingUserId ===
-            user.id ? (
-            <CircularProgress
-              size={22}
-            />
-          ) : (
+        render: (user) => (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent:
+                "center",
+              alignItems:
+                "center",
+              gap: 0.5,
+            }}
+          >
+            {/* Cambio de rol. */}
             <IconActionButton
               icon="edit"
               tooltip="Cambiar rol"
+              loading={
+                updatingUserId ===
+                user.id
+              }
               onClick={() =>
                 openChangeRoleDialog(
                   user
@@ -276,7 +319,26 @@ const AdminUsers = () => {
                 tableStyles.primaryActionButton
               }
             />
-          ),
+
+            {/* Restablecimiento de contraseña. */}
+            <IconActionButton
+              icon="changePassword"
+              tooltip="Restablecer contraseña"
+              onClick={() =>
+                openChangePasswordDialog(
+                  user
+                )
+              }
+              disabled={
+                updatingUserId ===
+                user.id
+              }
+              sx={
+                tableStyles.neutralActionButton
+              }
+            />
+          </Box>
+        ),
       },
     ];
 
@@ -411,17 +473,25 @@ const AdminUsers = () => {
           columns={columns}
           rows={filteredUsers}
           page={page}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
+          rowsPerPage={
+            rowsPerPage
+          }
+          onPageChange={
+            handleChangePage
+          }
+          onRowsPerPageChange={
+            handleChangeRowsPerPage
+          }
         />
       )}
 
       {users.length > 0 &&
-        filteredUsers.length === 0 && (
+        filteredUsers.length ===
+        0 && (
           <Box
             sx={{
-              marginTop: "16px",
+              marginTop:
+                "16px",
             }}
           >
             <EmptyState
@@ -431,37 +501,129 @@ const AdminUsers = () => {
           </Box>
         )}
 
+      {/* Cambio de rol. */}
       <ChangeUserRoleDialog
         open={openDialog}
-        selectedUser={selectedUser}
-        selectedRole={selectedRole}
-        updatingUserId={updatingUserId}
-        onClose={closeChangeRoleDialog}
-        onRoleChange={changeSelectedRole}
+        selectedUser={
+          selectedUser
+        }
+        selectedRole={
+          selectedRole
+        }
+        updatingUserId={
+          updatingUserId
+        }
+        onClose={
+          closeChangeRoleDialog
+        }
+        onRoleChange={
+          changeSelectedRole
+        }
         onSave={updateRole}
       />
 
-      <BulkUploadDialog
-        open={openBulkUploadDialog}
-        title="Carga masiva de usuarios"
-        description="Sube un archivo Excel con los usuarios que deseas registrar en el sistema."
-        requiredColumns={["nombre", "email", "contraseña", "rol"]}
-        file={bulkUploadFile}
-        loading={bulkUploadLoading}
-        completed={bulkUploadCompleted}
-        result={bulkUploadResult}
-        onClose={closeBulkUpload}
-        onFileChange={changeBulkUploadFile}
-        onUpload={uploadBulkUsers}
-        onClearResult={clearBulkUploadResult}
-        onDownloadTemplate={downloadBulkUsersTemplate}
+      {/* Restablecimiento de contraseña. */}
+      <ChangeUserPasswordDialog
+        open={
+          openPasswordDialog
+        }
+        selectedUser={
+          selectedPasswordUser
+        }
+        newPassword={
+          newPassword
+        }
+        confirmPassword={
+          confirmPassword
+        }
+        errors={
+          passwordFormErrors
+        }
+        loading={
+          passwordLoading
+        }
+        onClose={
+          closeChangePasswordDialog
+        }
+        onNewPasswordChange={
+          handleNewPasswordChange
+        }
+        onConfirmPasswordChange={
+          handleConfirmPasswordChange
+        }
+        onSave={
+          handleChangePassword
+        }
       />
 
+      {/* Carga masiva. */}
+      <BulkUploadDialog
+        open={
+          openBulkUploadDialog
+        }
+        title="Carga masiva de usuarios"
+        description="Sube un archivo Excel con los usuarios que deseas registrar en el sistema."
+        requiredColumns={[
+          "nombre",
+          "email",
+          "contraseña",
+          "rol",
+        ]}
+        file={
+          bulkUploadFile
+        }
+        loading={
+          bulkUploadLoading
+        }
+        completed={
+          bulkUploadCompleted
+        }
+        result={
+          bulkUploadResult
+        }
+        onClose={
+          closeBulkUpload
+        }
+        onFileChange={
+          changeBulkUploadFile
+        }
+        onUpload={
+          uploadBulkUsers
+        }
+        onClearResult={
+          clearBulkUploadResult
+        }
+        onDownloadTemplate={
+          downloadBulkUsersTemplate
+        }
+      />
+
+      {/* Mensajes de administración general. */}
       <CustomSnackbar
         open={openMessage}
         message={message}
-        severity={messageType}
-        onClose={closeMessage}
+        severity={
+          messageType
+        }
+        onClose={
+          closeMessage
+        }
+      />
+
+      {/* Mensajes del restablecimiento de contraseña. */}
+      <CustomSnackbar
+        open={
+          openPasswordMessage
+        }
+        message={
+          passwordMessage
+        }
+        severity={
+          passwordMessageType
+        }
+        onClose={
+          closePasswordMessage
+        }
       />
     </Box>
   );
