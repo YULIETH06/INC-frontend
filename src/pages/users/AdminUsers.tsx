@@ -6,8 +6,6 @@ import {
 import {
   Alert,
   Box,
-  MenuItem,
-  Select,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -45,13 +43,14 @@ import ListToolbar from "../../components/common/ListToolbar";
 import IconActionButton from "../../components/common/IconActionButton";
 import ActionButton from "../../components/common/ActionButton";
 import BulkUploadDialog from "../../components/common/BulkUploadDialog";
+import ClearableSelect from "../../components/common/ClearableSelect";
 
 import UserRoleChip from "../../components/users/UserRoleChip";
 import ChangeUserRoleDialog from "../../components/users/ChangeUserRoleDialog";
 import ChangeUserPasswordDialog from "../../components/users/ChangeUserPasswordDialog";
 
 import {
-  getFilterStyles,
+  filterStyles,
 } from "../../styles/filterStyles";
 
 import {
@@ -65,9 +64,6 @@ import {
 // Página principal para administrar usuarios.
 const AdminUsers = () => {
   const theme = useTheme();
-
-  const filterStyles =
-    getFilterStyles(theme);
 
   const tableStyles =
     getTableStyles(theme);
@@ -147,6 +143,23 @@ const AdminUsers = () => {
     "ALL" | UserRole
   >("ALL");
 
+  // Opciones disponibles para filtrar usuarios por rol.
+  const roleFilterOptions = [
+    {
+      label: "Todos los roles",
+      value: "ALL",
+    },
+    ...userRoles.map(
+      (role) => ({
+        label:
+          getUserRoleLabel(
+            role
+          ),
+        value: role,
+      })
+    ),
+  ];
+
   // Cambia la página actual de la tabla.
   const handleChangePage = (
     _event: unknown,
@@ -178,14 +191,10 @@ const AdminUsers = () => {
 
   // Actualiza el filtro por rol.
   const handleRoleFilterChange = (
-    event: {
-      target: {
-        value: string;
-      };
-    }
+    value: string
   ) => {
     setRoleFilter(
-      event.target.value as
+      value as
       | "ALL"
       | UserRole
     );
@@ -393,43 +402,23 @@ const AdminUsers = () => {
               filterContent={
                 <Box
                   sx={
-                    filterStyles.smallFilterMenuContent
+                    filterStyles.filterMenuContent
                   }
                 >
-                  <Select
-                    fullWidth
+                  <ClearableSelect
+                    label="Rol"
                     value={
                       roleFilter
+                    }
+                    options={
+                      roleFilterOptions
                     }
                     onChange={
                       handleRoleFilterChange
                     }
                     size="small"
-                    sx={
-                      filterStyles.filterSelect
-                    }
-                  >
-                    <MenuItem value="ALL">
-                      Todos los roles
-                    </MenuItem>
-
-                    {userRoles.map(
-                      (role) => (
-                        <MenuItem
-                          key={
-                            role
-                          }
-                          value={
-                            role
-                          }
-                        >
-                          {getUserRoleLabel(
-                            role
-                          )}
-                        </MenuItem>
-                      )
-                    )}
-                  </Select>
+                    minWidth="100%"
+                  />
 
                   <ActionButton
                     actionType="clear"
@@ -443,7 +432,7 @@ const AdminUsers = () => {
                       "ALL"
                     }
                     sx={
-                      filterStyles.clearFilterButtonWithMargin
+                      filterStyles.clearFilterButton
                     }
                   >
                     Limpiar filtro
@@ -462,9 +451,6 @@ const AdminUsers = () => {
                   }
                   disabled={
                     bulkUploadLoading
-                  }
-                  sx={
-                    filterStyles.iconButton
                   }
                 />
               }

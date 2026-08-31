@@ -3,24 +3,16 @@ import {
     useState,
 } from "react";
 
-import { useNavigate } from "react-router-dom";
+import {
+    useNavigate,
+} from "react-router-dom";
 
 import {
     Alert,
     Box,
-    IconButton,
-    InputAdornment,
-    TextField,
-    Tooltip,
     Typography,
     useTheme,
 } from "@mui/material";
-
-import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
-import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
-import PlayArrowOutlinedIcon from "@mui/icons-material/PlayArrowOutlined";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 import type {
     DataTableColumn,
@@ -34,19 +26,21 @@ import {
     usePersonnelCandidateValidations,
 } from "../../../hooks/humanTalent/candidateValidation/usePersonnelCandidateValidations";
 
+import {
+    getTableStyles,
+} from "../../../styles/tableStyles";
+
 import DataTable from "../../../components/common/DataTable";
 import LoadingBox from "../../../components/common/LoadingBox";
 import EmptyState from "../../../components/common/EmptyState";
 import CustomChip from "../../../components/common/CustomChip";
-
-import { getFilterStyles } from "../../../styles/filterStyles";
-import { getTableStyles } from "../../../styles/tableStyles";
+import ListToolbar from "../../../components/common/ListToolbar";
+import IconActionButton from "../../../components/common/IconActionButton";
 
 // Página principal de validación de cargo y postulante.
 const PersonnelCandidateValidations = () => {
     const navigate = useNavigate();
     const theme = useTheme();
-    const filterStyles = getFilterStyles(theme);
     const tableStyles = getTableStyles(theme);
 
     const {
@@ -59,8 +53,10 @@ const PersonnelCandidateValidations = () => {
         loadCandidates,
     } = usePersonnelCandidateValidations();
 
-    const [page, setPage] =
-        useState(0);
+    const [
+        page,
+        setPage,
+    ] = useState(0);
 
     const [
         rowsPerPage,
@@ -71,11 +67,6 @@ const PersonnelCandidateValidations = () => {
         searchTerm,
         setSearchTerm,
     ] = useState("");
-
-    const [
-        showSearch,
-        setShowSearch,
-    ] = useState(false);
 
     // Cambia la página actual.
     const handleChangePage = (
@@ -90,34 +81,19 @@ const PersonnelCandidateValidations = () => {
         event: React.ChangeEvent<HTMLInputElement>
     ) => {
         setRowsPerPage(
-            Number(event.target.value)
+            Number(
+                event.target.value
+            )
         );
 
         setPage(0);
     };
 
-    // Actualiza el texto de búsqueda.
+    // Actualiza la búsqueda y regresa a la primera página.
     const handleSearchChange = (
-        event: React.ChangeEvent<HTMLInputElement>
+        value: string
     ) => {
-        setSearchTerm(
-            event.target.value
-        );
-
-        setPage(0);
-    };
-
-    // Muestra u oculta el campo de búsqueda.
-    const toggleSearch = () => {
-        setShowSearch(
-            (previous) => !previous
-        );
-    };
-
-    // Limpia la búsqueda.
-    const clearSearch = () => {
-        setSearchTerm("");
-        setShowSearch(false);
+        setSearchTerm(value);
         setPage(0);
     };
 
@@ -132,8 +108,12 @@ const PersonnelCandidateValidations = () => {
             return candidates.filter(
                 (candidate) => {
                     const identificationType =
-                        candidate.identificationType.code ||
-                        candidate.identificationType.name;
+                        candidate
+                            .identificationType
+                            .code ||
+                        candidate
+                            .identificationType
+                            .name;
 
                     return (
                         candidate.name
@@ -141,26 +121,29 @@ const PersonnelCandidateValidations = () => {
                             .includes(
                                 normalizedSearch
                             ) ||
-
-                        candidate.identificationNumber
+                        candidate
+                            .identificationNumber
                             .toLowerCase()
                             .includes(
                                 normalizedSearch
                             ) ||
-
                         identificationType
                             .toLowerCase()
                             .includes(
                                 normalizedSearch
                             ) ||
-
-                        candidate.requisition.position.name
+                        candidate
+                            .requisition
+                            .position
+                            .name
                             .toLowerCase()
                             .includes(
                                 normalizedSearch
                             ) ||
-
-                        candidate.requisition.department.name
+                        candidate
+                            .requisition
+                            .department
+                            .name
                             .toLowerCase()
                             .includes(
                                 normalizedSearch
@@ -223,7 +206,7 @@ const PersonnelCandidateValidations = () => {
         }
     };
 
-    // Navega al proceso de validación del candidato seleccionado.
+    // Navega al proceso de validación del candidato.
     const goToCandidateValidation = (
         candidateId: number
     ) => {
@@ -245,7 +228,9 @@ const PersonnelCandidateValidations = () => {
                     index
                 ) => (
                     <Typography
-                        sx={tableStyles.rowNumber}
+                        sx={
+                            tableStyles.rowNumber
+                        }
                     >
                         {index + 1}
                     </Typography>
@@ -256,7 +241,9 @@ const PersonnelCandidateValidations = () => {
                 id: "name",
                 label: "Postulante",
 
-                render: (candidate) => (
+                render: (
+                    candidate
+                ) => (
                     <Typography
                         sx={{
                             fontWeight: 700,
@@ -264,16 +251,21 @@ const PersonnelCandidateValidations = () => {
                                 "text.primary",
                         }}
                     >
-                        {candidate.name}
+                        {
+                            candidate.name
+                        }
                     </Typography>
                 ),
             },
 
             {
                 id: "identification",
-                label: "Identificación",
+                label:
+                    "Identificación",
 
-                render: (candidate) =>
+                render: (
+                    candidate
+                ) =>
                     `${candidate.identificationType.code ||
                     candidate.identificationType.name
                     } ${candidate.identificationNumber
@@ -284,8 +276,11 @@ const PersonnelCandidateValidations = () => {
                 id: "position",
                 label: "Cargo",
 
-                render: (candidate) =>
-                    candidate.requisition
+                render: (
+                    candidate
+                ) =>
+                    candidate
+                        .requisition
                         .position.name,
             },
 
@@ -293,8 +288,11 @@ const PersonnelCandidateValidations = () => {
                 id: "department",
                 label: "Área",
 
-                render: (candidate) =>
-                    candidate.requisition
+                render: (
+                    candidate
+                ) =>
+                    candidate
+                        .requisition
                         .department.name,
             },
 
@@ -302,7 +300,9 @@ const PersonnelCandidateValidations = () => {
                 id: "status",
                 label: "Estado",
 
-                render: (candidate) => (
+                render: (
+                    candidate
+                ) => (
                     <CustomChip
                         label={getValidationStatusLabel(
                             candidate.validationStatus
@@ -320,7 +320,9 @@ const PersonnelCandidateValidations = () => {
                 label: "Acción",
                 align: "center",
 
-                render: (candidate) => {
+                render: (
+                    candidate
+                ) => {
                     const canStart =
                         canManageValidation &&
                         candidate.validationStatus ===
@@ -333,48 +335,52 @@ const PersonnelCandidateValidations = () => {
                         candidate.validationStatus !==
                         "VALIDACION_COMPLETADA";
 
-                    const tooltip = canStart
-                        ? "Iniciar validación"
-                        : canContinue
-                            ? "Continuar validación"
-                            : "Ver validación";
+                    const tooltip =
+                        canStart
+                            ? "Iniciar validación"
+                            : canContinue
+                                ? "Continuar validación"
+                                : "Ver validación";
 
                     return (
-                        <Tooltip
-                            title={tooltip}
-                        >
-                            <IconButton
-                                onClick={() =>
-                                    goToCandidateValidation(
-                                        candidate.id
-                                    )
-                                }
-                                sx={
-                                    tableStyles.primaryActionButton
-                                }
-                            >
-                                {canStart ||
-                                    canContinue ? (
-                                    <PlayArrowOutlinedIcon />
-                                ) : (
-                                    <VisibilityOutlinedIcon />
-                                )}
-                            </IconButton>
-                        </Tooltip>
+                        <IconActionButton
+                            icon={
+                                canStart ||
+                                    canContinue
+                                    ? "play"
+                                    : "view"
+                            }
+                            tooltip={
+                                tooltip
+                            }
+                            onClick={() =>
+                                goToCandidateValidation(
+                                    candidate.id
+                                )
+                            }
+                            sx={
+                                tableStyles.primaryActionButton
+                            }
+                        />
                     );
                 },
             },
         ];
 
-    if (loadingCandidates) {
-        return <LoadingBox />;
+    if (
+        loadingCandidates
+    ) {
+        return (
+            <LoadingBox />
+        );
     }
 
     return (
         <Box
             sx={{
                 width: "100%",
-                minHeight: "100%",
+                minHeight:
+                    "100%",
             }}
         >
             {loadError && (
@@ -389,7 +395,8 @@ const PersonnelCandidateValidations = () => {
                 </Alert>
             )}
 
-            {candidates.length === 0 ? (
+            {candidates.length ===
+                0 ? (
                 <EmptyState
                     title="No hay candidatos disponibles"
                     description="Cuando existan candidatos habilitados para validación, aparecerán en este listado."
@@ -399,82 +406,30 @@ const PersonnelCandidateValidations = () => {
                     title="Validación de cargo y postulante"
                     subtitle="Consulta y gestiona los candidatos disponibles para el proceso de validación."
                     actions={
-                        <>
-                            {showSearch ? (
-                                <TextField
-                                    placeholder="Buscar candidato, identificación, cargo o área"
-                                    value={
-                                        searchTerm
-                                    }
-                                    onChange={
-                                        handleSearchChange
-                                    }
-                                    size="small"
-                                    autoFocus
-                                    sx={
-                                        filterStyles.searchInput
-                                    }
-                                    slotProps={{
-                                        input: {
-                                            startAdornment:
-                                                (
-                                                    <InputAdornment position="start">
-                                                        <SearchOutlinedIcon fontSize="small" />
-                                                    </InputAdornment>
-                                                ),
-
-                                            endAdornment:
-                                                (
-                                                    <InputAdornment position="end">
-                                                        <IconButton
-                                                            size="small"
-                                                            onClick={
-                                                                clearSearch
-                                                            }
-                                                        >
-                                                            <CloseOutlinedIcon fontSize="small" />
-                                                        </IconButton>
-                                                    </InputAdornment>
-                                                ),
-                                        },
-                                    }}
-                                />
-                            ) : (
-                                <Tooltip title="Buscar candidato">
-                                    <IconButton
-                                        onClick={
-                                            toggleSearch
-                                        }
-                                        sx={
-                                            searchTerm
-                                                ? filterStyles.activeIconButton
-                                                : filterStyles.iconButton
-                                        }
-                                    >
-                                        <SearchOutlinedIcon />
-                                    </IconButton>
-                                </Tooltip>
-                            )}
-
-                            <Tooltip title="Actualizar lista">
-                                <IconButton
-                                    onClick={() =>
-                                        loadCandidates()
-                                    }
-                                    sx={
-                                        filterStyles.iconButton
-                                    }
-                                >
-                                    <RefreshOutlinedIcon />
-                                </IconButton>
-                            </Tooltip>
-                        </>
+                        <ListToolbar
+                            searchValue={
+                                searchTerm
+                            }
+                            onSearchChange={
+                                handleSearchChange
+                            }
+                            searchPlaceholder="Buscar candidato, identificación, cargo o área"
+                            searchTooltip="Buscar candidato"
+                            onRefresh={
+                                loadCandidates
+                            }
+                            refreshTooltip="Actualizar lista"
+                        />
                     }
-                    columns={columns}
+                    columns={
+                        columns
+                    }
                     rows={
                         filteredCandidates
                     }
-                    page={page}
+                    page={
+                        page
+                    }
                     rowsPerPage={
                         rowsPerPage
                     }
@@ -487,7 +442,8 @@ const PersonnelCandidateValidations = () => {
                 />
             )}
 
-            {candidates.length > 0 &&
+            {candidates.length >
+                0 &&
                 filteredCandidates.length ===
                 0 && (
                     <Box

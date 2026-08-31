@@ -1,47 +1,60 @@
-import { useState, type MouseEvent } from "react";
+import {
+    useState,
+} from "react";
+
 import {
     Alert,
     Box,
-    Button,
-    IconButton,
-    InputAdornment,
-    Menu,
-    MenuItem,
-    Select,
-    TextField,
-    Tooltip,
-    Typography,
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
 
-import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
-import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
-import FilterListOutlinedIcon from "@mui/icons-material/FilterListOutlined";
+import type {
+    PqrPriority,
+    PqrStatus,
+} from "../../../interfaces/pqrs/pqr.interface";
 
-import type { PqrPriority, PqrStatus } from "../../../interfaces/pqrs/pqr.interface";
+import {
+    useAdminPqrs,
+} from "../../../hooks/pqrs/useAdminPqrs";
 
-import { useAdminPqrs } from "../../../hooks/pqrs/useAdminPqrs";
-import { usePqrChat } from "../../../hooks/pqrs/usePqrChat";
+import {
+    usePqrChat,
+} from "../../../hooks/pqrs/usePqrChat";
+
+import {
+    useAuth,
+} from "../../../context/AuthContext";
+
+import {
+    pqrPriorityOptions,
+    pqrStatusOptions,
+} from "../../../data/pqrOptions";
 
 import {
     getCaseTypeLabel,
 } from "../../../utils/pqrs/pqrUtils";
 
+import {
+    filterStyles,
+} from "../../../styles/filterStyles";
+
 import PageHeader from "../../../components/common/PageHeader";
 import LoadingBox from "../../../components/common/LoadingBox";
 import EmptyState from "../../../components/common/EmptyState";
 import CustomSnackbar from "../../../components/common/CustomSnackbar";
-import { getFilterStyles } from "../../../styles/filterStyles";
-import { pqrPriorityOptions, pqrStatusOptions } from "../../../data/pqrOptions";
-import { PqrChatView } from "../../../components/pqrs/PqrChatView";
-import { useAuth } from "../../../context/AuthContext";
+import ListToolbar from "../../../components/common/ListToolbar";
+import ClearableSelect from "../../../components/common/ClearableSelect";
+import ActionButton from "../../../components/common/ActionButton";
+import DateInput from "../../../components/common/inputs/DateInput";
+
+import {
+    PqrChatView,
+} from "../../../components/pqrs/PqrChatView";
+
 import PqrTicketCard from "../../../components/pqrs/PqrTicketCard";
 
-// Página administrativa para consultar, cambiar estados, prioridades y dar seguimiento a las PQR.
+// Página administrativa para consultar, cambiar estados,
+// prioridades y dar seguimiento a las PQR.
 const AdminPqrs = () => {
-    const theme = useTheme();
-    const filterStyles = getFilterStyles(theme);
 
     const {
         pqrs,
@@ -71,42 +84,68 @@ const AdminPqrs = () => {
         handleAssignPqr,
     } = useAdminPqrs();
 
+    const {
+        token,
+        user,
+    } = useAuth();
+
     // Controla el texto escrito en el buscador.
-    const [searchTerm, setSearchTerm] = useState("");
+    const [
+        searchTerm,
+        setSearchTerm,
+    ] = useState("");
 
-    // Controla si el buscador está visible o solo se muestra el ícono.
-    const [showSearch, setShowSearch] = useState(false);
-
-    // Controla el filtro por estado de la PQR.
-    const [statusFilter, setStatusFilter] = useState<"ALL" | PqrStatus>("ALL");
-
-    const [priorityFilter, setPriorityFilter] = useState<"ALL" | PqrPriority>(
-        "ALL"
-    );
-
-    // Controla el filtro por tipo de caso de la PQR.
-    const [caseTypeFilter, setCaseTypeFilter] = useState("ALL");
-
-    // Controla el filtro para saber si la PQR tiene o no agente asignado.
-    const [agentFilter, setAgentFilter] = useState<
-        "ALL" | "WITH_AGENT" | "WITHOUT_AGENT"
+    // Controla el filtro por estado.
+    const [
+        statusFilter,
+        setStatusFilter,
+    ] = useState<
+        "ALL" | PqrStatus
     >("ALL");
 
-    // Controla la fecha inicial del filtro por rango.
-    const [startDateFilter, setStartDateFilter] = useState("");
+    // Controla el filtro por prioridad.
+    const [
+        priorityFilter,
+        setPriorityFilter,
+    ] = useState<
+        "ALL" | PqrPriority
+    >("ALL");
 
-    // Controla la fecha final del filtro por rango.
-    const [endDateFilter, setEndDateFilter] = useState("");
+    // Controla el filtro por tipo de caso.
+    const [
+        caseTypeFilter,
+        setCaseTypeFilter,
+    ] = useState("ALL");
 
-    // Controla la apertura del menú de filtros.
-    const [filterAnchorEl, setFilterAnchorEl] =
-        useState<null | HTMLElement>(null);
+    // Controla si la PQR tiene agente asignado.
+    const [
+        agentFilter,
+        setAgentFilter,
+    ] = useState<
+        | "ALL"
+        | "WITH_AGENT"
+        | "WITHOUT_AGENT"
+    >("ALL");
 
-    const [selectedChatPqrId, setSelectedChatPqrId] = useState<number | null>(
+    // Controla la fecha inicial.
+    const [
+        startDateFilter,
+        setStartDateFilter,
+    ] = useState("");
+
+    // Controla la fecha final.
+    const [
+        endDateFilter,
+        setEndDateFilter,
+    ] = useState("");
+
+    // Controla la PQR cuyo chat está abierto.
+    const [
+        selectedChatPqrId,
+        setSelectedChatPqrId,
+    ] = useState<number | null>(
         null
     );
-
-    const { token, user } = useAuth();
 
     const {
         messages,
@@ -121,34 +160,12 @@ const AdminPqrs = () => {
         setChatError,
         handleSendMessage,
     } = usePqrChat({
-        pqrId: selectedChatPqrId,
+        pqrId:
+            selectedChatPqrId,
         token,
     });
 
-    const openFilterMenu = Boolean(filterAnchorEl);
-
-    // Muestra el campo de búsqueda.
-    const toggleSearch = () => {
-        setShowSearch(true);
-    };
-
-    // Limpia el texto de búsqueda y oculta el campo.
-    const clearSearch = () => {
-        setSearchTerm("");
-        setShowSearch(false);
-    };
-
-    // Abre el menú de filtros.
-    const openFilters = (event: MouseEvent<HTMLButtonElement>) => {
-        setFilterAnchorEl(event.currentTarget);
-    };
-
-    // Cierra el menú de filtros.
-    const closeFilters = () => {
-        setFilterAnchorEl(null);
-    };
-
-    // Limpia todos los filtros aplicados.
+    // Limpia todos los filtros.
     const clearFilters = () => {
         setStatusFilter("ALL");
         setPriorityFilter("ALL");
@@ -158,17 +175,30 @@ const AdminPqrs = () => {
         setEndDateFilter("");
     };
 
-    const openPqrChat = (pqrId: number) => {
-        setSelectedChatPqrId(pqrId);
+    // Abre el chat de una PQR.
+    const openPqrChat = (
+        pqrId: number
+    ) => {
+        setSelectedChatPqrId(
+            pqrId
+        );
     };
 
+    // Cierra el chat activo.
     const closePqrChat = () => {
-        setSelectedChatPqrId(null);
+        setSelectedChatPqrId(
+            null
+        );
     };
 
-    const selectedChatPqr = pqrs.find((pqr) => pqr.id === selectedChatPqrId);
+    const selectedChatPqr =
+        pqrs.find(
+            (pqr) =>
+                pqr.id ===
+                selectedChatPqrId
+        );
 
-    // Verifica si existe algún filtro activo.
+    // Verifica si existen filtros activos.
     const hasActiveFilters =
         statusFilter !== "ALL" ||
         priorityFilter !== "ALL" ||
@@ -177,64 +207,179 @@ const AdminPqrs = () => {
         startDateFilter !== "" ||
         endDateFilter !== "";
 
-    const caseTypeOptions = Array.from(
-        new Set(pqrs.map((pqr) => pqr.caseType))
-    );
-
-    const filteredPqrs = pqrs.filter((pqr) => {
-        const normalizedSearch = searchTerm.toLowerCase().trim();
-
-        const matchesSearch =
-            !normalizedSearch ||
-            `${pqr.id}`.includes(normalizedSearch) ||
-            `pqr-${pqr.id}`.includes(normalizedSearch) ||
-            `#pqr-${pqr.id}`.includes(normalizedSearch) ||
-            pqr.description.toLowerCase().includes(normalizedSearch) ||
-            pqr.caseType.toLowerCase().includes(normalizedSearch) ||
-            // pqr.status.toLowerCase().includes(normalizedSearch) ||
-            // pqr.priority?.toLowerCase().includes(normalizedSearch) ||
-            pqr.user?.name?.toLowerCase().includes(normalizedSearch) ||
-            pqr.user?.email?.toLowerCase().includes(normalizedSearch) ||
-            pqr.assignedTo?.name?.toLowerCase().includes(normalizedSearch) ||
-            pqr.assignedTo?.email?.toLowerCase().includes(normalizedSearch);
-
-        const matchesStatus =
-            statusFilter === "ALL" || pqr.status === statusFilter;
-
-        const matchesPriority =
-            priorityFilter === "ALL" || pqr.priority === priorityFilter;
-
-        const matchesCaseType =
-            caseTypeFilter === "ALL" || pqr.caseType === caseTypeFilter;
-
-        const matchesAgent =
-            agentFilter === "ALL" ||
-            (agentFilter === "WITH_AGENT" && !!pqr.assignedTo) ||
-            (agentFilter === "WITHOUT_AGENT" && !pqr.assignedTo);
-
-        const createdDate = new Date(pqr.createdAt);
-
-        const startDate = startDateFilter
-            ? new Date(`${startDateFilter}T00:00:00`)
-            : null;
-
-        const endDate = endDateFilter
-            ? new Date(`${endDateFilter}T23:59:59.999`)
-            : null;
-
-        const matchesStartDate = !startDate || createdDate >= startDate;
-        const matchesEndDate = !endDate || createdDate <= endDate;
-
-        return (
-            matchesSearch &&
-            matchesStatus &&
-            matchesPriority &&
-            matchesCaseType &&
-            matchesAgent &&
-            matchesStartDate &&
-            matchesEndDate
+    // Obtiene los tipos de caso existentes.
+    const caseTypes =
+        Array.from(
+            new Set(
+                pqrs.map(
+                    (pqr) =>
+                        pqr.caseType
+                )
+            )
         );
-    });
+
+    // Opciones reutilizadas por ClearableSelect.
+    const statusFilterOptions = [
+        {
+            label:
+                "Todos los estados",
+            value: "ALL",
+        },
+        ...pqrStatusOptions,
+    ];
+
+    const priorityFilterOptions = [
+        {
+            label:
+                "Todas las prioridades",
+            value: "ALL",
+        },
+        ...pqrPriorityOptions,
+    ];
+
+    const caseTypeFilterOptions = [
+        {
+            label:
+                "Todos los tipos de caso",
+            value: "ALL",
+        },
+        ...caseTypes.map(
+            (caseType) => ({
+                label:
+                    getCaseTypeLabel(
+                        caseType
+                    ),
+                value: caseType,
+            })
+        ),
+    ];
+
+    const agentFilterOptions = [
+        {
+            label:
+                "Todas las PQR",
+            value: "ALL",
+        },
+        {
+            label:
+                "Con agente asignado",
+            value: "WITH_AGENT",
+        },
+        {
+            label:
+                "Sin agente asignado",
+            value: "WITHOUT_AGENT",
+        },
+    ];
+
+    // Filtra las PQR según búsqueda y filtros activos.
+    const filteredPqrs =
+        pqrs.filter((pqr) => {
+            const normalizedSearch =
+                searchTerm
+                    .toLowerCase()
+                    .trim();
+
+            const matchesSearch =
+                !normalizedSearch ||
+                `${pqr.id}`.includes(
+                    normalizedSearch
+                ) ||
+                `pqr-${pqr.id}`.includes(
+                    normalizedSearch
+                ) ||
+                `#pqr-${pqr.id}`.includes(
+                    normalizedSearch
+                ) ||
+                pqr.description
+                    .toLowerCase()
+                    .includes(
+                        normalizedSearch
+                    ) ||
+                pqr.user?.name
+                    ?.toLowerCase()
+                    .includes(
+                        normalizedSearch
+                    ) ||
+                pqr.user?.email
+                    ?.toLowerCase()
+                    .includes(
+                        normalizedSearch
+                    );
+
+            const matchesStatus =
+                statusFilter ===
+                "ALL" ||
+                pqr.status ===
+                statusFilter;
+
+            const matchesPriority =
+                priorityFilter ===
+                "ALL" ||
+                pqr.priority ===
+                priorityFilter;
+
+            const matchesCaseType =
+                caseTypeFilter ===
+                "ALL" ||
+                pqr.caseType ===
+                caseTypeFilter;
+
+            const matchesAgent =
+                agentFilter ===
+                "ALL" ||
+                (
+                    agentFilter ===
+                    "WITH_AGENT" &&
+                    Boolean(
+                        pqr.assignedTo
+                    )
+                ) ||
+                (
+                    agentFilter ===
+                    "WITHOUT_AGENT" &&
+                    !pqr.assignedTo
+                );
+
+            const createdDate =
+                new Date(
+                    pqr.createdAt
+                );
+
+            const startDate =
+                startDateFilter
+                    ? new Date(
+                        `${startDateFilter}T00:00:00`
+                    )
+                    : null;
+
+            const endDate =
+                endDateFilter
+                    ? new Date(
+                        `${endDateFilter}T23:59:59.999`
+                    )
+                    : null;
+
+            const matchesStartDate =
+                !startDate ||
+                createdDate >=
+                startDate;
+
+            const matchesEndDate =
+                !endDate ||
+                createdDate <=
+                endDate;
+
+            return (
+                matchesSearch &&
+                matchesStatus &&
+                matchesPriority &&
+                matchesCaseType &&
+                matchesAgent &&
+                matchesStartDate &&
+                matchesEndDate
+            );
+        });
 
     const style = {
         container: {
@@ -262,334 +407,359 @@ const AdminPqrs = () => {
         return <LoadingBox />;
     }
 
-    if (selectedChatPqr && user) {
+    if (
+        selectedChatPqr &&
+        user
+    ) {
         return (
             <>
                 <PqrChatView
-                    pqr={selectedChatPqr}
-                    messages={messages}
-                    messageText={messageText}
-                    selectedFile={selectedFile}
-                    loadingMessages={loadingMessages}
-                    sendingAttachment={sendingAttachment}
-                    chatError={chatError}
-                    currentUserRole={user.role}
-                    onBack={closePqrChat}
-                    onMessageChange={setMessageText}
-                    onSendMessage={handleSendMessage}
-                    onSelectFile={handleSelectFile}
-                    onRemoveSelectedFile={handleRemoveSelectedFile}
-                    onClearError={() => setChatError("")}
+                    pqr={
+                        selectedChatPqr
+                    }
+                    messages={
+                        messages
+                    }
+                    messageText={
+                        messageText
+                    }
+                    selectedFile={
+                        selectedFile
+                    }
+                    loadingMessages={
+                        loadingMessages
+                    }
+                    sendingAttachment={
+                        sendingAttachment
+                    }
+                    chatError={
+                        chatError
+                    }
+                    currentUserRole={
+                        user.role
+                    }
+                    onBack={
+                        closePqrChat
+                    }
+                    onMessageChange={
+                        setMessageText
+                    }
+                    onSendMessage={
+                        handleSendMessage
+                    }
+                    onSelectFile={
+                        handleSelectFile
+                    }
+                    onRemoveSelectedFile={
+                        handleRemoveSelectedFile
+                    }
+                    onClearError={() =>
+                        setChatError("")
+                    }
                 />
 
                 <CustomSnackbar
-                    open={openMessage}
-                    message={message}
-                    severity={messageType}
-                    onClose={closeMessage}
+                    open={
+                        openMessage
+                    }
+                    message={
+                        message
+                    }
+                    severity={
+                        messageType
+                    }
+                    onClose={
+                        closeMessage
+                    }
                 />
             </>
         );
     }
 
     return (
-        <Box sx={style.container}>
+        <Box
+            sx={
+                style.container
+            }
+        >
             <PageHeader
                 title="Todas las PQR"
                 subtitle="Administra y revisa las peticiones, quejas, reclamos o solicitudes registradas por los usuarios."
                 actions={
-                    <>
-                        {/* Buscador desplegable para filtrar PQR por texto. */}
-                        {showSearch ? (
-                            <TextField
-                                placeholder="Buscar PQR..."
-                                value={searchTerm}
-                                onChange={(event) =>
-                                    setSearchTerm(event.target.value)
-                                }
-                                size="small"
-                                autoFocus
-                                sx={filterStyles.searchInput}
-                                slotProps={{
-                                    input: {
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <SearchOutlinedIcon fontSize="small" />
-                                            </InputAdornment>
-                                        ),
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <IconButton
-                                                    size="small"
-                                                    onClick={clearSearch}
-                                                >
-                                                    <CloseOutlinedIcon fontSize="small" />
-                                                </IconButton>
-                                            </InputAdornment>
-                                        ),
-                                    },
-                                }}
-                            />
-                        ) : (
-                            <Tooltip title="Buscar PQR">
-                                <IconButton
-                                    onClick={toggleSearch}
-                                    sx={
-                                        searchTerm
-                                            ? filterStyles.activeIconButton
-                                            : filterStyles.iconButton
-                                    }
-                                >
-                                    <SearchOutlinedIcon />
-                                </IconButton>
-                            </Tooltip>
-                        )}
-
-                        {/* Botón que abre el menú de filtros. */}
-                        <Tooltip title="Filtrar PQR">
-                            <IconButton
-                                onClick={openFilters}
+                    <ListToolbar
+                        searchValue={
+                            searchTerm
+                        }
+                        onSearchChange={
+                            setSearchTerm
+                        }
+                        searchPlaceholder="Buscar PQR..."
+                        searchTooltip="Buscar PQR"
+                        filterActive={
+                            hasActiveFilters
+                        }
+                        filterTitle="Filtros de PQR"
+                        filterTooltip="Filtrar PQR"
+                        filterContent={
+                            <Box
                                 sx={
-                                    hasActiveFilters
-                                        ? filterStyles.activeIconButton
-                                        : filterStyles.iconButton
+                                    filterStyles.filterMenuContent
                                 }
                             >
-                                <FilterListOutlinedIcon />
-                            </IconButton>
-                        </Tooltip>
-
-                        <Menu
-                            anchorEl={filterAnchorEl}
-                            open={openFilterMenu}
-                            onClose={closeFilters}
-                            slotProps={{
-                                paper: {
-                                    sx: filterStyles.filterMenuPaper,
-                                },
-                            }}
-                        >
-                            <Box sx={filterStyles.filterMenuContent}>
-                                <Typography
-                                    variant="body2"
-                                    sx={filterStyles.filterTitle}
-                                >
-                                    Filtros de PQR
-                                </Typography>
-
-                                <Select
-                                    fullWidth
-                                    value={statusFilter}
-                                    onChange={(event) =>
+                                <ClearableSelect
+                                    label="Estado"
+                                    value={
+                                        statusFilter
+                                    }
+                                    options={
+                                        statusFilterOptions
+                                    }
+                                    onChange={(
+                                        value
+                                    ) =>
                                         setStatusFilter(
-                                            event.target.value as
+                                            value as
                                             | "ALL"
                                             | PqrStatus
                                         )
                                     }
                                     size="small"
-                                    sx={filterStyles.filterSelect}
-                                >
-                                    <MenuItem value="ALL">
-                                        Todos los estados
-                                    </MenuItem>
+                                    minWidth="100%"
+                                />
 
-                                    {pqrStatusOptions.map((option) => (
-                                        <MenuItem
-                                            key={option.value}
-                                            value={option.value}
-                                        >
-                                            {option.label}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-
-                                <Select
-                                    fullWidth
-                                    value={priorityFilter}
-                                    onChange={(event) =>
+                                <ClearableSelect
+                                    label="Prioridad"
+                                    value={
+                                        priorityFilter
+                                    }
+                                    options={
+                                        priorityFilterOptions
+                                    }
+                                    onChange={(
+                                        value
+                                    ) =>
                                         setPriorityFilter(
-                                            event.target.value as
+                                            value as
                                             | "ALL"
                                             | PqrPriority
                                         )
                                     }
                                     size="small"
-                                    sx={filterStyles.filterSelect}
-                                >
-                                    <MenuItem value="ALL">
-                                        Todas las prioridades
-                                    </MenuItem>
+                                    minWidth="100%"
+                                />
 
-                                    {pqrPriorityOptions.map((option) => (
-                                        <MenuItem
-                                            key={option.value}
-                                            value={option.value}
-                                        >
-                                            {option.label}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-
-                                <Select
-                                    fullWidth
-                                    value={caseTypeFilter}
-                                    onChange={(event) =>
-                                        setCaseTypeFilter(event.target.value)
+                                <ClearableSelect
+                                    label="Tipo de caso"
+                                    value={
+                                        caseTypeFilter
+                                    }
+                                    options={
+                                        caseTypeFilterOptions
+                                    }
+                                    onChange={
+                                        setCaseTypeFilter
                                     }
                                     size="small"
-                                    sx={filterStyles.filterSelect}
-                                >
-                                    <MenuItem value="ALL">
-                                        Todos los tipos de caso
-                                    </MenuItem>
+                                    minWidth="100%"
+                                />
 
-                                    {caseTypeOptions.map((caseType) => (
-                                        <MenuItem
-                                            key={caseType}
-                                            value={caseType}
-                                        >
-                                            {getCaseTypeLabel(caseType)}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-
-                                <Select
-                                    fullWidth
-                                    value={agentFilter}
-                                    onChange={(event) =>
+                                <ClearableSelect
+                                    label="Asignación"
+                                    value={
+                                        agentFilter
+                                    }
+                                    options={
+                                        agentFilterOptions
+                                    }
+                                    onChange={(
+                                        value
+                                    ) =>
                                         setAgentFilter(
-                                            event.target.value as
+                                            value as
                                             | "ALL"
                                             | "WITH_AGENT"
                                             | "WITHOUT_AGENT"
                                         )
                                     }
                                     size="small"
-                                    sx={filterStyles.filterSelect}
-                                >
-                                    <MenuItem value="ALL">
-                                        Todas las PQR
-                                    </MenuItem>
-                                    <MenuItem value="WITH_AGENT">
-                                        Con agente asignado
-                                    </MenuItem>
-                                    <MenuItem value="WITHOUT_AGENT">
-                                        Sin agente asignado
-                                    </MenuItem>
-                                </Select>
+                                    minWidth="100%"
+                                />
 
-                                <Box sx={filterStyles.filterDateRow}>
-                                    <TextField
+                                <Box
+                                    sx={
+                                        filterStyles.filterDateRow
+                                    }
+                                >
+                                    <DateInput
                                         label="Desde"
-                                        type="date"
-                                        value={startDateFilter}
-                                        onChange={(event) =>
-                                            setStartDateFilter(
-                                                event.target.value
-                                            )
+                                        value={
+                                            startDateFilter
                                         }
-                                        size="small"
-                                        sx={filterStyles.filterDateInput}
-                                        slotProps={{
-                                            inputLabel: {
-                                                shrink: true,
-                                            },
-                                        }}
+                                        onChange={
+                                            setStartDateFilter
+                                        }
+                                        maxDate={
+                                            endDateFilter ||
+                                            undefined
+                                        }
+                                        sx={
+                                            filterStyles.filterDateInput
+                                        }
                                     />
 
-                                    <TextField
+                                    <DateInput
                                         label="Hasta"
-                                        type="date"
-                                        value={endDateFilter}
-                                        onChange={(event) =>
-                                            setEndDateFilter(
-                                                event.target.value
-                                            )
+                                        value={
+                                            endDateFilter
                                         }
-                                        size="small"
-                                        sx={filterStyles.filterDateInput}
-                                        slotProps={{
-                                            inputLabel: {
-                                                shrink: true,
-                                            },
-                                        }}
+                                        onChange={
+                                            setEndDateFilter
+                                        }
+                                        minDate={
+                                            startDateFilter ||
+                                            undefined
+                                        }
+                                        sx={
+                                            filterStyles.filterDateInput
+                                        }
                                     />
                                 </Box>
 
-                                <Button
+                                <ActionButton
+                                    actionType="clear"
                                     fullWidth
                                     variant="text"
-                                    onClick={clearFilters}
-                                    disabled={!hasActiveFilters}
-                                    sx={filterStyles.clearFilterButton}
+                                    onClick={
+                                        clearFilters
+                                    }
+                                    disabled={
+                                        !hasActiveFilters
+                                    }
+                                    sx={
+                                        filterStyles.clearFilterButton
+                                    }
                                 >
                                     Limpiar filtros
-                                </Button>
+                                </ActionButton>
                             </Box>
-                        </Menu>
-
-                        <Tooltip title="Actualizar lista">
-                            <IconButton
-                                onClick={loadAllPqrs}
-                                sx={filterStyles.iconButton}
-                            >
-                                <RefreshOutlinedIcon />
-                            </IconButton>
-                        </Tooltip>
-                    </>
+                        }
+                        onRefresh={
+                            loadAllPqrs
+                        }
+                        refreshTooltip="Actualizar lista"
+                    />
                 }
             />
 
             {error && (
-                <Alert severity="error" sx={style.errorAlert}>
+                <Alert
+                    severity="error"
+                    sx={
+                        style.errorAlert
+                    }
+                >
                     {error}
                 </Alert>
             )}
 
-            {filteredPqrs.length === 0 ? (
+            {filteredPqrs.length ===
+                0 ? (
                 <EmptyState
                     title="No hay PQR registradas"
                     description="Cuando los usuarios creen PQR, aparecerán en este espacio."
                 />
             ) : (
-                <Box sx={style.list}>
-                    {filteredPqrs.map((pqr) => (
-                        <PqrTicketCard
-                            key={pqr.id}
-                            pqr={pqr}
-                            activeView="ASSIGNED"
-                            takingPqrId={null}
-                            onTakePqr={() => { }}
-                            updatingStatusId={updatingStatusId}
-                            updatingPriorityId={updatingPriorityId}
-                            statusValue={statusChanges[pqr.id] || pqr.status}
-                            priorityValue={
-                                priorityChanges[pqr.id] || pqr.priority || ""
-                            }
-                            onStatusChange={handleStatusChange}
-                            onUpdateStatus={handleUpdateStatus}
-                            onPriorityChange={handlePriorityChange}
-                            onUpdatePriority={handleUpdatePriority}
-                            onOpenChat={openPqrChat}
-                            agents={agents}
-                            selectedAgentId={
-                                agentChanges[pqr.id] || pqr.assignedToId || ""
-                            }
-                            assigningPqrId={assigningPqrId}
-                            onAgentChange={handleAgentChange}
-                            onAssignPqr={handleAssignPqr}
-                        />
-                    ))}
+                <Box
+                    sx={
+                        style.list
+                    }
+                >
+                    {filteredPqrs.map(
+                        (pqr) => (
+                            <PqrTicketCard
+                                key={
+                                    pqr.id
+                                }
+                                pqr={
+                                    pqr
+                                }
+                                activeView="ASSIGNED"
+                                takingPqrId={
+                                    null
+                                }
+                                onTakePqr={() => { }}
+                                updatingStatusId={
+                                    updatingStatusId
+                                }
+                                updatingPriorityId={
+                                    updatingPriorityId
+                                }
+                                statusValue={
+                                    statusChanges[
+                                    pqr.id
+                                    ] ||
+                                    pqr.status
+                                }
+                                priorityValue={
+                                    priorityChanges[
+                                    pqr.id
+                                    ] ||
+                                    pqr.priority ||
+                                    ""
+                                }
+                                onStatusChange={
+                                    handleStatusChange
+                                }
+                                onUpdateStatus={
+                                    handleUpdateStatus
+                                }
+                                onPriorityChange={
+                                    handlePriorityChange
+                                }
+                                onUpdatePriority={
+                                    handleUpdatePriority
+                                }
+                                onOpenChat={
+                                    openPqrChat
+                                }
+                                agents={
+                                    agents
+                                }
+                                selectedAgentId={
+                                    agentChanges[
+                                    pqr.id
+                                    ] ||
+                                    pqr.assignedToId ||
+                                    ""
+                                }
+                                assigningPqrId={
+                                    assigningPqrId
+                                }
+                                onAgentChange={
+                                    handleAgentChange
+                                }
+                                onAssignPqr={
+                                    handleAssignPqr
+                                }
+                            />
+                        )
+                    )}
                 </Box>
             )}
 
-            {/* Mensajes de éxito, error o advertencia */}
             <CustomSnackbar
-                open={openMessage}
-                message={message}
-                severity={messageType}
-                onClose={closeMessage}
+                open={
+                    openMessage
+                }
+                message={
+                    message
+                }
+                severity={
+                    messageType
+                }
+                onClose={
+                    closeMessage
+                }
             />
         </Box>
     );

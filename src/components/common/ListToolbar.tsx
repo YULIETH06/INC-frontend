@@ -224,7 +224,17 @@ const ListToolbar = ({
                             paper: {
                                 sx: {
                                     mt: 1,
-                                    minWidth: 240,
+
+                                    // Mantiene el mismo ancho en todos los filtros.
+                                    width: {
+                                        xs: 300,
+                                        sm: 340,
+                                    },
+
+                                    // Evita que el menú se salga de pantallas pequeñas.
+                                    maxWidth:
+                                        "calc(100vw - 32px)",
+
                                     p: 2,
                                     borderRadius: 2,
                                 },

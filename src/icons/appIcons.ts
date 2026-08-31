@@ -23,6 +23,15 @@ import KeyOutlinedIcon from "@mui/icons-material/KeyOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import FilterListOutlinedIcon from "@mui/icons-material/FilterListOutlined";
 import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
+import FolderOpenOutlinedIcon from "@mui/icons-material/FolderOpenOutlined";
+import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
+import PendingActionsOutlinedIcon from "@mui/icons-material/PendingActionsOutlined";
+import TaskAltOutlinedIcon from "@mui/icons-material/TaskAltOutlined";
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
+import RateReviewOutlinedIcon from "@mui/icons-material/RateReviewOutlined";
+import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
+import StarBorderOutlinedIcon from "@mui/icons-material/StarBorderOutlined";
+import PlayArrowOutlinedIcon from "@mui/icons-material/PlayArrowOutlined";
 
 export const appIcons = {
     save: SaveOutlinedIcon,
@@ -50,6 +59,16 @@ export const appIcons = {
     search: SearchOutlinedIcon,
     filter: FilterListOutlinedIcon,
     refresh: RefreshOutlinedIcon,
+
+    folderOpen: FolderOpenOutlinedIcon,
+    assignment: AssignmentOutlinedIcon,
+    pending: PendingActionsOutlinedIcon,
+    completed: TaskAltOutlinedIcon,
+    calendar: CalendarMonthOutlinedIcon,
+    review: RateReviewOutlinedIcon,
+    chat: ForumOutlinedIcon,
+    rating: StarBorderOutlinedIcon,
+    play: PlayArrowOutlinedIcon,
 };
 
 export type AppIconName =

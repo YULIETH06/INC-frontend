@@ -137,6 +137,7 @@ components/
 │   ├── InfoTooltip.tsx
 │   ├── IconActionButton.tsx
 │   ├── inputs/
+│   │   ├── DateInput.tsx
 │   │   ├── FileInput.tsx
 │   │   ├── MoneyInput.tsx
 │   │   ├── NumberInput.tsx
@@ -233,7 +234,7 @@ Estos componentes no pertenecen exclusivamente a un módulo, por lo tanto, puede
 | `InfoTooltip.tsx`         | Componente reutilizable para mostrar información adicional dentro de un panel flotante. Utiliza un botón con ícono informativo y permite configurar título, contenido, posición, alineación, tamaño y etiqueta accesible. Se abre mediante clic o teclado y se cierra al hacer clic afuera, presionar Escape o volver a seleccionar el botón.                                                                                                                                                                                                                              | Puede utilizarse para mostrar motivos de rechazo, explicaciones de campos, ayudas contextuales, aclaraciones, instrucciones o información complementaria sin ocupar espacio permanente en la interfaz. |
 | `IconActionButton.tsx`    | Componente reutilizable para representar acciones secundarias o compactas mediante un botón de ícono. Recibe el nombre semántico del ícono, lo obtiene desde `appIcons.ts` y permite mostrar tooltip, estado de carga, estado activo y deshabilitado. | Puede utilizarse para acciones compactas como consultar historiales, visualizar información, actualizar o ejecutar acciones secundarias sin recargar visualmente la interfaz. |
 | `LoadingBox.tsx`          | Componente reutilizable para mostrar un indicador de carga centrado. Permite configurar la altura mínima del contenedor y el tamaño del indicador según el espacio disponible.                                                                                                                                                                                                                                                                                                                                                                                             | Puede utilizarse en tablas, formularios, secciones, vistas de detalle o cualquier módulo que cargue datos.                                                                                             |
-| `ListToolbar.tsx`         | Componente reutilizable para encabezados de listados y tablas. Centraliza búsqueda, filtros, actualización y acciones adicionales, manteniendo una distribución responsiva y consistente. | Puede utilizarse en administración de usuarios, PQR, Talento Humano y otros listados que necesiten búsqueda, filtros o acciones rápidas. |
+| `ListToolbar.tsx`         | Componente reutilizable para encabezados de listados y tablas. Centraliza la apertura y cierre del buscador, el menú de filtros, la actualización y las acciones adicionales. | Se utiliza en `AdminUsers.tsx`, `AdminPqrs.tsx`, `AgentPqrs.tsx`, `MyPqrs.tsx` y `PersonnelCandidateValidations.tsx`, y puede reutilizarse en futuros listados. |
 | `NotificationBell.tsx`    | Componente reutilizable que muestra la campana de notificaciones, el contador de notificaciones no leídas y el listado de notificaciones del usuario autenticado.                                                                                                                                                                                                                                                                                                                                                                                                          | Se utiliza dentro de `Header.tsx` para mostrar novedades de módulos como PQR y Talento Humano.                                                                                                         |
 | `PageContainer.tsx`       | Componente reutilizable que sirve como contenedor general para organizar el contenido de una página. Ayuda a mantener márgenes, espaciados y estructura visual consistente.                                                                                                                                                                                                                                                                                                                                                                                                | Puede utilizarse en páginas como usuarios, PQR, dashboard, reportes y demás vistas internas.                                                                                                           |
 | `PageHeader.tsx`          | Componente reutilizable para mostrar el encabezado particular de una página. Recibe título, subtítulo, acciones principales y contenido adicional mediante `titleAdornment`, lo que permite colocar junto al título elementos como estados, chips, indicadores o ayudas informativas.                                                                                                                                                                                                                                                                                      | Puede utilizarse en listados, formularios y páginas de detalle, como el detalle de una requisición donde se muestra el estado general junto al título.                                                 |
@@ -249,6 +250,7 @@ Esta subcarpeta agrupa los campos de entrada reutilizables del sistema y mantien
 
 ```txt
 components/common/inputs/
+├── DateInput.tsx
 ├── FileInput.tsx
 ├── MoneyInput.tsx
 ├── NumberInput.tsx
@@ -259,6 +261,7 @@ components/common/inputs/
 
 | Componente | Uso principal |
 | ---------- | ------------- |
+| `DateInput.tsx` | Captura fechas mediante un campo reutilizable `type="date"`. Permite definir fecha mínima y máxima, modo de solo lectura, errores y texto de ayuda, manteniendo una apariencia consistente en formularios y filtros. |
 | `FileInput.tsx` | Selección y visualización de archivos, incluyendo nombre, tamaño, eliminación, error y texto de ayuda. |
 | `MoneyInput.tsx` | Captura valores monetarios y presenta el valor con formato numérico. |
 | `NumberInput.tsx` | Captura valores numéricos enteros evitando caracteres no permitidos. |
@@ -267,6 +270,16 @@ components/common/inputs/
 | `TextInput.tsx` | Captura textos de una sola línea y permite mostrar información no editable mediante `readOnly`. |
 
 El objetivo de `components/common/` es centralizar todos los elementos visuales que pueden servir en varias partes del sistema. Por ejemplo, `DataTable.tsx` no debe ser una tabla exclusiva para usuarios, sino una tabla general que pueda adaptarse a usuarios, PQR, roles o cualquier otro listado.
+
+Para los listados, `ListToolbar.tsx` es el componente estándar para búsqueda, filtros y actualización. Los filtros categóricos deben utilizar `ClearableSelect.tsx` en lugar de `Select` y `MenuItem` directos cuando no exista una necesidad específica que lo impida. Los campos de fecha reutilizables deben utilizar `DateInput.tsx`.
+
+Regla funcional de búsqueda y filtros:
+
+```txt
+Si un dato tiene un filtro específico, no debe incluirse también en la búsqueda textual.
+```
+
+Esto evita duplicar criterios y mantiene una separación clara entre búsqueda libre y filtrado estructurado.
 
 ---
 
@@ -478,7 +491,7 @@ Estos componentes no se ubican en `components/common/` porque su responsabilidad
 Si el componente puede usarse en varias vistas, debe ir en components/common.
 Si el componente solo pertenece a un módulo específico, debe ir en components/nombreModulo.
 Si el componente define la estructura visual general de una página, debe ir en components/layouts.
-Los íconos asociados con acciones comunes deben obtenerse desde el catálogo central ubicado en icons/appIcons.ts.
+Los íconos reutilizables deben obtenerse desde el catálogo central ubicado en `icons/appIcons.ts`.
 ```
 
 Esta organización permite que el proyecto sea más limpio, escalable y fácil de mantener, ya que cada componente tiene una responsabilidad clara y una ubicación lógica dentro de la estructura del frontend.
@@ -879,6 +892,15 @@ refresh
 settings
 signature
 changePassword
+folderOpen
+assignment
+pending
+completed
+calendar
+review
+chat
+rating
+play
 ```
 
 También define el tipo `AppIconName`, utilizado para limitar los nombres de íconos permitidos en los componentes que consumen este catálogo.
@@ -892,10 +914,11 @@ Convención actual: `save` se utiliza para acciones principales de guardar o env
 **Responsabilidad principal:**
 
 ```txt
-Centralizar los íconos asociados con acciones comunes del sistema.
+Centralizar los íconos reutilizables del sistema.
 Permitir cambiar un ícono desde un único lugar.
-Evitar importar repetidamente los mismos íconos dentro de los componentes reutilizables.
-Mantener una representación visual consistente de las acciones.
+Evitar imports directos repetidos desde `@mui/icons-material` en páginas y componentes cuando el ícono ya existe en el catálogo.
+Utilizar nombres generales que permitan reutilizar el mismo ícono en distintos módulos.
+Mantener una representación visual consistente de las acciones y estados.
 ```
 
 ---
@@ -1179,7 +1202,7 @@ pages/humanTalent/
 | Página                           | Descripción                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `CreatePersonnelRequisition.tsx` | Muestra el formulario para crear una requisición de personal. Utiliza `useCreatePersonnelRequisition.ts` para cargar departamentos, perfiles de cargo y ciudades, consultar y mostrar automáticamente la revisión vigente del cargo seleccionado, controlar los valores, validar la información y enviar la solicitud al backend.                                                                                                                                                                                                                    |
-| `PersonnelCandidateValidations.tsx` | Muestra el listado de candidatos disponibles para el proceso de validación de cargo y postulante. Permite buscar candidatos y navegar al detalle individual de validación. |
+| `PersonnelCandidateValidations.tsx` | Muestra el listado de candidatos disponibles para el proceso de validación de cargo y postulante mediante `DataTable`. Utiliza `ListToolbar` para buscar por nombre, identificación, cargo o área y actualizar el listado, y `IconActionButton` para iniciar, continuar o visualizar la validación. |
 | `PersonnelCandidateValidationDetail.tsx` | Muestra la vista independiente del proceso de validación de un candidato. Obtiene `candidateId` desde la ruta, presenta el encabezado de página y delega el flujo de etapas a `PersonnelCandidateValidationSection.tsx`. |
 | `PersonnelRequisitions.tsx`      | Muestra el listado general de requisiciones de personal y las acciones disponibles según el usuario y el paso actual del flujo. Utiliza `usePersonnelRequisitions.ts` para consultar, aprobar, rechazar, cancelar y registrar o decidir la confirmación de contratación.                                                                                                                                                                                                                                                                             |
 | `PersonnelRequisitionDetail.tsx` | Página encargada de presentar el detalle completo de una requisición de personal. Organiza la información general, las condiciones de contratación, las aprobaciones, la confirmación de contratación y los vistos buenos de Talento Humano. Cuando el proceso de candidatos ha sido iniciado, integra la sección correspondiente para mostrar y gestionar el cargue, la preselección y la trazabilidad de los candidatos según el estado del proceso y los permisos del usuario. |
@@ -1725,8 +1748,6 @@ Esta carpeta contiene estilos reutilizables del proyecto que pueden ser comparti
 
 Su objetivo principal es centralizar configuraciones visuales repetidas, evitar declarar los mismos estilos directamente dentro de las vistas y mantener una apariencia consistente en toda la aplicación.
 
-Los estilos pueden utilizar la configuración definida en el tema de Material UI, permitiendo que los colores y estados visuales dependan de la paleta global del sistema en lugar de utilizar valores de color escritos directamente en los componentes.
-
 **Estructura:**
 
 ```txt
@@ -1737,7 +1758,7 @@ styles/
 
 | Archivo | Descripción | Uso dentro del proyecto |
 | ------- | ----------- | ----------------------- |
-| `filterStyles.ts` | Contiene estilos reutilizables para controles de búsqueda, filtros, botones de acciones y menús de filtrado. | Se utiliza en páginas con tablas o listados que incluyen búsqueda, filtros y acciones de actualización. |
+| `filterStyles.ts` | Contiene únicamente estilos reutilizables para organizar el contenido interno de los filtros, los campos de fecha y el botón de limpieza. | Se utiliza en los filtros de `AdminPqrs.tsx`, `AgentPqrs.tsx`, `MyPqrs.tsx` y `AdminUsers.tsx`. La búsqueda, el menú y los botones de acción son responsabilidad de `ListToolbar.tsx`. |
 | `tableStyles.ts` | Contiene estilos reutilizables para elementos visuales de tablas y listados. | Se utiliza en listados que compartan estilos de numeración o botones de acción. |
 
 ---
@@ -1753,20 +1774,22 @@ Evitar repetir configuraciones visuales en páginas y componentes.
 
 #### `filterStyles.ts`
 
-El archivo `filterStyles.ts` contiene los estilos reutilizables utilizados principalmente en controles de búsqueda y filtrado.
+El archivo `filterStyles.ts` contiene únicamente los estilos reutilizables que siguen siendo necesarios dentro del contenido de los filtros.
 
-La función `getFilterStyles(theme)` recibe el tema activo de Material UI para construir los estilos de acuerdo con la paleta visual configurada en la aplicación.
+Actualmente exporta directamente el objeto:
+
+```txt
+filterStyles
+```
+
+La responsabilidad de búsqueda, apertura y cierre del menú de filtros, ancho del menú, indicador de filtro activo y actualización del listado se encuentra centralizada en `ListToolbar.tsx`.
 
 | Estilo | Descripción | Uso dentro del proyecto |
 | ------ | ----------- | ----------------------- |
-| `searchInput` | Define la apariencia del campo de búsqueda utilizado en los encabezados de listados. | Se utiliza en páginas que permiten buscar registros dentro de tablas o listados. |
-| `iconButton` | Define el estilo estándar de los botones utilizados para acciones como búsqueda, filtros o actualización. | Se utiliza en controles de acciones ubicados en encabezados de tablas. |
-| `activeIconButton` | Define el estilo visual de un botón cuando existe una búsqueda o filtro activo. | Se utiliza para indicar visualmente que existe un filtro aplicado. |
-| `smallFilterMenuPaper` | Define el contenedor visual de los menús pequeños de filtrado. | Se utiliza en menús desplegables de filtros. |
-| `smallFilterMenuContent` | Organiza el contenido interno de los menús de filtrado. | Se utiliza para distribuir selectores y acciones dentro de los filtros. |
-| `smallFilterTitle` | Define el estilo de los títulos utilizados dentro de un menú de filtro. | Se utiliza para identificar el criterio que se está filtrando. |
-| `filterSelect` | Define el estilo de los selectores utilizados dentro de los filtros. | Se utiliza en filtros por rol, estado u otras categorías. |
-| `clearFilterButtonWithMargin` | Define el estilo del botón utilizado para limpiar un filtro aplicado. | Se utiliza dentro de los menús de filtrado. |
+| `filterMenuContent` | Organiza verticalmente los controles mostrados dentro del menú de filtros mediante `flex`, dirección en columna y separación uniforme. | Se utiliza como contenedor común de `ClearableSelect`, campos de fecha y acciones de limpieza. |
+| `filterDateRow` | Distribuye los campos de fecha en una cuadrícula responsiva: una columna en pantallas pequeñas y dos columnas desde tamaños mayores. | Se utiliza en `AdminPqrs.tsx` para organizar los campos `Desde` y `Hasta`. |
+| `filterDateInput` | Define la apariencia de los campos de fecha utilizados dentro de los filtros. | Se aplica a los `DateInput` del rango de fechas de `AdminPqrs.tsx`. |
+| `clearFilterButton` | Define la apariencia común del botón utilizado para limpiar filtros. | Se utiliza en los menús de filtros de PQR y administración de usuarios. |
 
 ---
 
