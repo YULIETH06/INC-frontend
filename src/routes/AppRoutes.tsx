@@ -1,9 +1,15 @@
-import { Routes, Route } from "react-router-dom";
+import {
+  Routes,
+  Route,
+} from "react-router-dom";
 
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import Dashboard from "../pages/Dashboard";
+
 import PrivateRoute from "./PrivateRoute";
+import PublicRoute from "./PublicRoute";
+
 import DashboardLayout from "../components/layouts/DashboardLayout";
 
 import CreatePqr from "../pages/pqrs/user/CreatePqr";
@@ -21,25 +27,54 @@ import PersonnelCandidateValidations from "../pages/humanTalent/candidateValidat
 
 import UserSignature from "../pages/users/UserSignature";
 import ChangePassword from "../pages/users/ChangePassword";
+
 import PositionProfileRevisions from "../pages/positionManagement/PositionProfileRevisions";
 import PositionProfileRevisionDetail from "../pages/positionManagement/PositionProfileRevisionDetail";
 
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      {/* Rutas disponibles solo sin autenticación */}
+      <Route element={<PublicRoute />}>
+        <Route
+          path="/"
+          element={<Login />}
+        />
 
-      {/* Rutas con layout administrativo */}
+        <Route
+          path="/register"
+          element={<Register />}
+        />
+      </Route>
+
+      {/* Rutas disponibles solo con autenticación */}
       <Route element={<PrivateRoute />}>
         <Route element={<DashboardLayout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route
+            path="/dashboard"
+            element={<Dashboard />}
+          />
 
           {/* PQR */}
-          <Route path="/dashboard/pqrs/my" element={<MyPqrs />} />
-          <Route path="/dashboard/pqrs/create" element={<CreatePqr />} />
-          <Route path="/dashboard/pqrs" element={<AdminPqrs />} />
-          <Route path="/agent/pqrs" element={<AgentPqrs />} />
+          <Route
+            path="/dashboard/pqrs/my"
+            element={<MyPqrs />}
+          />
+
+          <Route
+            path="/dashboard/pqrs/create"
+            element={<CreatePqr />}
+          />
+
+          <Route
+            path="/dashboard/pqrs"
+            element={<AdminPqrs />}
+          />
+
+          <Route
+            path="/agent/pqrs"
+            element={<AgentPqrs />}
+          />
 
           {/* Talento Humano */}
           <Route
@@ -85,7 +120,10 @@ const AppRoutes = () => {
           />
 
           {/* Usuario */}
-          <Route path="/users" element={<AdminUsers />} />
+          <Route
+            path="/users"
+            element={<AdminUsers />}
+          />
 
           <Route
             path="/my-signature"
@@ -96,7 +134,6 @@ const AppRoutes = () => {
             path="/change-password"
             element={<ChangePassword />}
           />
-
         </Route>
       </Route>
     </Routes>

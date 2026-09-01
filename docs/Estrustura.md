@@ -1301,23 +1301,26 @@ Esta organización permite que cada ruta tenga una vista claramente identificada
 
 ### `src/routes/`
 
-Esta carpeta contiene la configuración de rutas del proyecto.
+La carpeta `routes/` contiene los archivos encargados de organizar el acceso a las diferentes páginas del sistema.
 
-Aquí se definen las rutas públicas, privadas y las páginas que se muestran según la URL.
+Su función principal es definir qué página debe mostrarse según la dirección a la que navega el usuario y controlar si puede acceder a ella dependiendo de si tiene o no una sesión iniciada.
 
-**Ejemplo:**
+De esta manera, la navegación se mantiene centralizada y no es necesario controlar el acceso individualmente dentro de cada página.
+
+#### Estructura
 
 ```txt
 routes/
 ├── AppRoutes.tsx
-└── PrivateRoute.tsx
+├── PrivateRoute.tsxs
+└── PublicRoute.tsx
 ```
 
-**Responsabilidad principal:**
-
-```txt
-Centralizar la navegación del sistema.
-```
+| Archivo | Descripción | Uso dentro del proyecto |
+| ------- | ----------- | ----------------------- |
+| `AppRoutes.tsx` | Archivo principal de navegación del sistema. Organiza las páginas disponibles y define cuáles pertenecen al acceso público y cuáles forman parte de las áreas internas de la aplicación. | Se utiliza para relacionar cada dirección del sistema con la página que debe mostrarse al usuario. |
+| `PrivateRoute.tsx` | Controla el acceso a las páginas que requieren que el usuario haya iniciado sesión. Evita que una persona sin autenticación pueda ingresar directamente a las áreas internas del sistema. | Se utiliza para proteger páginas como el Dashboard, PQR, Talento Humano, Gestión de Cargos, usuarios y configuraciones personales. |
+| `PublicRoute.tsx` | Controla el acceso a las páginas destinadas a usuarios que todavía no han iniciado sesión. Evita que un usuario autenticado regrese nuevamente a las páginas de inicio de sesión o registro mientras su sesión continúa activa. | Se utiliza principalmente para proteger las páginas `Login.tsx` y `Register.tsx`. |
 
 ---
 
