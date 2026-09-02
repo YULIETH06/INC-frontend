@@ -14,6 +14,7 @@ import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
 import PrintOutlinedIcon from "@mui/icons-material/PrintOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import UploadFileOutlinedIcon from "@mui/icons-material/UploadFileOutlined";
+import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
@@ -50,6 +51,7 @@ export const appIcons = {
     print: PrintOutlinedIcon,
     file: DescriptionOutlinedIcon,
     upload: UploadFileOutlinedIcon,
+    download: DownloadOutlinedIcon,
     lock: LockOutlinedIcon,
     unlock: LockOpenOutlinedIcon,
     history: HistoryOutlinedIcon,

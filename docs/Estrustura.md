@@ -197,6 +197,7 @@ components/
 │   └── SidebarMenu.tsx
 │
 ├── pqrs/
+│   ├── PqrAttachmentPreviewDialog.tsx
 │   ├── PqrChatView.tsx
 │   ├── PqrRatingSummary.tsx
 │   └── PqrTicketCard.tsx
@@ -452,7 +453,8 @@ Estos componentes están relacionados directamente con la lógica visual de las 
 
 | Componente             | Descripción                                                                                                                                                                                                                                                                                                                                                                            | Uso dentro del proyecto                                                                                                                             |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `PqrChatView.tsx`      | Componente encargado de mostrar la vista visual del chat de una PQR. Presenta la información de la solicitud, los mensajes enviados y recibidos, el campo de escritura, el botón para enviar mensajes, el botón para adjuntar archivos y la visualización de imágenes o documentos enviados en la conversación.                                                                        | Se utiliza en el módulo de PQR para permitir la comunicación entre usuario, agente o administrador mediante mensajes de texto y archivos adjuntos.  |
+| `PqrChatView.tsx`      | Componente encargado de mostrar la vista visual del chat de una PQR. Presenta la información de la solicitud, los mensajes enviados y recibidos, el campo de escritura, el botón para enviar mensajes, el botón para adjuntar archivos y la visualización de imágenes o documentos enviados en la conversación. Las imágenes adjuntas pueden abrirse en una vista ampliada y descargarse directamente desde el chat. | Se utiliza en el módulo de PQR para permitir la comunicación entre usuario, agente o administrador mediante mensajes de texto y archivos adjuntos. |
+| `PqrAttachmentPreviewDialog.tsx` | Componente encargado de mostrar una imagen adjunta del chat en una vista ampliada mediante `CustomDialog`. Mantiene el nombre original del archivo y ofrece la acción de descarga utilizando los componentes reutilizables del sistema. | Se utiliza desde `PqrChatView.tsx` cuando el usuario selecciona una imagen adjunta para visualizarla en mayor tamaño. |
 | `PqrRatingSummary.tsx` | Componente encargado de mostrar el resumen de la calificación realizada por el usuario sobre una PQR. Puede incluir la puntuación, comentario y fecha de calificación.                                                                                                                                                                                                                 | Se utiliza en vistas donde se necesita mostrar la valoración dada a una PQR respondida o cerrada.                                                   |
 | `PqrTicketCard.tsx`    | Componente encargado de mostrar una PQR en formato de tarjeta compacta. Presenta el identificador de la PQR, tipo de caso, estado, prioridad, fecha, usuario, agente asignado cuando aplica, descripción, calificación, acciones relacionadas con estado, prioridad y chat. También puede mostrar un contador visual de mensajes sin revisar cuando la PQR tiene novedades en el chat. | Se utiliza en vistas como `AgentPqrs` y `AdminPqrs` para reutilizar el diseño visual de las tarjetas de PQR y evitar repetir código en cada página. |
 
@@ -883,6 +885,7 @@ back
 print
 file
 upload
+download
 lock
 unlock
 history
@@ -1940,7 +1943,7 @@ Los archivos ubicados en `utils/common/` contienen funciones generales que puede
 | `dateUtils.ts`       | Contiene funciones auxiliares relacionadas con la transformación y presentación de fechas.                                 | Se utiliza para mostrar fechas de registros, mensajes, requisiciones, aprobaciones, notificaciones y otros datos temporales. |
 | `excelUtils.ts`      | Contiene funciones auxiliares relacionadas con la transformación de valores utilizados al generar archivos de Excel.       | Se utiliza para adaptar colores de la interfaz al formato requerido por ExcelJS.                                             |
 | `fileUrl.ts`         | Contiene funciones auxiliares para construir direcciones completas de archivos e imágenes almacenados en el backend.       | Se utiliza para mostrar firmas, archivos adjuntos, imágenes y otros recursos cuya ruta es enviada de forma relativa.         |
-| `fileUtils.ts`       | Contiene funciones auxiliares relacionadas con la conversión y presentación del tamaño de archivos.                        | Se utiliza para mostrar de manera legible el tamaño de archivos seleccionados, cargados o adjuntos.                          |
+| `fileUtils.ts`       | Contiene funciones auxiliares relacionadas con la presentación y descarga de archivos.                                      | Se utiliza para mostrar tamaños de archivos de forma legible y descargar archivos o imágenes conservando su nombre original. |
 | `formatText.ts`      | Contiene funciones auxiliares para transformar textos técnicos y obtener etiquetas legibles.                               | Se utiliza en formularios, detalles, listas y componentes que necesitan presentar valores de forma clara.                    |
 | `getErrorMessage.ts` | Contiene una función auxiliar encargada de obtener mensajes claros a partir de errores producidos durante peticiones HTTP. | Se utiliza en hooks, páginas y componentes para mostrar mensajes comprensibles cuando ocurre un error.                       |
 | `numberUtils.ts`     | Contiene funciones auxiliares relacionadas con la limpieza, presentación y formato de valores numéricos y monetarios.      | Se utiliza en formularios, detalles y componentes donde se manejan salarios, montos, cuotas, abonos y saldos.                |
@@ -1999,11 +2002,13 @@ buildFileUrl()
 
 ```txt
 formatFileSize()
+downloadFile()
 ```
 
-| Función                | Descripción                                                                                                    |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `formatFileSize(size)` | Convierte el tamaño de un archivo expresado en bytes a kilobytes o megabytes para mostrarlo de manera legible. |
+| Función                            | Descripción                                                                                                                                                |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `formatFileSize(size)`             | Convierte el tamaño de un archivo expresado en bytes a kilobytes o megabytes para mostrarlo de manera legible.                                             |
+| `downloadFile(fileUrl, fileName)`  | Descarga un archivo desde su URL y conserva el nombre original. Se utiliza, entre otros casos, para descargar imágenes adjuntas desde el chat de una PQR. |
 
 ---
 
