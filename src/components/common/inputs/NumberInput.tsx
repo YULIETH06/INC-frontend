@@ -12,13 +12,15 @@ import type {
     TextFieldProps,
 } from "@mui/material";
 
-import { cleanNumberInput } from "../../../utils/common/numberUtils";
+import {
+    cleanNumberInput,
+} from "../../../utils/common/numberUtils";
 
 type NumberInputProps = Omit<
     TextFieldProps,
     "type" | "value" | "onChange"
 > & {
-    value: string;
+    value: string | number;
     onChange: (value: string) => void;
     hint?: ReactNode;
 };
@@ -38,12 +40,18 @@ const NumberInput = ({
         event: React.ChangeEvent<HTMLInputElement>
     ) => {
         onChange(
-            cleanNumberInput(event.target.value)
+            cleanNumberInput(
+                event.target.value
+            )
         );
     };
 
     return (
-        <Box sx={{ width: "100%" }}>
+        <Box
+            sx={{
+                width: "100%",
+            }}
+        >
             <TextField
                 {...props}
                 fullWidth

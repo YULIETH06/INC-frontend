@@ -22,7 +22,7 @@ type MoneyInputProps = Omit<
     TextFieldProps,
     "type" | "value" | "onChange"
 > & {
-    value: string;
+    value: string | number;
     onChange: (value: string) => void;
     hint?: ReactNode;
 };
@@ -42,21 +42,29 @@ const MoneyInput = ({
         event: React.ChangeEvent<HTMLInputElement>
     ) => {
         const cleanValue =
-            cleanNumberInput(event.target.value);
+            cleanNumberInput(
+                event.target.value
+            );
 
         onChange(cleanValue);
     };
 
     return (
-        <Box sx={{ width: "100%" }}>
+        <Box
+            sx={{
+                width: "100%",
+            }}
+        >
             <TextField
                 {...props}
                 fullWidth
                 type="text"
                 value={
-                    value
-                        ? formatNumberInput(value)
-                        : ""
+                    value === ""
+                        ? ""
+                        : formatNumberInput(
+                            String(value)
+                        )
                 }
                 error={error}
                 helperText={helperText}
