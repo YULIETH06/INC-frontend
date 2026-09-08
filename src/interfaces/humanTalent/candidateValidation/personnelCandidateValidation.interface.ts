@@ -21,12 +21,27 @@ export type CandidatePositionType =
     | "NUEVO_CARGO"
     | "CARGO_EXISTENTE";
 
+// Estados internos de la Fase 4.
+export type CandidateTechnicalEvaluationStatus =
+    | "EN_REGISTRO"
+    | "PENDIENTE_APROBACION"
+    | "APROBADA";
+
 // Estados calculados del proceso de validación.
 export type CandidateValidationStatus =
     | "SIN_INICIAR"
     | "CONCEPTO_APLICACION_COMPLETADO"
     | "VALIDACION_CARGO_COMPLETADA"
-    | "VALIDACION_COMPLETADA";
+    | "VALIDACION_COMPLETADA"
+    | "EVALUACION_TECNICA_EN_REGISTRO"
+    | "EVALUACION_TECNICA_PENDIENTE_APROBACION"
+    | "EVALUACION_TECNICA_COMPLETADA";
+
+// Resumen de la Evaluación Técnica dentro del listado.
+export interface PersonnelCandidateTechnicalEvaluationSummary {
+    status: CandidateTechnicalEvaluationStatus;
+    isSuitable: boolean | null;
+}
 
 // Resumen de una validación dentro del listado.
 export interface PersonnelCandidateValidationSummary {
@@ -37,6 +52,9 @@ export interface PersonnelCandidateValidationSummary {
     isSuitable: boolean | null;
     completedStep: number;
     validatedAt: string | null;
+
+    technicalEvaluation:
+    PersonnelCandidateTechnicalEvaluationSummary | null;
 }
 
 // Candidato mostrado en el listado de validaciones.
@@ -103,6 +121,34 @@ export interface PersonnelCandidateRequirementValidation {
     gapClosure: string | null;
 }
 
+// Evaluación Técnica registrada en la Fase 4.
+export interface PersonnelCandidateTechnicalEvaluation {
+    id: number;
+
+    interviewScore: string | null;
+    interviewRecordedAt: string | null;
+
+    examScore: string | null;
+    examRecordedAt: string | null;
+
+    status:
+    CandidateTechnicalEvaluationStatus;
+
+    isSuitable: boolean | null;
+
+    enteredById: number;
+
+    enteredBy:
+    Pick<RequisitionUser, "id" | "name">;
+
+    approvedById: number | null;
+
+    approvedBy:
+    Pick<RequisitionUser, "id" | "name"> | null;
+
+    approvedAt: string | null;
+}
+
 // Validación completa guardada para el candidato.
 export interface PersonnelCandidateValidation {
     id: number;
@@ -131,6 +177,9 @@ export interface PersonnelCandidateValidation {
 
     requirementValidations:
     PersonnelCandidateRequirementValidation[];
+
+    technicalEvaluation:
+    PersonnelCandidateTechnicalEvaluation | null;
 }
 
 // Candidato mostrado en el detalle.
@@ -150,6 +199,11 @@ export interface PersonnelCandidateValidationCandidate {
         CandidateSubmissionStatus;
 
         positionRevisionId: number;
+
+        createdById: number;
+
+        createdBy:
+        Pick<RequisitionUser, "id" | "name">;
 
         department:
         Department;
@@ -173,6 +227,8 @@ export interface PersonnelCandidateValidationDetailResponse {
     PersonnelCandidateValidationCandidate;
 
     canManageValidation: boolean;
+
+    canApproveTechnicalEvaluation: boolean;
 }
 
 // Formulario de la Fase 1.
@@ -231,6 +287,28 @@ export interface CandidateValidationFormErrors {
     CandidateRequirementValidationFormErrors[];
 }
 
+// Formulario de calificaciones de la Fase 4.
+export interface CandidateTechnicalEvaluationForm {
+    interviewScore: number | null;
+    examScore: number | null;
+}
+
+// Errores Yup de las calificaciones de la Fase 4.
+export interface CandidateTechnicalEvaluationFormErrors {
+    interviewScore: string;
+    examScore: string;
+}
+
+// Formulario de confirmación de la Fase 4.
+export interface CandidateTechnicalEvaluationApprovalForm {
+    isSuitable: boolean | null;
+}
+
+// Errores de confirmación de la Fase 4.
+export interface CandidateTechnicalEvaluationApprovalFormErrors {
+    isSuitable: string;
+}
+
 // Datos enviados al backend en la Fase 1.
 export interface CreatePersonnelCandidateValidationData {
     applicationConcept:
@@ -260,6 +338,17 @@ export interface CompletePersonnelCandidateValidationData {
 
     requirementValidations:
     CandidateRequirementValidationData[];
+}
+
+// Datos enviados al guardar calificaciones de la Fase 4.
+export interface SavePersonnelCandidateTechnicalEvaluationData {
+    interviewScore?: number;
+    examScore?: number;
+}
+
+// Datos enviados al confirmar la Fase 4.
+export interface ApprovePersonnelCandidateTechnicalEvaluationData {
+    isSuitable: boolean;
 }
 
 // Respuesta general al guardar una fase de validación.

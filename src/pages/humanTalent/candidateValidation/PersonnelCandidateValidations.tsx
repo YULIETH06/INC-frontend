@@ -172,7 +172,16 @@ const PersonnelCandidateValidations = () => {
                 return "Validación de cargo";
 
             case "VALIDACION_COMPLETADA":
-                return "Validación completada";
+                return "Validación del postulante";
+
+            case "EVALUACION_TECNICA_EN_REGISTRO":
+                return "Evaluación técnica en registro";
+
+            case "EVALUACION_TECNICA_PENDIENTE_APROBACION":
+                return "Evaluación técnica pendiente";
+
+            case "EVALUACION_TECNICA_COMPLETADA":
+                return "Evaluación técnica completada";
 
             default:
                 return status;
@@ -199,6 +208,15 @@ const PersonnelCandidateValidations = () => {
                 return "info";
 
             case "VALIDACION_COMPLETADA":
+                return "success";
+
+            case "EVALUACION_TECNICA_EN_REGISTRO":
+                return "warning";
+
+            case "EVALUACION_TECNICA_PENDIENTE_APROBACION":
+                return "info";
+
+            case "EVALUACION_TECNICA_COMPLETADA":
                 return "success";
 
             default:
@@ -297,6 +315,23 @@ const PersonnelCandidateValidations = () => {
             },
 
             {
+                id: "requisition",
+                label: "Requisición",
+
+                render: (
+                    candidate
+                ) => (
+                    <Typography
+                        sx={{
+                            fontWeight: 700,
+                        }}
+                    >
+                        {candidate.requisition.id}
+                    </Typography>
+                ),
+            },
+
+            {
                 id: "status",
                 label: "Estado",
 
@@ -328,19 +363,32 @@ const PersonnelCandidateValidations = () => {
                         candidate.validationStatus ===
                         "SIN_INICIAR";
 
+                    const isTechnicalApprovalPending =
+                        candidate.validationStatus ===
+                        "EVALUACION_TECNICA_PENDIENTE_APROBACION";
+
+                    const phaseThreeNotSuitable =
+                        candidate.validationStatus ===
+                        "VALIDACION_COMPLETADA" &&
+                        candidate.validation?.isSuitable === false;
+
                     const canContinue =
                         canManageValidation &&
                         candidate.validationStatus !==
                         "SIN_INICIAR" &&
                         candidate.validationStatus !==
-                        "VALIDACION_COMPLETADA";
+                        "EVALUACION_TECNICA_COMPLETADA" &&
+                        !isTechnicalApprovalPending &&
+                        !phaseThreeNotSuitable;
 
                     const tooltip =
                         canStart
                             ? "Iniciar validación"
-                            : canContinue
-                                ? "Continuar validación"
-                                : "Ver validación";
+                            : isTechnicalApprovalPending
+                                ? "Ver evaluación técnica"
+                                : canContinue
+                                    ? "Continuar validación"
+                                    : "Ver validación";
 
                     return (
                         <IconActionButton

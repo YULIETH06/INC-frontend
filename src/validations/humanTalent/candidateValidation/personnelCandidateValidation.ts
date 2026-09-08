@@ -106,3 +106,70 @@ export const candidateValidationSchema =
             )
             .required(),
     });
+
+// Validación de las calificaciones de la Fase 4.
+export const candidateTechnicalEvaluationSchema =
+    Yup.object({
+        interviewScore: Yup.number()
+            .nullable()
+            .typeError(
+                "Ingrese una calificación válida."
+            )
+            .min(
+                0,
+                "La calificación debe estar entre 0.0 y 5.0."
+            )
+            .max(
+                5,
+                "La calificación debe estar entre 0.0 y 5.0."
+            )
+            .test(
+                "one-decimal",
+                "La calificación solo puede tener un decimal.",
+                (value) =>
+                    value === null ||
+                    value === undefined ||
+                    Number(value.toFixed(1)) === value
+            ),
+
+        examScore: Yup.number()
+            .nullable()
+            .typeError(
+                "Ingrese una calificación válida."
+            )
+            .min(
+                0,
+                "La calificación debe estar entre 0.0 y 5.0."
+            )
+            .max(
+                5,
+                "La calificación debe estar entre 0.0 y 5.0."
+            )
+            .test(
+                "one-decimal",
+                "La calificación solo puede tener un decimal.",
+                (value) =>
+                    value === null ||
+                    value === undefined ||
+                    Number(value.toFixed(1)) === value
+            ),
+    })
+        .test(
+            "at-least-one-score",
+            "Debe diligenciar por lo menos una calificación.",
+            (value) =>
+                value?.interviewScore !== null &&
+                value?.interviewScore !== undefined ||
+                value?.examScore !== null &&
+                value?.examScore !== undefined
+        );
+
+// Validación de la confirmación de la Fase 4.
+export const candidateTechnicalEvaluationApprovalSchema =
+    Yup.object({
+        isSuitable: Yup.boolean()
+            .nullable()
+            .required(
+                "Debe indicar si el postulante es apto para continuar."
+            ),
+    });

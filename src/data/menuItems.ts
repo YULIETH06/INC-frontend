@@ -105,20 +105,20 @@ export const menuItems: MenuModule[] = [
           },
         ],
       },
-      // {
-      //   name: "Validación de postulantes",
-      //   options: [
-      //     {
-      //       label: "Validación de cargo y postulante",
-      //       path: "/dashboard/human-talent/candidate-validations",
-      //       roles: ["ADMIN", "USER"],
-      //       positionCodes: [
-      //         "DPC-TH-0003", // Jefe de Talento Humano
-      //         "DPC-TH-0080", // Auxiliar de Talento Humano
-      //       ],
-      //     },
-      //   ],
-      // },
+      {
+        name: "Validación de postulantes",
+        options: [
+          {
+            label: "Validación de cargo y postulante",
+            path: "/dashboard/human-talent/candidate-validations",
+            roles: ["ADMIN", "USER"],
+            positionCodes: [
+              ...requisitionCreatePositionCodes,
+              "DPC-TH-0080", // Auxiliar de Talento Humano
+            ],
+          },
+        ],
+      },
     ],
   },
 

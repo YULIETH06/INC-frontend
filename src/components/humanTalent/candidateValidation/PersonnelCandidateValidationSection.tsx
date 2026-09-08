@@ -18,6 +18,7 @@ import ProcessStepper from "../../common/ProcessStepper";
 
 import CandidateApplicationConceptStep from "./CandidateApplicationConceptStep";
 import CandidatePositionValidationStep from "./CandidatePositionValidationStep";
+import CandidateTechnicalEvaluationStep from "./CandidateTechnicalEvaluationStep";
 import CandidateValidationStep from "./CandidateValidationStep";
 
 import {
@@ -45,19 +46,26 @@ const PersonnelCandidateValidationSection = ({
     const {
         candidate,
         canManageValidation,
+        canApproveTechnicalEvaluation,
 
         applicationConceptForm,
         positionValidationForm,
         candidateValidationForm,
+        technicalEvaluationForm,
+        technicalEvaluationApprovalForm,
 
         applicationConceptErrors,
         positionValidationErrors,
         candidateValidationErrors,
+        technicalEvaluationErrors,
+        technicalEvaluationApprovalErrors,
 
         loadingDetail,
         loadingApplicationConcept,
         loadingPositionValidation,
         loadingCandidateValidation,
+        loadingTechnicalEvaluation,
+        loadingTechnicalEvaluationApproval,
 
         detailError,
 
@@ -75,9 +83,15 @@ const PersonnelCandidateValidationSection = ({
         handleRequirementGapClosureChange,
         handleSuitableChange,
 
+        handleInterviewScoreChange,
+        handleExamScoreChange,
+        handleTechnicalEvaluationSuitableChange,
+
         handleSaveApplicationConcept,
         handleSavePositionValidation,
         handleSaveCandidateValidation,
+        handleSaveTechnicalEvaluation,
+        handleApproveTechnicalEvaluation,
 
         closeMessage,
     } = usePersonnelCandidateValidationDetail({
@@ -91,6 +105,17 @@ const PersonnelCandidateValidationSection = ({
     // Ubica al usuario en la siguiente etapa pendiente.
     useEffect(() => {
         if (!candidate) {
+            return;
+        }
+
+        const phaseThreeSuitable =
+            candidate.validation?.isSuitable === true;
+
+        if (
+            completedStep >= 3 &&
+            phaseThreeSuitable
+        ) {
+            setActiveStep(3);
             return;
         }
 
@@ -125,6 +150,14 @@ const PersonnelCandidateValidationSection = ({
             disabled:
                 completedStep < 2,
         },
+        {
+            label: "Evaluación técnica",
+            completed:
+                completedStep >= 4,
+            disabled:
+                completedStep < 3 ||
+                candidate?.validation?.isSuitable !== true,
+        },
     ];
 
     // Permite consultar únicamente las etapas habilitadas.
@@ -141,6 +174,16 @@ const PersonnelCandidateValidationSection = ({
         if (
             step === 2 &&
             completedStep < 2
+        ) {
+            return;
+        }
+
+        if (
+            step === 3 &&
+            (
+                completedStep < 3 ||
+                candidate?.validation?.isSuitable !== true
+            )
         ) {
             return;
         }
@@ -358,6 +401,57 @@ const PersonnelCandidateValidationSection = ({
                                 }
                                 onSave={
                                     handleSaveCandidateValidation
+                                }
+                            />
+                        )}
+
+                        {/* Fase 4. */}
+                        {activeStep === 3 && (
+                            <CandidateTechnicalEvaluationStep
+                                candidate={
+                                    candidate
+                                }
+                                form={
+                                    technicalEvaluationForm
+                                }
+                                formErrors={
+                                    technicalEvaluationErrors
+                                }
+                                approvalForm={
+                                    technicalEvaluationApprovalForm
+                                }
+                                approvalFormErrors={
+                                    technicalEvaluationApprovalErrors
+                                }
+                                canManageValidation={
+                                    canManageValidation
+                                }
+                                canApproveTechnicalEvaluation={
+                                    canApproveTechnicalEvaluation
+                                }
+                                completedStep={
+                                    completedStep
+                                }
+                                loading={
+                                    loadingTechnicalEvaluation
+                                }
+                                loadingApproval={
+                                    loadingTechnicalEvaluationApproval
+                                }
+                                onInterviewScoreChange={
+                                    handleInterviewScoreChange
+                                }
+                                onExamScoreChange={
+                                    handleExamScoreChange
+                                }
+                                onSuitableChange={
+                                    handleTechnicalEvaluationSuitableChange
+                                }
+                                onSave={
+                                    handleSaveTechnicalEvaluation
+                                }
+                                onApprove={
+                                    handleApproveTechnicalEvaluation
                                 }
                             />
                         )}

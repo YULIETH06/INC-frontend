@@ -1,11 +1,13 @@
 import api from "../../../api/axios";
 
 import type {
+    ApprovePersonnelCandidateTechnicalEvaluationData,
     CompletePersonnelCandidateValidationData,
     CreatePersonnelCandidateValidationData,
     PersonnelCandidateValidationActionResponse,
     PersonnelCandidateValidationDetailResponse,
     PersonnelCandidateValidationsResponse,
+    SavePersonnelCandidateTechnicalEvaluationData,
     UpdatePersonnelCandidatePositionValidationData,
 } from "../../../interfaces/humanTalent/candidateValidation/personnelCandidateValidation.interface";
 
@@ -68,6 +70,34 @@ export const completePersonnelCandidateValidation = async (
     const response =
         await api.patch<PersonnelCandidateValidationActionResponse>(
             `/human-talent/candidate-validations/${candidateId}/candidate`,
+            data
+        );
+
+    return response.data;
+};
+
+// Guarda las calificaciones de la Fase 4.
+export const savePersonnelCandidateTechnicalEvaluation = async (
+    candidateId: number,
+    data: SavePersonnelCandidateTechnicalEvaluationData
+): Promise<PersonnelCandidateValidationActionResponse> => {
+    const response =
+        await api.patch<PersonnelCandidateValidationActionResponse>(
+            `/human-talent/candidate-validations/${candidateId}/technical-evaluation`,
+            data
+        );
+
+    return response.data;
+};
+
+// Confirma la Fase 4.
+export const approvePersonnelCandidateTechnicalEvaluation = async (
+    candidateId: number,
+    data: ApprovePersonnelCandidateTechnicalEvaluationData
+): Promise<PersonnelCandidateValidationActionResponse> => {
+    const response =
+        await api.patch<PersonnelCandidateValidationActionResponse>(
+            `/human-talent/candidate-validations/${candidateId}/technical-evaluation/approve`,
             data
         );
 

@@ -7,15 +7,19 @@ import {
 import { ValidationError } from "yup";
 
 import {
+    approvePersonnelCandidateTechnicalEvaluation,
     completePersonnelCandidateValidation,
     createPersonnelCandidateValidation,
     getPersonnelCandidateValidationDetail,
+    savePersonnelCandidateTechnicalEvaluation,
     updatePersonnelCandidatePositionValidation,
 } from "../../../services/humanTalent/candidateValidation/personnelCandidateValidationService";
 
 import {
     candidateApplicationConceptSchema,
     candidatePositionValidationSchema,
+    candidateTechnicalEvaluationApprovalSchema,
+    candidateTechnicalEvaluationSchema,
     candidateValidationSchema,
 } from "../../../validations/humanTalent/candidateValidation/personnelCandidateValidation";
 
@@ -24,15 +28,21 @@ import { getErrorMessage } from "../../../utils/common/getErrorMessage";
 import type { MessageType } from "../../../interfaces/common/message.interface";
 
 import type {
+    ApprovePersonnelCandidateTechnicalEvaluationData,
     CandidateApplicationConceptForm,
     CandidateApplicationConceptFormErrors,
     CandidatePositionValidationForm,
     CandidatePositionValidationFormErrors,
     CandidateRequirementValidationFormErrors,
+    CandidateTechnicalEvaluationApprovalForm,
+    CandidateTechnicalEvaluationApprovalFormErrors,
+    CandidateTechnicalEvaluationForm,
+    CandidateTechnicalEvaluationFormErrors,
     CandidateValidationForm,
     CandidateValidationFormErrors,
     CompletePersonnelCandidateValidationData,
     PersonnelCandidateValidationCandidate,
+    SavePersonnelCandidateTechnicalEvaluationData,
     UpdatePersonnelCandidatePositionValidationData,
 } from "../../../interfaces/humanTalent/candidateValidation/personnelCandidateValidation.interface";
 
@@ -81,6 +91,32 @@ const initialCandidateValidationErrors:
     requirementValidations: [],
 };
 
+// Estado inicial de las calificaciones de la Fase 4.
+const initialTechnicalEvaluationForm:
+    CandidateTechnicalEvaluationForm = {
+    interviewScore: null,
+    examScore: null,
+};
+
+// Errores iniciales de las calificaciones de la Fase 4.
+const initialTechnicalEvaluationErrors:
+    CandidateTechnicalEvaluationFormErrors = {
+    interviewScore: "",
+    examScore: "",
+};
+
+// Estado inicial de la confirmación de la Fase 4.
+const initialTechnicalEvaluationApprovalForm:
+    CandidateTechnicalEvaluationApprovalForm = {
+    isSuitable: null,
+};
+
+// Errores iniciales de la confirmación de la Fase 4.
+const initialTechnicalEvaluationApprovalErrors:
+    CandidateTechnicalEvaluationApprovalFormErrors = {
+    isSuitable: "",
+};
+
 // Hook encargado del detalle y las etapas de validación del candidato.
 export const usePersonnelCandidateValidationDetail = ({
     candidateId,
@@ -98,6 +134,12 @@ export const usePersonnelCandidateValidationDetail = ({
     const [
         canManageValidation,
         setCanManageValidation,
+    ] = useState(false);
+
+    // Permiso para confirmar la Evaluación Técnica.
+    const [
+        canApproveTechnicalEvaluation,
+        setCanApproveTechnicalEvaluation,
     ] = useState(false);
 
     // Formularios de las etapas.
@@ -122,6 +164,20 @@ export const usePersonnelCandidateValidationDetail = ({
         initialCandidateValidationForm
     );
 
+    const [
+        technicalEvaluationForm,
+        setTechnicalEvaluationForm,
+    ] = useState<CandidateTechnicalEvaluationForm>(
+        initialTechnicalEvaluationForm
+    );
+
+    const [
+        technicalEvaluationApprovalForm,
+        setTechnicalEvaluationApprovalForm,
+    ] = useState<CandidateTechnicalEvaluationApprovalForm>(
+        initialTechnicalEvaluationApprovalForm
+    );
+
     // Errores Yup de las etapas.
     const [
         applicationConceptErrors,
@@ -144,6 +200,20 @@ export const usePersonnelCandidateValidationDetail = ({
         initialCandidateValidationErrors
     );
 
+    const [
+        technicalEvaluationErrors,
+        setTechnicalEvaluationErrors,
+    ] = useState<CandidateTechnicalEvaluationFormErrors>(
+        initialTechnicalEvaluationErrors
+    );
+
+    const [
+        technicalEvaluationApprovalErrors,
+        setTechnicalEvaluationApprovalErrors,
+    ] = useState<CandidateTechnicalEvaluationApprovalFormErrors>(
+        initialTechnicalEvaluationApprovalErrors
+    );
+
     // Estados de carga.
     const [
         loadingDetail,
@@ -163,6 +233,16 @@ export const usePersonnelCandidateValidationDetail = ({
     const [
         loadingCandidateValidation,
         setLoadingCandidateValidation,
+    ] = useState(false);
+
+    const [
+        loadingTechnicalEvaluation,
+        setLoadingTechnicalEvaluation,
+    ] = useState(false);
+
+    const [
+        loadingTechnicalEvaluationApproval,
+        setLoadingTechnicalEvaluationApproval,
     ] = useState(false);
 
     // Error producido al consultar el detalle.
@@ -242,6 +322,32 @@ export const usePersonnelCandidateValidationDetail = ({
                 requirementValidations,
             });
 
+            const technicalEvaluation =
+                validation?.technicalEvaluation;
+
+            setTechnicalEvaluationForm({
+                interviewScore:
+                    technicalEvaluation?.interviewScore !== null &&
+                        technicalEvaluation?.interviewScore !== undefined
+                        ? Number(
+                            technicalEvaluation.interviewScore
+                        )
+                        : null,
+
+                examScore:
+                    technicalEvaluation?.examScore !== null &&
+                        technicalEvaluation?.examScore !== undefined
+                        ? Number(
+                            technicalEvaluation.examScore
+                        )
+                        : null,
+            });
+
+            setTechnicalEvaluationApprovalForm({
+                isSuitable:
+                    technicalEvaluation?.isSuitable ?? null,
+            });
+
             setApplicationConceptErrors(
                 initialApplicationConceptErrors
             );
@@ -262,6 +368,14 @@ export const usePersonnelCandidateValidationDetail = ({
                         })
                     ),
             });
+
+            setTechnicalEvaluationErrors(
+                initialTechnicalEvaluationErrors
+            );
+
+            setTechnicalEvaluationApprovalErrors(
+                initialTechnicalEvaluationApprovalErrors
+            );
         },
         []
     );
@@ -276,6 +390,7 @@ export const usePersonnelCandidateValidationDetail = ({
             ) {
                 setCandidate(null);
                 setCanManageValidation(false);
+                setCanApproveTechnicalEvaluation(false);
                 return;
             }
 
@@ -296,6 +411,10 @@ export const usePersonnelCandidateValidationDetail = ({
                     response.canManageValidation
                 );
 
+                setCanApproveTechnicalEvaluation(
+                    response.canApproveTechnicalEvaluation
+                );
+
                 initializeForms(
                     response.candidate
                 );
@@ -304,6 +423,7 @@ export const usePersonnelCandidateValidationDetail = ({
 
                 setCandidate(null);
                 setCanManageValidation(false);
+                setCanApproveTechnicalEvaluation(false);
 
                 setDetailError(
                     getErrorMessage(
@@ -540,6 +660,57 @@ export const usePersonnelCandidateValidationDetail = ({
                 isSuitable: "",
             })
         );
+    };
+
+    // Actualiza la calificación de la entrevista en la Fase 4.
+    const handleInterviewScoreChange = (
+        value: number | null
+    ) => {
+        setTechnicalEvaluationForm(
+            (previous) => ({
+                ...previous,
+                interviewScore: value,
+            })
+        );
+
+        setTechnicalEvaluationErrors(
+            (previous) => ({
+                ...previous,
+                interviewScore: "",
+            })
+        );
+    };
+
+    // Actualiza la calificación del examen en la Fase 4.
+    const handleExamScoreChange = (
+        value: number | null
+    ) => {
+        setTechnicalEvaluationForm(
+            (previous) => ({
+                ...previous,
+                examScore: value,
+            })
+        );
+
+        setTechnicalEvaluationErrors(
+            (previous) => ({
+                ...previous,
+                examScore: "",
+            })
+        );
+    };
+
+    // Actualiza la decisión de aptitud de la Fase 4.
+    const handleTechnicalEvaluationSuitableChange = (
+        value: boolean
+    ) => {
+        setTechnicalEvaluationApprovalForm({
+            isSuitable: value,
+        });
+
+        setTechnicalEvaluationApprovalErrors({
+            isSuitable: "",
+        });
     };
 
     // Guarda la Fase 1.
@@ -899,6 +1070,231 @@ export const usePersonnelCandidateValidationDetail = ({
             }
         };
 
+    // Guarda las calificaciones de la Fase 4.
+    const handleSaveTechnicalEvaluation =
+        async () => {
+            if (!candidate) {
+                return;
+            }
+
+            try {
+                await candidateTechnicalEvaluationSchema.validate(
+                    technicalEvaluationForm,
+                    {
+                        abortEarly: false,
+                    }
+                );
+
+                setLoadingTechnicalEvaluation(true);
+
+                setTechnicalEvaluationErrors(
+                    initialTechnicalEvaluationErrors
+                );
+
+                setMessage("");
+                setOpenMessage(false);
+
+                const data:
+                    SavePersonnelCandidateTechnicalEvaluationData =
+                    {};
+
+                if (
+                    technicalEvaluationForm.interviewScore !==
+                    null
+                ) {
+                    data.interviewScore =
+                        technicalEvaluationForm.interviewScore;
+                }
+
+                if (
+                    technicalEvaluationForm.examScore !==
+                    null
+                ) {
+                    data.examScore =
+                        technicalEvaluationForm.examScore;
+                }
+
+                const response =
+                    await savePersonnelCandidateTechnicalEvaluation(
+                        candidate.id,
+                        data
+                    );
+
+                await loadCandidateDetail();
+
+                setMessage(
+                    response.message ||
+                    "Evaluación técnica guardada correctamente."
+                );
+
+                setMessageSeverity("success");
+                setOpenMessage(true);
+            } catch (error: unknown) {
+                if (error instanceof ValidationError) {
+                    const errors:
+                        CandidateTechnicalEvaluationFormErrors =
+                    {
+                        ...initialTechnicalEvaluationErrors,
+                    };
+
+                    error.inner.forEach(
+                        (validationError) => {
+                            if (
+                                validationError.path ===
+                                "interviewScore"
+                            ) {
+                                errors.interviewScore =
+                                    validationError.message;
+                            }
+
+                            if (
+                                validationError.path ===
+                                "examScore"
+                            ) {
+                                errors.examScore =
+                                    validationError.message;
+                            }
+                        }
+                    );
+
+                    setTechnicalEvaluationErrors(
+                        errors
+                    );
+
+                    const hasFieldError =
+                        Boolean(errors.interviewScore) ||
+                        Boolean(errors.examScore);
+
+                    if (!hasFieldError) {
+                        setMessage(
+                            error.errors[0] ||
+                            "Debe diligenciar por lo menos una calificación."
+                        );
+
+                        setMessageSeverity("warning");
+                        setOpenMessage(true);
+                    } else {
+                        setMessage("");
+                        setOpenMessage(false);
+                    }
+
+                    return;
+                }
+
+                console.error(error);
+
+                setMessage(
+                    getErrorMessage(
+                        error,
+                        "Error al guardar la Evaluación Técnica."
+                    )
+                );
+
+                setMessageSeverity("error");
+                setOpenMessage(true);
+            } finally {
+                setLoadingTechnicalEvaluation(false);
+            }
+        };
+
+    // Confirma la decisión final de la Fase 4.
+    const handleApproveTechnicalEvaluation =
+        async () => {
+            if (!candidate) {
+                return;
+            }
+
+            try {
+                await candidateTechnicalEvaluationApprovalSchema.validate(
+                    technicalEvaluationApprovalForm,
+                    {
+                        abortEarly: false,
+                    }
+                );
+
+                if (
+                    technicalEvaluationApprovalForm.isSuitable ===
+                    null
+                ) {
+                    return;
+                }
+
+                setLoadingTechnicalEvaluationApproval(true);
+
+                setTechnicalEvaluationApprovalErrors(
+                    initialTechnicalEvaluationApprovalErrors
+                );
+
+                setMessage("");
+                setOpenMessage(false);
+
+                const data:
+                    ApprovePersonnelCandidateTechnicalEvaluationData =
+                {
+                    isSuitable:
+                        technicalEvaluationApprovalForm.isSuitable,
+                };
+
+                const response =
+                    await approvePersonnelCandidateTechnicalEvaluation(
+                        candidate.id,
+                        data
+                    );
+
+                await loadCandidateDetail();
+
+                setMessage(
+                    response.message ||
+                    "Evaluación técnica confirmada correctamente."
+                );
+
+                setMessageSeverity("success");
+                setOpenMessage(true);
+            } catch (error: unknown) {
+                if (error instanceof ValidationError) {
+                    const errors:
+                        CandidateTechnicalEvaluationApprovalFormErrors =
+                    {
+                        ...initialTechnicalEvaluationApprovalErrors,
+                    };
+
+                    error.inner.forEach(
+                        (validationError) => {
+                            if (
+                                validationError.path ===
+                                "isSuitable"
+                            ) {
+                                errors.isSuitable =
+                                    validationError.message;
+                            }
+                        }
+                    );
+
+                    setTechnicalEvaluationApprovalErrors(
+                        errors
+                    );
+
+                    setMessage("");
+                    setOpenMessage(false);
+                    return;
+                }
+
+                console.error(error);
+
+                setMessage(
+                    getErrorMessage(
+                        error,
+                        "Error al confirmar la Evaluación Técnica."
+                    )
+                );
+
+                setMessageSeverity("error");
+                setOpenMessage(true);
+            } finally {
+                setLoadingTechnicalEvaluationApproval(false);
+            }
+        };
+
     // Cierra el mensaje visual.
     const closeMessage = () => {
         setOpenMessage(false);
@@ -911,19 +1307,26 @@ export const usePersonnelCandidateValidationDetail = ({
     return {
         candidate,
         canManageValidation,
+        canApproveTechnicalEvaluation,
 
         applicationConceptForm,
         positionValidationForm,
         candidateValidationForm,
+        technicalEvaluationForm,
+        technicalEvaluationApprovalForm,
 
         applicationConceptErrors,
         positionValidationErrors,
         candidateValidationErrors,
+        technicalEvaluationErrors,
+        technicalEvaluationApprovalErrors,
 
         loadingDetail,
         loadingApplicationConcept,
         loadingPositionValidation,
         loadingCandidateValidation,
+        loadingTechnicalEvaluation,
+        loadingTechnicalEvaluationApproval,
 
         detailError,
 
@@ -943,9 +1346,15 @@ export const usePersonnelCandidateValidationDetail = ({
         handleRequirementGapClosureChange,
         handleSuitableChange,
 
+        handleInterviewScoreChange,
+        handleExamScoreChange,
+        handleTechnicalEvaluationSuitableChange,
+
         handleSaveApplicationConcept,
         handleSavePositionValidation,
         handleSaveCandidateValidation,
+        handleSaveTechnicalEvaluation,
+        handleApproveTechnicalEvaluation,
 
         closeMessage,
     };
