@@ -3,6 +3,12 @@ import {
     Box,
     Divider,
     Stack,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
     TextField,
     Typography,
 } from "@mui/material";
@@ -155,186 +161,313 @@ const CandidateTechnicalEvaluationStep = ({
                 approvalForm.isSuitable
             );
 
-    const statusLabel =
-        status === "EN_REGISTRO"
-            ? "En registro"
-            : status === "PENDIENTE_APROBACION"
-                ? "Pendiente de confirmación"
-                : status === "APROBADA"
-                    ? "Confirmada"
-                    : "Sin iniciar";
-
     return (
         <SectionCard
             title="4. Evaluación técnica"
-            subtitle="Registra las calificaciones obtenidas en entrevista y examen."
+            subtitle="Evalúa los resultados obtenidos por el postulante en entrevista y examen."
         >
             <Stack spacing={3}>
-
-                {/* Calificaciones. */}
-                <FormGrid
-                    columns={{
-                        xs: "1fr",
-                        sm: "1fr 1fr",
+                {/* Tabla de resultados técnicos. */}
+                <TableContainer
+                    sx={{
+                        width: "100%",
+                        overflowX: "auto",
+                        border: 1,
+                        borderColor: "divider",
+                        borderRadius: 1,
                     }}
                 >
-                    <TextField
-                        label="Calificación entrevista"
-                        type="number"
-                        value={
-                            form.interviewScore ??
-                            ""
-                        }
-                        onChange={(event) =>
-                            onInterviewScoreChange(
-                                event.target.value ===
-                                    ""
-                                    ? null
-                                    : Number(
-                                        event.target
-                                            .value
-                                    )
-                            )
-                        }
-                        error={Boolean(
-                            formErrors.interviewScore
-                        )}
-                        helperText={
-                            formErrors.interviewScore ||
-                            "Calificación entre 0.0 y 5.0"
-                        }
-                        disabled={
-                            scoresLocked ||
-                            loading
-                        }
-                        fullWidth
-                        slotProps={{
-                            htmlInput: {
-                                min: 0,
-                                max: 5,
-                                step: 0.1,
+                    <Table
+                        size="small"
+                        sx={{
+                            minWidth: 760,
+                            tableLayout: "fixed",
+
+                            "& .MuiTableCell-root": {
+                                borderColor: "divider",
                             },
                         }}
-                    />
+                    >
+                        <TableHead>
+                            <TableRow
+                                sx={{
+                                    bgcolor:
+                                        "background.default",
+                                }}
+                            >
+                                <TableCell
+                                    sx={{
+                                        width: "20%",
+                                        fontWeight: 700,
+                                        py: 1.25,
+                                        px: 1.5,
+                                    }}
+                                >
+                                    Evaluación
+                                </TableCell>
 
-                    <TextField
-                        label="Calificación examen"
-                        type="number"
-                        value={
-                            form.examScore ??
-                            ""
-                        }
-                        onChange={(event) =>
-                            onExamScoreChange(
-                                event.target.value ===
-                                    ""
-                                    ? null
-                                    : Number(
-                                        event.target
-                                            .value
-                                    )
-                            )
-                        }
-                        error={Boolean(
-                            formErrors.examScore
-                        )}
-                        helperText={
-                            formErrors.examScore ||
-                            "Calificación entre 0.0 y 5.0"
-                        }
-                        disabled={
-                            scoresLocked ||
-                            loading
-                        }
-                        fullWidth
-                        slotProps={{
-                            htmlInput: {
-                                min: 0,
-                                max: 5,
-                                step: 0.1,
-                            },
-                        }}
-                    />
-                </FormGrid>
+                                <TableCell
+                                    sx={{
+                                        width: "32%",
+                                        fontWeight: 700,
+                                        py: 1.25,
+                                        px: 1.5,
+                                    }}
+                                >
+                                    Calificación
+                                </TableCell>
 
-                {/* Clasificación de las calificaciones. */}
-                {(form.interviewScore !== null ||
-                    form.examScore !== null) && (
-                        <FormGrid
-                            columns={{
-                                xs: "1fr",
-                                sm: "1fr 1fr",
-                            }}
-                        >
-                            <InfoItem
-                                label="Resultado entrevista"
-                                value={
-                                    getScoreLabel(
-                                        form.interviewScore
-                                    )
-                                }
-                            />
+                                <TableCell
+                                    sx={{
+                                        width: "24%",
+                                        fontWeight: 700,
+                                        py: 1.25,
+                                        px: 1.5,
+                                    }}
+                                >
+                                    Resultado
+                                </TableCell>
 
-                            <InfoItem
-                                label="Resultado examen"
-                                value={
-                                    getScoreLabel(
-                                        form.examScore
-                                    )
-                                }
-                            />
-                        </FormGrid>
-                    )}
+                                <TableCell
+                                    sx={{
+                                        width: "24%",
+                                        fontWeight: 700,
+                                        py: 1.25,
+                                        px: 1.5,
+                                    }}
+                                >
+                                    Fecha
+                                </TableCell>
+                            </TableRow>
+                        </TableHead>
 
-                {/* Fechas registradas automáticamente. */}
-                {technicalEvaluation && (
-                    <>
-                        <Divider />
+                        <TableBody>
+                            <TableRow>
+                                <TableCell
+                                    sx={{
+                                        verticalAlign:
+                                            "middle",
+                                        fontWeight: 700,
+                                        bgcolor:
+                                            "background.default",
+                                        py: 1.5,
+                                        px: 1.5,
+                                    }}
+                                >
+                                    Entrevista
+                                </TableCell>
 
-                        <FormGrid
-                            columns={{
-                                xs: "1fr",
-                                sm: "1fr 1fr",
-                                md: "repeat(3, 1fr)",
-                            }}
-                        >
-                            <InfoItem
-                                label="Fecha entrevista"
-                                value={
-                                    technicalEvaluation
-                                        .interviewRecordedAt
-                                        ? formatDate(
+                                <TableCell
+                                    sx={{
+                                        verticalAlign:
+                                            "middle",
+                                        py: 1,
+                                        px: 1.5,
+                                    }}
+                                >
+                                    <TextField
+                                        type="number"
+                                        value={
+                                            form.interviewScore ??
+                                            ""
+                                        }
+                                        onChange={(event) =>
+                                            onInterviewScoreChange(
+                                                event.target.value ===
+                                                    ""
+                                                    ? null
+                                                    : Number(
+                                                        event.target
+                                                            .value
+                                                    )
+                                            )
+                                        }
+                                        error={Boolean(
+                                            formErrors.interviewScore
+                                        )}
+                                        helperText={
+                                            formErrors.interviewScore ||
+                                            "Calificación entre 0.0 y 5.0"
+                                        }
+                                        disabled={
+                                            scoresLocked ||
+                                            loading
+                                        }
+                                        fullWidth
+                                        size="small"
+                                        slotProps={{
+                                            htmlInput: {
+                                                min: 0,
+                                                max: 5,
+                                                step: 0.1,
+                                            },
+                                        }}
+                                    />
+                                </TableCell>
+
+                                <TableCell
+                                    sx={{
+                                        verticalAlign:
+                                            "middle",
+                                        py: 1.5,
+                                        px: 1.5,
+                                    }}
+                                >
+                                    <Typography
+                                        variant="body2"
+                                        sx={{
+                                            fontWeight: 600,
+                                        }}
+                                    >
+                                        {
+                                            getScoreLabel(
+                                                form.interviewScore
+                                            ) ?? "—"
+                                        }
+                                    </Typography>
+                                </TableCell>
+
+                                <TableCell
+                                    sx={{
+                                        verticalAlign:
+                                            "middle",
+                                        py: 1.5,
+                                        px: 1.5,
+                                    }}
+                                >
+                                    <Typography
+                                        variant="body2"
+                                    >
+                                        {
                                             technicalEvaluation
-                                                .interviewRecordedAt
-                                        )
-                                        : undefined
-                                }
-                            />
+                                                ?.interviewRecordedAt
+                                                ? formatDate(
+                                                    technicalEvaluation
+                                                        .interviewRecordedAt
+                                                )
+                                                : "—"
+                                        }
+                                    </Typography>
+                                </TableCell>
+                            </TableRow>
 
-                            <InfoItem
-                                label="Fecha examen"
-                                value={
-                                    technicalEvaluation
-                                        .examRecordedAt
-                                        ? formatDate(
+                            <TableRow
+                                sx={{
+                                    "&:last-child td": {
+                                        borderBottom: 0,
+                                    },
+                                }}
+                            >
+                                <TableCell
+                                    sx={{
+                                        verticalAlign:
+                                            "middle",
+                                        fontWeight: 700,
+                                        bgcolor:
+                                            "background.default",
+                                        py: 1.5,
+                                        px: 1.5,
+                                    }}
+                                >
+                                    Examen
+                                </TableCell>
+
+                                <TableCell
+                                    sx={{
+                                        verticalAlign:
+                                            "middle",
+                                        py: 1,
+                                        px: 1.5,
+                                    }}
+                                >
+                                    <TextField
+                                        type="number"
+                                        value={
+                                            form.examScore ??
+                                            ""
+                                        }
+                                        onChange={(event) =>
+                                            onExamScoreChange(
+                                                event.target.value ===
+                                                    ""
+                                                    ? null
+                                                    : Number(
+                                                        event.target
+                                                            .value
+                                                    )
+                                            )
+                                        }
+                                        error={Boolean(
+                                            formErrors.examScore
+                                        )}
+                                        helperText={
+                                            formErrors.examScore ||
+                                            "Calificación entre 0.0 y 5.0"
+                                        }
+                                        disabled={
+                                            scoresLocked ||
+                                            loading
+                                        }
+                                        fullWidth
+                                        size="small"
+                                        slotProps={{
+                                            htmlInput: {
+                                                min: 0,
+                                                max: 5,
+                                                step: 0.1,
+                                            },
+                                        }}
+                                    />
+                                </TableCell>
+
+                                <TableCell
+                                    sx={{
+                                        verticalAlign:
+                                            "middle",
+                                        py: 1.5,
+                                        px: 1.5,
+                                    }}
+                                >
+                                    <Typography
+                                        variant="body2"
+                                        sx={{
+                                            fontWeight: 600,
+                                        }}
+                                    >
+                                        {
+                                            getScoreLabel(
+                                                form.examScore
+                                            ) ?? "—"
+                                        }
+                                    </Typography>
+                                </TableCell>
+
+                                <TableCell
+                                    sx={{
+                                        verticalAlign:
+                                            "middle",
+                                        py: 1.5,
+                                        px: 1.5,
+                                    }}
+                                >
+                                    <Typography
+                                        variant="body2"
+                                    >
+                                        {
                                             technicalEvaluation
-                                                .examRecordedAt
-                                        )
-                                        : undefined
-                                }
-                            />
-
-                            <InfoItem
-                                label="Calificaciones registradas por"
-                                value={
-                                    technicalEvaluation
-                                        .enteredBy
-                                        ?.name
-                                }
-                            />
-                        </FormGrid>
-                    </>
-                )}
+                                                ?.examRecordedAt
+                                                ? formatDate(
+                                                    technicalEvaluation
+                                                        .examRecordedAt
+                                                )
+                                                : "—"
+                                        }
+                                    </Typography>
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </TableContainer>
 
                 {/* Acción para guardar las calificaciones. */}
                 {canSaveScores && (
@@ -370,7 +503,7 @@ const CandidateTechnicalEvaluationStep = ({
                         </Alert>
                     )}
 
-                {/* Confirmación del creador de la requisición. */}
+                {/* Resultado general de la evaluación técnica. */}
                 {(canConfirm ||
                     isCompleted) && (
                         <>
@@ -384,8 +517,7 @@ const CandidateTechnicalEvaluationStep = ({
                                         mb: 0.5,
                                     }}
                                 >
-                                    Resultado de la
-                                    Evaluación Técnica
+                                    Resultado de la Evaluación Técnica
                                 </Typography>
 
                                 <Typography
@@ -396,9 +528,7 @@ const CandidateTechnicalEvaluationStep = ({
                                         mb: 1,
                                     }}
                                 >
-                                    ¿Postulante apto para
-                                    seguir en proceso de
-                                    selección?
+                                    ¿Postulante apto para seguir en proceso de selección?
                                 </Typography>
 
                                 <RadioOptionGroup
@@ -463,19 +593,6 @@ const CandidateTechnicalEvaluationStep = ({
                                     sm: "1fr 1fr",
                                 }}
                             >
-                                <InfoItem
-                                    label="Fecha de confirmación"
-                                    value={
-                                        technicalEvaluation
-                                            .approvedAt
-                                            ? formatDate(
-                                                technicalEvaluation
-                                                    .approvedAt
-                                            )
-                                            : undefined
-                                    }
-                                />
-
                                 <InfoItem
                                     label="Realizado por"
                                     value={
