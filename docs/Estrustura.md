@@ -677,8 +677,12 @@ hooks/
 │
 ├── humanTalent/
 │   ├── candidateValidation/
+│   │   ├── useApplicationConceptValidation.ts
+│   │   ├── useCandidateRequirementValidation.ts
 │   │   ├── usePersonnelCandidateValidationDetail.ts
-│   │   └── usePersonnelCandidateValidations.ts
+│   │   ├── usePersonnelCandidateValidations.ts
+│   │   ├── usePositionValidation.ts
+│   │   └── useTechnicalEvaluation.ts
 │   │
 │   └── requisitions/
 │       ├── useCreatePersonnelRequisition.ts
@@ -743,8 +747,12 @@ Los hooks de Talento Humano se separan entre `candidateValidation/` y `requisiti
 ```txt
 hooks/humanTalent/
 ├── candidateValidation/
+│   ├── useApplicationConceptValidation.ts
+│   ├── useCandidateRequirementValidation.ts
 │   ├── usePersonnelCandidateValidationDetail.ts
-│   └── usePersonnelCandidateValidations.ts
+│   ├── usePersonnelCandidateValidations.ts
+│   ├── usePositionValidation.ts
+│   └── useTechnicalEvaluation.ts
 │
 └── requisitions/
     ├── useCreatePersonnelRequisition.ts
@@ -757,7 +765,11 @@ hooks/humanTalent/
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `useCreatePersonnelRequisition.ts`     | Maneja la lógica del formulario para crear una requisición de personal. Controla los estados del formulario, carga departamentos, perfiles de cargo y ciudades, consulta automáticamente la revisión vigente del cargo seleccionado, valida la información con Yup, limpia errores, muestra mensajes de respuesta y envía la requisición al backend junto con el identificador de la revisión utilizada. También controla campos condicionales relacionados con el motivo y el tipo de contratación.                                                                      | Se utiliza en la página `CreatePersonnelRequisition.tsx`.                                                                                                                |
 | `usePersonnelCandidateValidations.ts`  | Maneja la consulta del listado de candidatos disponibles para el módulo de validación, los permisos generales de gestión, estados de carga, errores y mensajes del listado. | Se utiliza en `PersonnelCandidateValidations.tsx`. |
-| `usePersonnelCandidateValidationDetail.ts` | Maneja la lógica completa del detalle y de las cuatro fases implementadas. Inicializa los formularios y errores, valida con Yup, guarda las Fases 1, 2 y 3, registra las calificaciones de la Fase 4, controla la confirmación de la Evaluación Técnica, vuelve a consultar el detalle después de cada acción y administra mensajes, permisos y estados de carga. | Se utiliza en `PersonnelCandidateValidationSection.tsx`. |
+| `useApplicationConceptValidation.ts` | Maneja la lógica exclusiva de la Fase 1: estado del concepto de aplicación, errores, validación Yup, guardado y sincronización con el detalle consultado. | Se utiliza internamente desde `usePersonnelCandidateValidationDetail.ts`. |
+| `usePositionValidation.ts` | Maneja la lógica exclusiva de la Fase 2: tipo de cargo, código de control de cambios, errores, validación Yup, guardado y sincronización con el detalle consultado. | Se utiliza internamente desde `usePersonnelCandidateValidationDetail.ts`. |
+| `useCandidateRequirementValidation.ts` | Maneja la lógica exclusiva de la Fase 3: evaluación de requisitos, cumplimiento, evidencia, cierre de brecha, resultado final de aptitud, errores, validación Yup y guardado. | Se utiliza internamente desde `usePersonnelCandidateValidationDetail.ts`. |
+| `useTechnicalEvaluation.ts` | Maneja la lógica exclusiva de la Fase 4: calificaciones de entrevista y examen, errores, validación Yup, guardado de notas y confirmación final de aptitud. | Se utiliza internamente desde `usePersonnelCandidateValidationDetail.ts`. |
+| `usePersonnelCandidateValidationDetail.ts` | Actúa como hook coordinador del detalle de validación. Consulta el candidato, administra permisos, carga general, errores y mensajes compartidos, y conecta los hooks independientes de las Fases 1, 2, 3 y 4. | Se utiliza en `PersonnelCandidateValidationSection.tsx`. |
 | `usePersonnelRequisitionCandidates.ts` | Maneja la lógica completa del cargue y la preselección de candidatos. Consulta los candidatos registrados, los tipos de identificación, el historial de movimientos y las fotografías históricas de cada cargue cerrado. Controla el formulario de registro y edición, la carga de hojas de vida, la eliminación de candidatos, el cierre y la reapertura del cargue. También administra la selección temporal de candidatos, permite agregar o retirar candidatos de la selección y confirma la preselección definitiva. Controla las reglas relacionadas con el plazo de presentación inicial, las justificaciones requeridas cuando corresponde y los motivos de reapertura. Después de las acciones que modifican el proceso, actualiza la información necesaria para mantener la vista sincronizada sin recargar la página. | Se utiliza en `PersonnelRequisitionCandidatesSection.tsx`. |
 | `usePersonnelRequisitionDetail.ts`     | Maneja la consulta del detalle completo de una requisición de personal mediante su identificador. Controla el estado de carga, almacena la requisición obtenida, procesa errores de la petición y permite volver a cargar la información cuando sea necesario.                                                                                                                                                                                                                                                                                                            | Se utiliza en `PersonnelRequisitionDetail.tsx` y `PersonnelRequisitionFormat.tsx` para consultar la misma información desde la vista de detalle y el formato imprimible. |
 | `usePersonnelRequisitions.ts`          | Maneja la lógica principal del listado y flujo de requisiciones de personal. Consulta las requisiciones disponibles, controla estados de carga, selecciona la requisición sobre la que se realizará una acción y coordina las decisiones de aprobación o rechazo. También maneja la creación de la confirmación de contratación, las decisiones de Talento Humano, la apertura y cierre de diálogos y los mensajes mostrados mediante snackbar.                                                                                                                           | Se utiliza en la página `PersonnelRequisitions.tsx` para listar y gestionar las requisiciones según los permisos y el paso actual del usuario dentro del flujo.          |

@@ -495,11 +495,7 @@ const CandidateTechnicalEvaluationStep = ({
                     "PENDIENTE_APROBACION" &&
                     !canApproveTechnicalEvaluation && (
                         <Alert severity="info">
-                            Las calificaciones están
-                            completas. La Evaluación
-                            Técnica está pendiente de
-                            confirmación por el usuario
-                            que creó la requisición.
+                            Las calificaciones están completas. La Evaluación Técnica está pendiente de confirmación.
                         </Alert>
                     )}
 
