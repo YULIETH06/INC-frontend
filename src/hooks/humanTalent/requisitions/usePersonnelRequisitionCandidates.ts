@@ -105,7 +105,7 @@ export const usePersonnelRequisitionCandidates = ({
         setIdentificationTypes,
     ] = useState<IdentificationType[]>([]);
 
-    // Indica si el usuario autenticado es el Auxiliar
+    // Indica si el usuario autenticado es el Analista
     // encargado de gestionar los candidatos.
     const [
         isCandidateManager,

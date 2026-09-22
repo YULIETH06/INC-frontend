@@ -126,7 +126,7 @@ const CandidateTechnicalEvaluationStep = ({
     onApprove,
 }: CandidateTechnicalEvaluationStepProps) => {
     const technicalEvaluation =
-        candidate.validation?.technicalEvaluation;
+        candidate.validation?.personnelCandidateTechnicalEvaluation;
 
     const status =
         technicalEvaluation?.status;

@@ -99,7 +99,7 @@ export const useCandidateRequirementValidation = ({
                 .requirementDescriptions.map(
                     (description) => {
                         const savedValidation =
-                            validation?.requirementValidations.find(
+                            validation?.personnelCandidateRequirementValidations?.find(
                                 (item) =>
                                     item.requirementDescriptionId ===
                                     description.id

@@ -294,7 +294,7 @@ const PersonnelRequisitionCandidatesSection = ({
         !loadingCandidates &&
         !loadError;
 
-    // Solo el Auxiliar de Talento Humano puede
+    // Solo el Analista de Talento Humano puede
     // reabrir un cargue previamente cerrado.
     const canReopenCandidates =
         isSubmissionClosed &&
@@ -433,7 +433,7 @@ const PersonnelRequisitionCandidatesSection = ({
                                                 gap: 1,
                                             }}
                                         >
-                                            {/* Acciones del Auxiliar mientras el cargue está abierto. */}
+                                            {/* Acciones del Analista mientras el cargue está abierto. */}
                                             {canManageCandidates && (
                                                 <>
                                                     <ActionButton
@@ -471,7 +471,7 @@ const PersonnelRequisitionCandidatesSection = ({
                                                 </>
                                             )}
 
-                                            {/* Acción del Auxiliar cuando el cargue está cerrado. */}
+                                            {/* Acción del Analista cuando el cargue está cerrado. */}
                                             {canReopenCandidates && (
                                                 <ActionButton
                                                     actionType="unlock"

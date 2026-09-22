@@ -329,7 +329,7 @@ Estos componentes dependen directamente de las requisiciones de personal, sus ap
 Requisición APROBADA
 ↓
 Cargue de candidatos ABIERTA
-├── Auxiliar de Talento Humano
+├── Analista de Talento Humano
 │   ├── Registrar candidato
 │   ├── Editar candidato
 │   ├── Eliminar candidato
@@ -337,7 +337,7 @@ Cargue de candidatos ABIERTA
 ↓
 Cargue CERRADA
 ├── Se genera una fotografía histórica: Cargue N
-├── Auxiliar → puede reabrir el cargue
+├── Analista → puede reabrir el cargue
 └── Creador de la requisición → puede realizar la preselección
     ├── Seleccionar uno o varios candidatos
     ├── Quitar una selección temporal
@@ -406,7 +406,7 @@ components/humanTalent/candidateValidation/
 | `CandidatePositionValidationStep.tsx` | Representa la **Fase 2: Validación de cargo**. Muestra información de la revisión utilizada, permite clasificar el proceso como `Nuevo cargo` o `Cargo existente`, solicita el código de control de cambios cuando corresponde y, para cargo existente, presenta si el perfil de cargo utilizado continúa vigente. | Se renderiza después de completar la Fase 1. |
 | `CandidateRequirementValidationTable.tsx` | Tabla reutilizable dentro del flujo de validación. Agrupa las descripciones por requerimiento y permite evaluar cada descripción de forma independiente. Si el candidato cumple, solicita evidencia; si no cumple, solicita el cierre de brecha. | Se utiliza dentro de `CandidateValidationStep.tsx` para presentar de forma compacta Formación, Experiencia y Conocimientos específicos, incluyendo múltiples descripciones por requisito. |
 | `CandidateValidationStep.tsx` | Representa la **Fase 3: Validación del postulante**. Agrupa las descripciones de la revisión exacta utilizada por la requisición, delega su evaluación a `CandidateRequirementValidationTable.tsx`, solicita el resultado final de aptitud y muestra la fecha y el usuario que realizó la validación cuando el proceso fue completado. | Se renderiza después de completar la Fase 2. |
-| `CandidateTechnicalEvaluationStep.tsx` | Representa la **Fase 4: Evaluación Técnica**. Permite al Auxiliar de Talento Humano registrar las calificaciones de entrevista y examen de forma independiente. Cuando ambas están registradas, la evaluación queda pendiente de aprobación. El usuario que creó la requisición puede revisar las calificaciones y confirmar si el postulante es apto o no para continuar. | Se renderiza después de completar la Fase 3 cuando el postulante fue considerado apto para continuar. |
+| `CandidateTechnicalEvaluationStep.tsx` | Representa la **Fase 4: Evaluación Técnica**. Permite al Analista de Talento Humano registrar las calificaciones de entrevista y examen de forma independiente. Cuando ambas están registradas, la evaluación queda pendiente de aprobación. El usuario que creó la requisición puede revisar las calificaciones y confirmar si el postulante es apto o no para continuar. | Se renderiza después de completar la Fase 3 cuando el postulante fue considerado apto para continuar. |
 | `PersonnelCandidateValidationSection.tsx` | Componente coordinador del proceso de validación de cargo y postulante. Consulta la información del candidato, muestra el `ProcessStepper`, presenta la información general del cargo y del postulante, controla la etapa activa y delega las Fases 1, 2, 3 y 4 a sus componentes correspondientes. También controla la navegación entre etapas y presenta estados de carga, errores y mensajes del proceso. | Se utiliza en la página `PersonnelCandidateValidationDetail.tsx`. |
 
 ---
@@ -1537,7 +1537,7 @@ preselectPersonnelRequisitionCandidates()
 | `createPersonnelHiringConfirmation(requisitionId, data)` | Registra la confirmación final de contratación asociada con una requisición aprobada. |
 | `decidePersonnelHiringConfirmation(hiringConfirmationId, data)` | Permite aprobar, rechazar o cancelar el paso actual de una confirmación de contratación. |
 | `createPersonnelRequisitionCandidate(requisitionId, data)` | Registra un candidato mediante `multipart/form-data`, enviando tipo de identificación, número de identificación, nombre, observación y hoja de vida. |
-| `getPersonnelRequisitionCandidates(requisitionId)` | Consulta los candidatos registrados para una requisición. Mientras el cargue está abierto, la consulta está restringida al Auxiliar de Talento Humano; cuando está cerrado, también pueden consultar los usuarios autorizados para visualizar la requisición. |
+| `getPersonnelRequisitionCandidates(requisitionId)` | Consulta los candidatos registrados para una requisición. Mientras el cargue está abierto, la consulta está restringida al Analista de Talento Humano; cuando está cerrado, también pueden consultar los usuarios autorizados para visualizar la requisición. |
 | `updatePersonnelRequisitionCandidate(requisitionId, candidateId, data)` | Actualiza los datos o la hoja de vida de un candidato mientras el cargue permanece abierto. |
 | `deletePersonnelRequisitionCandidate(requisitionId, candidateId)` | Elimina un candidato y su archivo asociado mientras el cargue permanece abierto. |
 | `closePersonnelRequisitionCandidates(requisitionId, data)` | Cierra el cargue. En el primer cierre conserva la fecha en `candidateSubmissionClosedAt`; si se realiza después de `candidateSubmissionDeadlineAt`, envía `lateReason`. En cierres posteriores no vuelve a evaluar el plazo inicial y el primer cierre no cambia. |
@@ -2286,7 +2286,7 @@ candidateTechnicalEvaluationApprovalSchema
 | `candidateApplicationConceptSchema` | Valida que el usuario seleccione un concepto de aplicación permitido antes de crear la validación. | Se utiliza al guardar la Fase 1. |
 | `candidatePositionValidationSchema` | Valida el tipo de cargo y exige el código de control de cambios cuando se selecciona `NUEVO_CARGO`. | Se utiliza al guardar la Fase 2. |
 | `candidateValidationSchema` | Valida el resultado final y cada descripción de requisito. Cuando `complies` es `true`, exige evidencia; cuando es `false`, exige cierre de brecha. | Se utiliza al completar la Fase 3. |
-| `candidateTechnicalEvaluationSchema` | Valida las calificaciones de entrevista y examen. Permite registrar una o ambas y controla que los valores se encuentren dentro del rango permitido. | Se utiliza cuando el Auxiliar de Talento Humano guarda las calificaciones de la Fase 4. |
+| `candidateTechnicalEvaluationSchema` | Valida las calificaciones de entrevista y examen. Permite registrar una o ambas y controla que los valores se encuentren dentro del rango permitido. | Se utiliza cuando el Analista de Talento Humano guarda las calificaciones de la Fase 4. |
 | `candidateTechnicalEvaluationApprovalSchema` | Valida que se indique si el postulante es apto o no apto antes de confirmar la Evaluación Técnica. | Se utiliza cuando el creador de la requisición confirma la Fase 4. |
 
 ---

@@ -40,7 +40,7 @@ const requisitionCreatePositionCodes = [
 
 const requisitionViewPositionCodes = [
   ...requisitionCreatePositionCodes,
-  "DPC-TH-0080", // Auxiliar de Talento Humano: puede ver, pero no crear
+  "DPC-TH-0118", // Analista de Talento Humano: puede ver, pero no crear
 ];
 
 export const menuItems: MenuModule[] = [
@@ -114,7 +114,7 @@ export const menuItems: MenuModule[] = [
             roles: ["ADMIN", "USER"],
             positionCodes: [
               ...requisitionCreatePositionCodes,
-              "DPC-TH-0080", // Auxiliar de Talento Humano
+              "DPC-TH-0118", // Analista de Talento Humano
             ],
           },
         ],

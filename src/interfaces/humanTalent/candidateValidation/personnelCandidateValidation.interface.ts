@@ -175,10 +175,10 @@ export interface PersonnelCandidateValidation {
     performedBy:
     Pick<RequisitionUser, "id" | "name"> | null;
 
-    requirementValidations:
+    personnelCandidateRequirementValidations:
     PersonnelCandidateRequirementValidation[];
 
-    technicalEvaluation:
+    personnelCandidateTechnicalEvaluation:
     PersonnelCandidateTechnicalEvaluation | null;
 }
 

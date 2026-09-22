@@ -84,7 +84,7 @@ const PersonnelRequisitions = () => {
         requisition: PersonnelRequisition
     ) => {
         return (
-            userHasPosition("DPC-TH-0080") &&
+            userHasPosition("DPC-TH-0118") &&
             canCreateHiringConfirmation(requisition)
         );
     };

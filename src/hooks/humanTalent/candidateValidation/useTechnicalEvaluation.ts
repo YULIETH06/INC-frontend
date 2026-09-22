@@ -124,7 +124,7 @@ export const useTechnicalEvaluation = ({
     useEffect(() => {
         const technicalEvaluation =
             candidate?.validation
-                ?.technicalEvaluation;
+                ?.personnelCandidateTechnicalEvaluation;
 
         setTechnicalEvaluationForm({
             interviewScore:
