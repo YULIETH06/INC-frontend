@@ -5,21 +5,18 @@ import {
     CardContent,
     Divider,
     Stack,
-    Tooltip,
     Typography,
 } from "@mui/material";
 
 import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutlineOutlined";
-import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 
 import ActionButton from "../../common/ActionButton";
 import CustomChip from "../../common/CustomChip";
 import InfoItem from "../../common/InfoItem";
+import FilePreviewCard from "../../common/FilePreviewCard";
 
 import { getInitials } from "../../../utils/common/avatarUtils";
 import { formatDate } from "../../../utils/common/dateUtils";
-import { formatFileSize } from "../../../utils/common/fileUtils";
-import { buildFileUrl } from "../../../utils/common/fileUrl";
 
 import type {
     PersonnelRequisitionCandidate,
@@ -95,23 +92,6 @@ const PersonnelRequisitionCandidateCard = ({
     const canShowSelectionAction =
         canSelect &&
         !candidate.isPreselected;
-
-    // Abre la hoja de vida almacenada en el backend.
-    const handleOpenResume = () => {
-        const fileUrl = buildFileUrl(
-            candidate.fileUrl
-        );
-
-        if (!fileUrl) {
-            return;
-        }
-
-        window.open(
-            fileUrl,
-            "_blank",
-            "noopener,noreferrer"
-        );
-    };
 
     return (
         <Card
@@ -276,79 +256,16 @@ const PersonnelRequisitionCandidateCard = ({
                     )}
 
                     {/* Archivo de hoja de vida. */}
-                    <Box
-                        sx={{
-                            display: "flex",
-                            flexDirection: {
-                                xs: "column",
-                                sm: "row",
-                            },
-                            alignItems: {
-                                xs: "stretch",
-                                sm: "center",
-                            },
-                            justifyContent:
-                                "space-between",
-                            gap: 2,
-                            p: 1.5,
-                            border: 1,
-                            borderColor: "divider",
-                            borderRadius: 2,
-                            bgcolor: "action.hover",
-                        }}
-                    >
-                        <Stack
-                            direction="row"
-                            spacing={1}
-                            sx={{
-                                alignItems: "center",
-                                minWidth: 0,
-                            }}
-                        >
-                            <Tooltip
-                                title={
-                                    candidate.originalName
-                                }
-                                arrow
-                                placement="top"
-                            >
-                                <DescriptionOutlinedIcon
-                                    sx={{
-                                        color:
-                                            "primary.main",
-                                        flexShrink: 0,
-                                        cursor: "help",
-                                    }}
-                                />
-                            </Tooltip>
-
-                            <Typography
-                                variant="caption"
-                                sx={{
-                                    color:
-                                        "text.secondary",
-                                }}
-                            >
-                                {formatFileSize(
-                                    candidate.fileSize
-                                )}
-                            </Typography>
-                        </Stack>
-
-                        <ActionButton
-                            actionType="open"
-                            tooltip="Ver hoja de vida"
-                            fullWidthOnMobile
-                            onClick={
-                                handleOpenResume
-                            }
-                            sx={{
-                                flexShrink: 0,
-                            }}
-                        >
-                            Ver archivo
-                        </ActionButton>
-                    </Box>
+                    <FilePreviewCard
+                        fileUrl={
+                            candidate.fileUrl
+                        }
+                        fileSize={
+                            candidate.fileSize
+                        }
+                        buttonLabel="Ver hoja de vida"
+                        buttonTooltip="Ver hoja de vida"
+                    />
 
                     {/* Información secundaria del proceso. */}
                     <Box

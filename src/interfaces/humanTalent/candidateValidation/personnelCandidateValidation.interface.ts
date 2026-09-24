@@ -131,6 +131,13 @@ export interface PersonnelCandidateTechnicalEvaluation {
     examScore: string | null;
     examRecordedAt: string | null;
 
+    examEvidenceOriginalName: string | null;
+    examEvidenceFileName: string | null;
+    examEvidenceFileUrl: string | null;
+    examEvidenceMimeType: string | null;
+    examEvidenceFileSize: number | null;
+    examEvidenceUploadedAt: string | null;
+
     status:
     CandidateTechnicalEvaluationStatus;
 
@@ -287,16 +294,18 @@ export interface CandidateValidationFormErrors {
     CandidateRequirementValidationFormErrors[];
 }
 
-// Formulario de calificaciones de la Fase 4.
+// Formulario de calificaciones y evidencia de la Fase 4.
 export interface CandidateTechnicalEvaluationForm {
     interviewScore: number | null;
     examScore: number | null;
+    examEvidenceFile: File | null;
 }
 
-// Errores Yup de las calificaciones de la Fase 4.
+// Errores de las calificaciones y evidencia de la Fase 4.
 export interface CandidateTechnicalEvaluationFormErrors {
     interviewScore: string;
     examScore: string;
+    examEvidenceFile: string;
 }
 
 // Formulario de confirmación de la Fase 4.
@@ -338,12 +347,6 @@ export interface CompletePersonnelCandidateValidationData {
 
     requirementValidations:
     CandidateRequirementValidationData[];
-}
-
-// Datos enviados al guardar calificaciones de la Fase 4.
-export interface SavePersonnelCandidateTechnicalEvaluationData {
-    interviewScore?: number;
-    examScore?: number;
 }
 
 // Datos enviados al confirmar la Fase 4.

@@ -7,7 +7,6 @@ import type {
     PersonnelCandidateValidationActionResponse,
     PersonnelCandidateValidationDetailResponse,
     PersonnelCandidateValidationsResponse,
-    SavePersonnelCandidateTechnicalEvaluationData,
     UpdatePersonnelCandidatePositionValidationData,
 } from "../../../interfaces/humanTalent/candidateValidation/personnelCandidateValidation.interface";
 
@@ -76,10 +75,11 @@ export const completePersonnelCandidateValidation = async (
     return response.data;
 };
 
-// Guarda las calificaciones de la Fase 4.
+// Guarda las calificaciones de la Fase 4
+// junto con la evidencia PDF del examen.
 export const savePersonnelCandidateTechnicalEvaluation = async (
     candidateId: number,
-    data: SavePersonnelCandidateTechnicalEvaluationData
+    data: FormData
 ): Promise<PersonnelCandidateValidationActionResponse> => {
     const response =
         await api.patch<PersonnelCandidateValidationActionResponse>(

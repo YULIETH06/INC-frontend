@@ -18,6 +18,8 @@ import FormGrid from "../../common/FormGrid";
 import InfoItem from "../../common/InfoItem";
 import RadioOptionGroup from "../../common/RadioOptionGroup";
 import SectionCard from "../../common/SectionCard";
+import FileInput from "../../common/inputs/FileInput";
+import FilePreviewCard from "../../common/FilePreviewCard";
 
 import { formatDate } from "../../../utils/common/dateUtils";
 
@@ -59,6 +61,10 @@ interface CandidateTechnicalEvaluationStepProps {
 
     onExamScoreChange: (
         value: number | null
+    ) => void;
+
+    onExamEvidenceFileChange: (
+        file: File | null
     ) => void;
 
     onSuitableChange: (
@@ -121,6 +127,7 @@ const CandidateTechnicalEvaluationStep = ({
     loadingApproval,
     onInterviewScoreChange,
     onExamScoreChange,
+    onExamEvidenceFileChange,
     onSuitableChange,
     onSave,
     onApprove,
@@ -469,6 +476,54 @@ const CandidateTechnicalEvaluationStep = ({
                     </Table>
                 </TableContainer>
 
+                {/* Evidencia del examen. */}
+                <Box>
+                    {technicalEvaluation?.examEvidenceFileUrl &&
+                        technicalEvaluation.examEvidenceOriginalName ? (
+                        <FilePreviewCard
+                            fileName={
+                                technicalEvaluation
+                                    .examEvidenceOriginalName
+                            }
+                            fileUrl={
+                                technicalEvaluation
+                                    .examEvidenceFileUrl
+                            }
+                            fileSize={
+                                technicalEvaluation
+                                    .examEvidenceFileSize
+                            }
+                            label="Evidencia registrada"
+                            buttonLabel="Ver examen"
+                            buttonTooltip="Ver examen"
+                        />
+                    ) : (
+                        <FileInput
+                            label="Evidencia del examen"
+                            value={
+                                form.examEvidenceFile
+                            }
+                            accept=".pdf,application/pdf"
+                            onChange={
+                                onExamEvidenceFileChange
+                            }
+                            onRemove={() =>
+                                onExamEvidenceFileChange(
+                                    null
+                                )
+                            }
+                            error={
+                                formErrors.examEvidenceFile
+                            }
+                            hint="Adjunte el archivo PDF correspondiente al examen."
+                            disabled={
+                                scoresLocked ||
+                                loading
+                            }
+                        />
+                    )}
+                </Box>
+
                 {/* Acción para guardar las calificaciones. */}
                 {canSaveScores && (
                     <Box
@@ -495,7 +550,7 @@ const CandidateTechnicalEvaluationStep = ({
                     "PENDIENTE_APROBACION" &&
                     !canApproveTechnicalEvaluation && (
                         <Alert severity="info">
-                            Las calificaciones están completas. La Evaluación Técnica está pendiente de confirmación.
+                            La Evaluación Técnica está pendiente de confirmación.
                         </Alert>
                     )}
 

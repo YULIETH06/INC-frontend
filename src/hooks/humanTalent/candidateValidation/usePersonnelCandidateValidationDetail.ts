@@ -314,6 +314,9 @@ export const usePersonnelCandidateValidationDetail = ({
         handleExamScoreChange:
             technicalEvaluation.handleExamScoreChange,
 
+        handleExamEvidenceFileChange:
+            technicalEvaluation.handleExamEvidenceFileChange,
+
         handleTechnicalEvaluationSuitableChange:
             technicalEvaluation.handleTechnicalEvaluationSuitableChange,
 

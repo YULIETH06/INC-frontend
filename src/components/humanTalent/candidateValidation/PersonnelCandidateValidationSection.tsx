@@ -85,6 +85,7 @@ const PersonnelCandidateValidationSection = ({
 
         handleInterviewScoreChange,
         handleExamScoreChange,
+        handleExamEvidenceFileChange,
         handleTechnicalEvaluationSuitableChange,
 
         handleSaveApplicationConcept,
@@ -441,9 +442,15 @@ const PersonnelCandidateValidationSection = ({
                                 onInterviewScoreChange={
                                     handleInterviewScoreChange
                                 }
+
                                 onExamScoreChange={
                                     handleExamScoreChange
                                 }
+
+                                onExamEvidenceFileChange={
+                                    handleExamEvidenceFileChange
+                                }
+
                                 onSuitableChange={
                                     handleTechnicalEvaluationSuitableChange
                                 }

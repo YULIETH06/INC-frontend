@@ -26,7 +26,6 @@ import type {
     CandidateTechnicalEvaluationForm,
     CandidateTechnicalEvaluationFormErrors,
     PersonnelCandidateValidationCandidate,
-    SavePersonnelCandidateTechnicalEvaluationData,
 } from "../../../interfaces/humanTalent/candidateValidation/personnelCandidateValidation.interface";
 
 interface UseTechnicalEvaluationProps {
@@ -46,18 +45,20 @@ interface UseTechnicalEvaluationProps {
     ) => void;
 }
 
-// Estado inicial de las calificaciones de la Fase 4.
+// Estado inicial de las calificaciones y evidencia de la Fase 4.
 const initialTechnicalEvaluationForm:
     CandidateTechnicalEvaluationForm = {
     interviewScore: null,
     examScore: null,
+    examEvidenceFile: null,
 };
 
-// Errores iniciales de las calificaciones de la Fase 4.
+// Errores iniciales de las calificaciones y evidencia de la Fase 4.
 const initialTechnicalEvaluationErrors:
     CandidateTechnicalEvaluationFormErrors = {
     interviewScore: "",
     examScore: "",
+    examEvidenceFile: "",
 };
 
 // Estado inicial de la confirmación de la Fase 4.
@@ -142,6 +143,8 @@ export const useTechnicalEvaluation = ({
                         technicalEvaluation.examScore
                     )
                     : null,
+
+            examEvidenceFile: null,
         });
 
         setTechnicalEvaluationApprovalForm({
@@ -197,6 +200,25 @@ export const useTechnicalEvaluation = ({
         );
     };
 
+    // Actualiza la evidencia PDF del examen.
+    const handleExamEvidenceFileChange = (
+        file: File | null
+    ) => {
+        setTechnicalEvaluationForm(
+            (previous) => ({
+                ...previous,
+                examEvidenceFile: file,
+            })
+        );
+
+        setTechnicalEvaluationErrors(
+            (previous) => ({
+                ...previous,
+                examEvidenceFile: "",
+            })
+        );
+    };
+
     // Actualiza la decisión final de aptitud.
     const handleTechnicalEvaluationSuitableChange = (
         value: boolean
@@ -235,30 +257,45 @@ export const useTechnicalEvaluation = ({
 
                 clearMessage();
 
-                const data:
-                    SavePersonnelCandidateTechnicalEvaluationData =
-                    {};
+                const formData = new FormData();
 
                 if (
                     technicalEvaluationForm.interviewScore !==
                     null
                 ) {
-                    data.interviewScore =
-                        technicalEvaluationForm.interviewScore;
+                    formData.append(
+                        "interviewScore",
+                        String(
+                            technicalEvaluationForm.interviewScore
+                        )
+                    );
                 }
 
                 if (
                     technicalEvaluationForm.examScore !==
                     null
                 ) {
-                    data.examScore =
-                        technicalEvaluationForm.examScore;
+                    formData.append(
+                        "examScore",
+                        String(
+                            technicalEvaluationForm.examScore
+                        )
+                    );
+                }
+
+                if (
+                    technicalEvaluationForm.examEvidenceFile
+                ) {
+                    formData.append(
+                        "file",
+                        technicalEvaluationForm.examEvidenceFile
+                    );
                 }
 
                 const response =
                     await savePersonnelCandidateTechnicalEvaluation(
                         candidate.id,
-                        data
+                        formData
                     );
 
                 await reloadCandidateDetail();
@@ -296,6 +333,14 @@ export const useTechnicalEvaluation = ({
                                 errors.examScore =
                                     validationError.message;
                             }
+
+                            if (
+                                validationError.path ===
+                                "examEvidenceFile"
+                            ) {
+                                errors.examEvidenceFile =
+                                    validationError.message;
+                            }
                         }
                     );
 
@@ -309,6 +354,9 @@ export const useTechnicalEvaluation = ({
                         ) ||
                         Boolean(
                             errors.examScore
+                        ) ||
+                        Boolean(
+                            errors.examEvidenceFile
                         );
 
                     if (!hasFieldError) {
@@ -451,6 +499,7 @@ export const useTechnicalEvaluation = ({
 
         handleInterviewScoreChange,
         handleExamScoreChange,
+        handleExamEvidenceFileChange,
         handleTechnicalEvaluationSuitableChange,
 
         handleSaveTechnicalEvaluation,

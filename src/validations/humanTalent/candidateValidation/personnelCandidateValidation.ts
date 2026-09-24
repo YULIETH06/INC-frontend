@@ -153,6 +153,26 @@ export const candidateTechnicalEvaluationSchema =
                     value === undefined ||
                     Number(value.toFixed(1)) === value
             ),
+        examEvidenceFile: Yup.mixed<File>()
+            .nullable()
+            .test(
+                "exam-evidence-required",
+                "Debe adjuntar el archivo PDF del examen.",
+                function (value) {
+                    const {
+                        examScore,
+                    } = this.parent;
+
+                    if (
+                        examScore !== null &&
+                        examScore !== undefined
+                    ) {
+                        return value instanceof File;
+                    }
+
+                    return true;
+                }
+            ),
     })
         .test(
             "at-least-one-score",
