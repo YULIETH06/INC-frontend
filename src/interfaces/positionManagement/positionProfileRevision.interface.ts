@@ -44,11 +44,43 @@ export interface PositionRequirement {
     descriptions: PositionRequirementDescription[];
 }
 
+// Competencia asociada a una revisión de perfil de cargo.
+export interface PositionCompetency {
+    id: number;
+    revisionId: number;
+    competencyTypeId: number;
+    competency: string;
+    createdAt: string;
+    updatedAt: string;
+    deletedAt?: string | null;
+}
+
+// Tipo de competencia configurado para la revisión.
+// La propiedad interna coincide con la respuesta real del backend.
+export interface PositionCompetencyType {
+    id: number;
+    name: string;
+    positionCompetencyDescriptions: PositionCompetency[];
+}
+
+// Datos manejados en el formulario de competencias.
+export interface PositionCompetencyForm {
+    competencyTypeId: number | "";
+    competency: string;
+}
+
+// Errores de validación del formulario de competencias.
+export interface PositionCompetencyFormErrors {
+    competencyTypeId: string;
+    competency: string;
+}
+
 // Detalle completo de una revisión.
 export interface PositionProfileRevisionDetail
     extends PositionProfileRevision {
     positionProfile: PositionProfileRevisionPosition;
     requirements: PositionRequirement[];
+    competencies: PositionCompetencyType[];
 }
 
 // Datos para crear una revisión.

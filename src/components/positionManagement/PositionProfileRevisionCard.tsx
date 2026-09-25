@@ -22,7 +22,11 @@ interface PositionProfileRevisionCardProps {
     revision: PositionProfileRevision;
     selected?: boolean;
 
-    onSelect: (
+    onViewRequirements: (
+        revision: PositionProfileRevision
+    ) => void;
+
+    onViewCompetencies: (
         revision: PositionProfileRevision
     ) => void;
 
@@ -43,7 +47,8 @@ interface PositionProfileRevisionCardProps {
 const PositionProfileRevisionCard = ({
     revision,
     selected = false,
-    onSelect,
+    onViewRequirements,
+    onViewCompetencies,
     onEdit,
     onPublish,
     onDelete,
@@ -246,16 +251,39 @@ const PositionProfileRevisionCard = ({
                             gap: 1,
                         }}
                     >
-                        <ActionButton
-                            actionType="open"
-                            tooltip="Ver detalle de la revisión"
-                            fullWidthOnMobile
-                            onClick={() =>
-                                onSelect(revision)
-                            }
+                        <Stack
+                            direction={{
+                                xs: "column",
+                                sm: "row",
+                            }}
+                            spacing={1}
                         >
-                            Ver detalle
-                        </ActionButton>
+                            <ActionButton
+                                actionType="open"
+                                tooltip="Ver requisitos de la revisión"
+                                fullWidthOnMobile
+                                onClick={() =>
+                                    onViewRequirements(
+                                        revision
+                                    )
+                                }
+                            >
+                                Requisitos
+                            </ActionButton>
+
+                            <ActionButton
+                                actionType="open"
+                                tooltip="Ver competencias de la revisión"
+                                fullWidthOnMobile
+                                onClick={() =>
+                                    onViewCompetencies(
+                                        revision
+                                    )
+                                }
+                            >
+                                Competencias
+                            </ActionButton>
+                        </Stack>
 
                         {isDraft && (
                             <Stack

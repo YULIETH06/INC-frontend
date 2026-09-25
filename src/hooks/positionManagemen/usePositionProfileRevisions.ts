@@ -9,13 +9,16 @@ import { ValidationError } from "yup";
 import {
     createPositionProfileRevision,
     createPositionRequirementDescription,
+    createPositionCompetency,
     deletePositionProfileRevision,
     deletePositionRequirementDescription,
+    deletePositionCompetency,
     getPositionProfileRevisionDetail,
     getPositionProfileRevisions,
     publishPositionProfileRevision,
     updatePositionProfileRevision,
     updatePositionRequirementDescription,
+    updatePositionCompetency,
 } from "../../services/positionManagement/positionProfileRevisionService";
 
 import {
@@ -30,6 +33,9 @@ import { getErrorMessage } from "../../utils/common/getErrorMessage";
 import type { MessageType } from "../../interfaces/common/message.interface";
 
 import type {
+    PositionCompetency,
+    PositionCompetencyForm,
+    PositionCompetencyFormErrors,
     PositionProfileRevision,
     PositionProfileRevisionDetail,
     PositionProfileRevisionForm,
@@ -72,6 +78,18 @@ const initialDescriptionFormErrors: PositionRequirementDescriptionFormErrors =
     description: "",
 };
 
+// Estado inicial del formulario de competencia.
+const initialCompetencyForm: PositionCompetencyForm = {
+    competencyTypeId: "",
+    competency: "",
+};
+
+// Estado inicial de los errores del formulario de competencia.
+const initialCompetencyFormErrors: PositionCompetencyFormErrors = {
+    competencyTypeId: "",
+    competency: "",
+};
+
 // Hook encargado de gestionar las revisiones de un perfil de cargo.
 export const usePositionProfileRevisions = ({
     positionProfileId,
@@ -83,7 +101,7 @@ export const usePositionProfileRevisions = ({
         PositionProfileRevision[]
     >([]);
 
-    // Detalle de la revisión seleccionada.
+    // Revisión seleccionada para consultar sus requisitos y competencias.
     const [
         selectedRevisionDetail,
         setSelectedRevisionDetail,
@@ -137,6 +155,14 @@ export const usePositionProfileRevisions = ({
         null
     );
 
+    // Competencia seleccionada para editar.
+    const [
+        editingCompetency,
+        setEditingCompetency,
+    ] = useState<PositionCompetency | null>(
+        null
+    );
+
     // Datos actuales del formulario de revisión.
     const [revisionForm, setRevisionForm] =
         useState<PositionProfileRevisionForm>(
@@ -147,6 +173,12 @@ export const usePositionProfileRevisions = ({
     const [descriptionForm, setDescriptionForm] =
         useState<PositionRequirementDescriptionForm>(
             initialDescriptionForm
+        );
+
+    // Datos actuales del formulario de competencia.
+    const [competencyForm, setCompetencyForm] =
+        useState<PositionCompetencyForm>(
+            initialCompetencyForm
         );
 
     // Errores del formulario de revisión.
@@ -163,6 +195,14 @@ export const usePositionProfileRevisions = ({
         setDescriptionFormErrors,
     ] = useState<PositionRequirementDescriptionFormErrors>(
         initialDescriptionFormErrors
+    );
+
+    // Errores del formulario de competencia.
+    const [
+        competencyFormErrors,
+        setCompetencyFormErrors,
+    ] = useState<PositionCompetencyFormErrors>(
+        initialCompetencyFormErrors
     );
 
     // Controla la apertura del formulario de revisión.
@@ -195,13 +235,19 @@ export const usePositionProfileRevisions = ({
         setOpenDeleteDescriptionDialog,
     ] = useState(false);
 
+    // Controla la apertura del formulario de competencia.
+    const [
+        openCompetencyDialog,
+        setOpenCompetencyDialog,
+    ] = useState(false);
+
     // Controla la carga del listado de revisiones.
     const [
         loadingRevisions,
         setLoadingRevisions,
     ] = useState(false);
 
-    // Controla la carga del detalle de una revisión.
+    // Controla la carga de los requisitos y competencias de una revisión.
     const [
         loadingRevisionDetail,
         setLoadingRevisionDetail,
@@ -237,10 +283,22 @@ export const usePositionProfileRevisions = ({
         setLoadingDescriptionDelete,
     ] = useState(false);
 
+    // Controla la creación o actualización de una competencia.
+    const [
+        loadingCompetencySubmit,
+        setLoadingCompetencySubmit,
+    ] = useState(false);
+
+    // Controla la eliminación de una competencia.
+    const [
+        loadingCompetencyDelete,
+        setLoadingCompetencyDelete,
+    ] = useState(false);
+
     // Error producido al cargar las revisiones.
     const [loadError, setLoadError] = useState("");
 
-    // Error producido al cargar el detalle.
+    // Error producido al cargar los requisitos y competencias.
     const [detailError, setDetailError] =
         useState("");
 
@@ -292,7 +350,7 @@ export const usePositionProfileRevisions = ({
         }
     }, [enabled, positionProfileId]);
 
-    // Consulta el detalle de una revisión.
+    // Consulta los requisitos y competencias de una revisión.
     const loadRevisionDetail = useCallback(
         async (revisionId: number) => {
             if (
@@ -327,7 +385,7 @@ export const usePositionProfileRevisions = ({
                 setDetailError(
                     getErrorMessage(
                         error,
-                        "Error al cargar el detalle de la revisión."
+                        "Error al cargar los requisitos y competencias de la revisión."
                     )
                 );
             } finally {
@@ -337,7 +395,7 @@ export const usePositionProfileRevisions = ({
         [enabled, positionProfileId]
     );
 
-    // Limpia el error del campo de observación.
+    // Limpia el error del formulario de revisión.
     const clearRevisionFieldError = () => {
         setMessage("");
         setOpenMessage(false);
@@ -347,13 +405,23 @@ export const usePositionProfileRevisions = ({
         );
     };
 
-    // Limpia el error del campo de descripción.
+    // Limpia el error del formulario de descripción.
     const clearDescriptionFieldError = () => {
         setMessage("");
         setOpenMessage(false);
 
         setDescriptionFormErrors(
             initialDescriptionFormErrors
+        );
+    };
+
+    // Limpia el error del formulario de competencia.
+    const clearCompetencyFieldError = () => {
+        setMessage("");
+        setOpenMessage(false);
+
+        setCompetencyFormErrors(
+            initialCompetencyFormErrors
         );
     };
 
@@ -379,6 +447,30 @@ export const usePositionProfileRevisions = ({
         clearDescriptionFieldError();
     };
 
+    // Actualiza la competencia del formulario.
+    const handleCompetencyChange = (
+        value: string
+    ) => {
+        setCompetencyForm((previous) => ({
+            ...previous,
+            competency: value,
+        }));
+
+        clearCompetencyFieldError();
+    };
+
+    // Actualiza el tipo de competencia del formulario.
+    const handleCompetencyTypeChange = (
+        value: number | ""
+    ) => {
+        setCompetencyForm((previous) => ({
+            ...previous,
+            competencyTypeId: value,
+        }));
+
+        clearCompetencyFieldError();
+    };
+
     // Limpia el formulario de revisión.
     const resetRevisionForm = () => {
         setRevisionForm(initialRevisionForm);
@@ -400,6 +492,17 @@ export const usePositionProfileRevisions = ({
 
         setSelectedRequirementId(null);
         setEditingDescription(null);
+    };
+
+    // Limpia el formulario de competencia.
+    const resetCompetencyForm = () => {
+        setCompetencyForm(initialCompetencyForm);
+
+        setCompetencyFormErrors(
+            initialCompetencyFormErrors
+        );
+
+        setEditingCompetency(null);
     };
 
     // Abre el formulario para crear una revisión.
@@ -511,6 +614,51 @@ export const usePositionProfileRevisions = ({
         resetDescriptionForm();
     };
 
+    // Abre el formulario para agregar una competencia.
+    // El tipo de competencia queda preseleccionado.
+    const openCreateCompetencyDialog = (
+        competencyTypeId: number
+    ) => {
+        resetCompetencyForm();
+
+        setCompetencyForm({
+            competencyTypeId,
+            competency: "",
+        });
+
+        setOpenCompetencyDialog(true);
+    };
+
+    // Abre el formulario para actualizar una competencia.
+    // El tipo de competencia permanece fijo.
+    const openEditCompetencyDialog = (
+        competency: PositionCompetency
+    ) => {
+        setEditingCompetency(competency);
+
+        setCompetencyForm({
+            competencyTypeId:
+                competency.competencyTypeId,
+            competency: competency.competency,
+        });
+
+        setCompetencyFormErrors(
+            initialCompetencyFormErrors
+        );
+
+        setOpenCompetencyDialog(true);
+    };
+
+    // Cierra el formulario de competencias.
+    const closeCompetencyDialog = () => {
+        if (loadingCompetencySubmit) {
+            return;
+        }
+
+        setOpenCompetencyDialog(false);
+        resetCompetencyForm();
+    };
+
     // Abre la confirmación para eliminar una descripción.
     const openDeleteDescriptionConfirmation = (
         requirementId: number,
@@ -614,6 +762,8 @@ export const usePositionProfileRevisions = ({
                                 previous.positionProfile,
                             requirements:
                                 previous.requirements,
+                            competencies:
+                                previous.competencies,
                         };
                     }
                 );
@@ -987,7 +1137,232 @@ export const usePositionProfileRevisions = ({
         }
     };
 
-    // Limpia el detalle cuando cambia el perfil de cargo.
+    // Registra una competencia en una revisión.
+    const handleCreateCompetency = async (
+        revisionId: number,
+        data: {
+            competencyTypeId: number;
+            competency: string;
+        }
+    ): Promise<boolean> => {
+        try {
+            setLoadingCompetencySubmit(true);
+            setMessage("");
+            setOpenMessage(false);
+
+            const response = await createPositionCompetency(
+                positionProfileId,
+                revisionId,
+                data
+            );
+
+            await loadRevisionDetail(revisionId);
+
+            setMessage(
+                response.message ||
+                "Competencia registrada correctamente."
+            );
+
+            setMessageSeverity("success");
+            setOpenMessage(true);
+
+            return true;
+        } catch (error: unknown) {
+            console.error(error);
+
+            setMessage(
+                getErrorMessage(
+                    error,
+                    "Error al registrar la competencia."
+                )
+            );
+
+            setMessageSeverity("error");
+            setOpenMessage(true);
+
+            return false;
+        } finally {
+            setLoadingCompetencySubmit(false);
+        }
+    };
+
+    // Actualiza una competencia de una revisión.
+    const handleUpdateCompetency = async (
+        revisionId: number,
+        competencyDescriptionId: number,
+        data: {
+            competency: string;
+        }
+    ): Promise<boolean> => {
+        try {
+            setLoadingCompetencySubmit(true);
+            setMessage("");
+            setOpenMessage(false);
+
+            const response =
+                await updatePositionCompetency(
+                    positionProfileId,
+                    revisionId,
+                    competencyDescriptionId,
+                    data
+                );
+
+            await loadRevisionDetail(revisionId);
+
+            setMessage(
+                response.message ||
+                "Competencia actualizada correctamente."
+            );
+
+            setMessageSeverity("success");
+            setOpenMessage(true);
+
+            return true;
+        } catch (error: unknown) {
+            console.error(error);
+
+            setMessage(
+                getErrorMessage(
+                    error,
+                    "Error al actualizar la competencia."
+                )
+            );
+
+            setMessageSeverity("error");
+            setOpenMessage(true);
+
+            return false;
+        } finally {
+            setLoadingCompetencySubmit(false);
+        }
+    };
+
+    // Crea o actualiza una competencia de una revisión.
+    const handleSubmitCompetency = async (
+        event: React.FormEvent<HTMLFormElement>,
+        revisionId: number
+    ) => {
+        event.preventDefault();
+
+        const errors: PositionCompetencyFormErrors = {
+            ...initialCompetencyFormErrors,
+        };
+
+        const competencyTypeId =
+            competencyForm.competencyTypeId;
+
+        const normalizedCompetency =
+            competencyForm.competency.trim();
+
+        // Valida el tipo de competencia.
+        if (
+            typeof competencyTypeId !== "number" ||
+            !Number.isInteger(competencyTypeId) ||
+            competencyTypeId <= 0
+        ) {
+            errors.competencyTypeId =
+                "El tipo de competencia es obligatorio.";
+        }
+
+        // Valida la competencia.
+        if (!normalizedCompetency) {
+            errors.competency =
+                "La competencia es obligatoria.";
+        } else if (normalizedCompetency.length > 500) {
+            errors.competency =
+                "La competencia no puede superar los 500 caracteres.";
+        }
+
+        // Si existen errores, no continúa con la petición.
+        if (
+            errors.competencyTypeId ||
+            errors.competency
+        ) {
+            setCompetencyFormErrors(errors);
+            return;
+        }
+
+        setCompetencyFormErrors(
+            initialCompetencyFormErrors
+        );
+
+        // Después de la validación, el tipo siempre debe ser numérico.
+        const validCompetencyTypeId =
+            Number(competencyTypeId);
+
+        let success = false;
+
+        // Actualización.
+        if (editingCompetency) {
+            success = await handleUpdateCompetency(
+                revisionId,
+                editingCompetency.id,
+                {
+                    competency: normalizedCompetency,
+                }
+            );
+        } else {
+            // Creación.
+            success = await handleCreateCompetency(
+                revisionId,
+                {
+                    competencyTypeId:
+                        validCompetencyTypeId,
+                    competency: normalizedCompetency,
+                }
+            );
+        }
+
+        // Solo cierra el diálogo si la operación fue exitosa.
+        if (success) {
+            closeCompetencyDialog();
+        }
+    };
+
+    // Elimina lógicamente una competencia de una revisión.
+    const handleDeleteCompetency = async (
+        revisionId: number,
+        competencyDescriptionId: number
+    ) => {
+        try {
+            setLoadingCompetencyDelete(true);
+            setMessage("");
+            setOpenMessage(false);
+
+            const response =
+                await deletePositionCompetency(
+                    positionProfileId,
+                    revisionId,
+                    competencyDescriptionId
+                );
+
+            await loadRevisionDetail(revisionId);
+
+            setMessage(
+                response.message ||
+                "Competencia eliminada correctamente."
+            );
+
+            setMessageSeverity("success");
+            setOpenMessage(true);
+        } catch (error: unknown) {
+            console.error(error);
+
+            setMessage(
+                getErrorMessage(
+                    error,
+                    "Error al eliminar la competencia."
+                )
+            );
+
+            setMessageSeverity("error");
+            setOpenMessage(true);
+        } finally {
+            setLoadingCompetencyDelete(false);
+        }
+    };
+
+    // Limpia el contenido seleccionado cuando cambia el perfil de cargo.
     useEffect(() => {
         setSelectedRevisionDetail(null);
         setDetailError("");
@@ -1021,6 +1396,10 @@ export const usePositionProfileRevisions = ({
     const isEditingDescription =
         Boolean(editingDescription);
 
+    // Indica si se está actualizando una competencia.
+    const isEditingCompetency =
+        Boolean(editingCompetency);
+
     // Indica si el formulario de revisión tiene cambios.
     const hasRevisionFormChanges = editingRevision
         ? revisionForm.changeObservation.trim() !==
@@ -1033,6 +1412,13 @@ export const usePositionProfileRevisions = ({
             ? descriptionForm.description.trim() !==
             editingDescription.description
             : descriptionForm.description.trim() !== "";
+
+    // Indica si el formulario de competencia tiene cambios.
+    const hasCompetencyFormChanges =
+        editingCompetency
+            ? competencyForm.competency.trim() !==
+            editingCompetency.competency
+            : competencyForm.competency.trim() !== "";
 
     return {
         revisions,
@@ -1050,6 +1436,10 @@ export const usePositionProfileRevisions = ({
         editingDescription,
         descriptionToDelete,
 
+        competencyForm,
+        competencyFormErrors,
+        editingCompetency,
+
         revisionForm,
         revisionFormErrors,
 
@@ -1061,6 +1451,7 @@ export const usePositionProfileRevisions = ({
         openPublishRevisionDialog,
         openDescriptionDialog,
         openDeleteDescriptionDialog,
+        openCompetencyDialog,
 
         loadingRevisions,
         loadingRevisionDetail,
@@ -1069,6 +1460,8 @@ export const usePositionProfileRevisions = ({
         loadingPublish,
         loadingDescriptionSubmit,
         loadingDescriptionDelete,
+        loadingCompetencySubmit,
+        loadingCompetencyDelete,
 
         loadError,
         detailError,
@@ -1079,14 +1472,24 @@ export const usePositionProfileRevisions = ({
 
         isEditingRevision,
         isEditingDescription,
+        isEditingCompetency,
+
         hasRevisionFormChanges,
         hasDescriptionFormChanges,
+        hasCompetencyFormChanges,
 
         loadRevisions,
         loadRevisionDetail,
 
         handleChangeObservation,
         handleDescriptionChange,
+        handleCompetencyChange,
+        handleCompetencyTypeChange,
+
+        handleCreateCompetency,
+        handleUpdateCompetency,
+        handleSubmitCompetency,
+        handleDeleteCompetency,
 
         openCreateRevisionDialog,
         openEditRevisionDialog,
@@ -1106,6 +1509,10 @@ export const usePositionProfileRevisions = ({
         closeDescriptionDialog,
         handleSubmitDescription,
 
+        openCreateCompetencyDialog,
+        openEditCompetencyDialog,
+        closeCompetencyDialog,
+
         openDeleteDescriptionConfirmation,
         closeDeleteDescriptionConfirmation,
         handleDeleteDescription,
@@ -1113,5 +1520,6 @@ export const usePositionProfileRevisions = ({
         closeMessage,
         resetRevisionForm,
         resetDescriptionForm,
+        resetCompetencyForm,
     };
 };

@@ -47,7 +47,7 @@ export const getCurrentPositionProfileRevision = async (
     return response.data;
 };
 
-// Obtiene el detalle de una revisión con sus requisitos y descripciones.
+// Obtiene el detalle de una revisión con requisitos, competencias y sus descripciones.
 export const getPositionProfileRevisionDetail = async (
     positionProfileId: number,
     revisionId: number
@@ -141,6 +141,53 @@ export const deletePositionRequirementDescription = async (
         await api.delete<PositionRequirementDescriptionResponse>(
             `/position-management/position-profiles/${positionProfileId}/revisions/${revisionId}/requirements/${requirementId}/descriptions/${descriptionId}`
         );
+
+    return response.data;
+};
+
+// Agrega una competencia a una revisión de perfil de cargo.
+export const createPositionCompetency = async (
+    positionProfileId: number,
+    revisionId: number,
+    data: {
+        competencyTypeId: number;
+        competency: string;
+    }
+) => {
+    const response = await api.post(
+        `/position-management/position-profiles/${positionProfileId}/revisions/${revisionId}/competencies`,
+        data
+    );
+
+    return response.data;
+};
+
+// Actualiza la descripción de una competencia de una revisión.
+export const updatePositionCompetency = async (
+    positionProfileId: number,
+    revisionId: number,
+    competencyDescriptionId: number,
+    data: {
+        competency: string;
+    }
+) => {
+    const response = await api.patch(
+        `/position-management/position-profiles/${positionProfileId}/revisions/${revisionId}/competencies/${competencyDescriptionId}`,
+        data
+    );
+
+    return response.data;
+};
+
+// Elimina lógicamente una competencia de una revisión.
+export const deletePositionCompetency = async (
+    positionProfileId: number,
+    revisionId: number,
+    competencyDescriptionId: number
+) => {
+    const response = await api.delete(
+        `/position-management/position-profiles/${positionProfileId}/revisions/${revisionId}/competencies/${competencyDescriptionId}`
+    );
 
     return response.data;
 };

@@ -87,8 +87,8 @@ const PositionProfileRevisionsSection = ({
         positionProfileId,
     });
 
-    // Navega a la página independiente del detalle.
-    const goToRevisionDetail = (
+    // Navega a la administración de requisitos de la revisión.
+    const goToRevisionRequirements = (
         revisionId: number
     ) => {
         const nextSearchParams =
@@ -106,6 +106,28 @@ const PositionProfileRevisionsSection = ({
 
         navigate(
             `/dashboard/position-management/position-profiles/${positionProfileId}/revisions/${revisionId}?${nextSearchParams.toString()}`
+        );
+    };
+
+    // Navega a la administración de competencias de la revisión.
+    const goToRevisionCompetencies = (
+        revisionId: number
+    ) => {
+        const nextSearchParams =
+            new URLSearchParams(searchParams);
+
+        nextSearchParams.set(
+            "positionProfileId",
+            String(positionProfileId)
+        );
+
+        nextSearchParams.set(
+            "revisionId",
+            String(revisionId)
+        );
+
+        navigate(
+            `/dashboard/position-management/position-profiles/${positionProfileId}/revisions/${revisionId}/competencies?${nextSearchParams.toString()}`
         );
     };
 
@@ -241,20 +263,23 @@ const PositionProfileRevisionsSection = ({
                                 {revisions.map(
                                     (revision) => (
                                         <PositionProfileRevisionCard
-                                            key={
-                                                revision.id
-                                            }
-                                            revision={
-                                                revision
-                                            }
+                                            key={revision.id}
+                                            revision={revision}
                                             selected={
                                                 selectedRevisionId ===
                                                 revision.id
                                             }
-                                            onSelect={(
+                                            onViewRequirements={(
                                                 selectedRevision
                                             ) =>
-                                                goToRevisionDetail(
+                                                goToRevisionRequirements(
+                                                    selectedRevision.id
+                                                )
+                                            }
+                                            onViewCompetencies={(
+                                                selectedRevision
+                                            ) =>
+                                                goToRevisionCompetencies(
                                                     selectedRevision.id
                                                 )
                                             }

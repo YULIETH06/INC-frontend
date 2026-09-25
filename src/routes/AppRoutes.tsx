@@ -30,6 +30,7 @@ import ChangePassword from "../pages/users/ChangePassword";
 
 import PositionProfileRevisions from "../pages/positionManagement/PositionProfileRevisions";
 import PositionProfileRevisionDetail from "../pages/positionManagement/PositionProfileRevisionDetail";
+import PositionProfileRevisionCompetencies from "../pages/positionManagement/PositionProfileRevisionCompetencies";
 
 const AppRoutes = () => {
   return (
@@ -117,6 +118,11 @@ const AppRoutes = () => {
           <Route
             path="/dashboard/position-management/position-profiles/:positionProfileId/revisions/:revisionId"
             element={<PositionProfileRevisionDetail />}
+          />
+
+          <Route
+            path="/dashboard/position-management/position-profiles/:positionProfileId/revisions/:revisionId/competencies"
+            element={<PositionProfileRevisionCompetencies />}
           />
 
           {/* Usuario */}
