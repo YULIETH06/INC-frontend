@@ -8,24 +8,24 @@ import { ValidationError } from "yup";
 
 import {
     createPositionProfileRevision,
-    createPositionRequirementDescription,
+    createPositionRequirement,
     createPositionCompetency,
     deletePositionProfileRevision,
-    deletePositionRequirementDescription,
+    deletePositionRequirement,
     deletePositionCompetency,
     getPositionProfileRevisionDetail,
     getPositionProfileRevisions,
     publishPositionProfileRevision,
     updatePositionProfileRevision,
-    updatePositionRequirementDescription,
+    updatePositionRequirement,
     updatePositionCompetency,
 } from "../../services/positionManagement/positionProfileRevisionService";
 
 import {
     createPositionProfileRevisionSchema,
-    createPositionRequirementDescriptionSchema,
+    createPositionRequirementSchema,
     updatePositionProfileRevisionSchema,
-    updatePositionRequirementDescriptionSchema,
+    updatePositionRequirementSchema,
 } from "../../validations/positionManagement/positionProfileRevisionValidation";
 
 import { getErrorMessage } from "../../utils/common/getErrorMessage";
@@ -40,9 +40,9 @@ import type {
     PositionProfileRevisionDetail,
     PositionProfileRevisionForm,
     PositionProfileRevisionFormErrors,
-    PositionRequirementDescription,
-    PositionRequirementDescriptionForm,
-    PositionRequirementDescriptionFormErrors,
+    PositionRequirementEntry,
+    PositionRequirementForm,
+    PositionRequirementFormErrors,
 } from "../../interfaces/positionManagement/positionProfileRevision.interface";
 
 // Propiedades recibidas por el hook.
@@ -51,10 +51,10 @@ interface UsePositionProfileRevisionsProps {
     enabled?: boolean;
 }
 
-// Descripción seleccionada para eliminar.
-interface DescriptionToDelete {
+// Requisito seleccionado para eliminar.
+interface RequirementToDelete {
     requirementId: number;
-    description: PositionRequirementDescription;
+    requirement: PositionRequirementEntry;
 }
 
 // Estado inicial del formulario de revisión.
@@ -67,13 +67,13 @@ const initialRevisionFormErrors: PositionProfileRevisionFormErrors = {
     changeObservation: "",
 };
 
-// Estado inicial del formulario de descripción.
-const initialDescriptionForm: PositionRequirementDescriptionForm = {
+// Estado inicial del formulario de requisito.
+const initialRequirementForm: PositionRequirementForm = {
     description: "",
 };
 
-// Estado inicial de los errores del formulario de descripción.
-const initialDescriptionFormErrors: PositionRequirementDescriptionFormErrors =
+// Estado inicial de los errores del formulario de requisito.
+const initialRequirementFormErrors: PositionRequirementFormErrors =
 {
     description: "",
 };
@@ -133,25 +133,25 @@ export const usePositionProfileRevisions = ({
         null
     );
 
-    // Requisito seleccionado para agregar o editar una descripción.
+    // Requisito seleccionado para agregar o editar un requisito.
     const [
         selectedRequirementId,
         setSelectedRequirementId,
     ] = useState<number | null>(null);
 
-    // Descripción seleccionada para editar.
+    // Requisito seleccionado para editar.
     const [
-        editingDescription,
-        setEditingDescription,
-    ] = useState<PositionRequirementDescription | null>(
+        editingRequirement,
+        setEditingRequirement,
+    ] = useState<PositionRequirementEntry | null>(
         null
     );
 
-    // Descripción seleccionada para eliminar.
+    // Requisito seleccionado para eliminar.
     const [
-        descriptionToDelete,
-        setDescriptionToDelete,
-    ] = useState<DescriptionToDelete | null>(
+        requirementToDelete,
+        setRequirementToDelete,
+    ] = useState<RequirementToDelete | null>(
         null
     );
 
@@ -169,10 +169,10 @@ export const usePositionProfileRevisions = ({
             initialRevisionForm
         );
 
-    // Datos actuales del formulario de descripción.
-    const [descriptionForm, setDescriptionForm] =
-        useState<PositionRequirementDescriptionForm>(
-            initialDescriptionForm
+    // Datos actuales del formulario de requisito.
+    const [requirementForm, setRequirementForm] =
+        useState<PositionRequirementForm>(
+            initialRequirementForm
         );
 
     // Datos actuales del formulario de competencia.
@@ -189,12 +189,12 @@ export const usePositionProfileRevisions = ({
         initialRevisionFormErrors
     );
 
-    // Errores del formulario de descripción.
+    // Errores del formulario de requisito.
     const [
-        descriptionFormErrors,
-        setDescriptionFormErrors,
-    ] = useState<PositionRequirementDescriptionFormErrors>(
-        initialDescriptionFormErrors
+        requirementFormErrors,
+        setRequirementFormErrors,
+    ] = useState<PositionRequirementFormErrors>(
+        initialRequirementFormErrors
     );
 
     // Errores del formulario de competencia.
@@ -223,16 +223,16 @@ export const usePositionProfileRevisions = ({
         setOpenPublishRevisionDialog,
     ] = useState(false);
 
-    // Controla la apertura del formulario de descripción.
+    // Controla la apertura del formulario de requisito.
     const [
-        openDescriptionDialog,
-        setOpenDescriptionDialog,
+        openRequirementDialog,
+        setOpenRequirementDialog,
     ] = useState(false);
 
-    // Controla la confirmación de eliminación de una descripción.
+    // Controla la confirmación de eliminación de un requisito.
     const [
-        openDeleteDescriptionDialog,
-        setOpenDeleteDescriptionDialog,
+        openDeleteRequirementDialog,
+        setOpenDeleteRequirementDialog,
     ] = useState(false);
 
     // Controla la apertura del formulario de competencia.
@@ -271,16 +271,16 @@ export const usePositionProfileRevisions = ({
         setLoadingPublish,
     ] = useState(false);
 
-    // Controla la creación o actualización de una descripción.
+    // Controla la creación o actualización de un requisito.
     const [
-        loadingDescriptionSubmit,
-        setLoadingDescriptionSubmit,
+        loadingRequirementSubmit,
+        setLoadingRequirementSubmit,
     ] = useState(false);
 
-    // Controla la eliminación de una descripción.
+    // Controla la eliminación de un requisito.
     const [
-        loadingDescriptionDelete,
-        setLoadingDescriptionDelete,
+        loadingRequirementDelete,
+        setLoadingRequirementDelete,
     ] = useState(false);
 
     // Controla la creación o actualización de una competencia.
@@ -405,13 +405,13 @@ export const usePositionProfileRevisions = ({
         );
     };
 
-    // Limpia el error del formulario de descripción.
-    const clearDescriptionFieldError = () => {
+    // Limpia el error del formulario de requisito.
+    const clearRequirementFieldError = () => {
         setMessage("");
         setOpenMessage(false);
 
-        setDescriptionFormErrors(
-            initialDescriptionFormErrors
+        setRequirementFormErrors(
+            initialRequirementFormErrors
         );
     };
 
@@ -436,15 +436,15 @@ export const usePositionProfileRevisions = ({
         clearRevisionFieldError();
     };
 
-    // Actualiza la descripción del requisito.
-    const handleDescriptionChange = (
+    // Actualiza el requisito.
+    const handleRequirementChange = (
         value: string
     ) => {
-        setDescriptionForm({
+        setRequirementForm({
             description: value,
         });
 
-        clearDescriptionFieldError();
+        clearRequirementFieldError();
     };
 
     // Actualiza la competencia del formulario.
@@ -482,16 +482,16 @@ export const usePositionProfileRevisions = ({
         setEditingRevision(null);
     };
 
-    // Limpia el formulario de descripción.
-    const resetDescriptionForm = () => {
-        setDescriptionForm(initialDescriptionForm);
+    // Limpia el formulario de requisito.
+    const resetRequirementForm = () => {
+        setRequirementForm(initialRequirementForm);
 
-        setDescriptionFormErrors(
-            initialDescriptionFormErrors
+        setRequirementFormErrors(
+            initialRequirementFormErrors
         );
 
         setSelectedRequirementId(null);
-        setEditingDescription(null);
+        setEditingRequirement(null);
     };
 
     // Limpia el formulario de competencia.
@@ -575,43 +575,43 @@ export const usePositionProfileRevisions = ({
         setOpenPublishRevisionDialog(false);
     };
 
-    // Abre el formulario para agregar una descripción.
-    const openCreateDescriptionDialog = (
+    // Abre el formulario para agregar un requisito.
+    const openCreateRequirementDialog = (
         requirementId: number
     ) => {
-        resetDescriptionForm();
+        resetRequirementForm();
 
         setSelectedRequirementId(requirementId);
-        setOpenDescriptionDialog(true);
+        setOpenRequirementDialog(true);
     };
 
-    // Abre el formulario para actualizar una descripción.
-    const openEditDescriptionDialog = (
+    // Abre el formulario para actualizar un requisito.
+    const openEditRequirementDialog = (
         requirementId: number,
-        description: PositionRequirementDescription
+        requirement: PositionRequirementEntry
     ) => {
         setSelectedRequirementId(requirementId);
-        setEditingDescription(description);
+        setEditingRequirement(requirement);
 
-        setDescriptionForm({
-            description: description.description,
+        setRequirementForm({
+            description: requirement.description,
         });
 
-        setDescriptionFormErrors(
-            initialDescriptionFormErrors
+        setRequirementFormErrors(
+            initialRequirementFormErrors
         );
 
-        setOpenDescriptionDialog(true);
+        setOpenRequirementDialog(true);
     };
 
-    // Cierra el formulario de descripción.
-    const closeDescriptionDialog = () => {
-        if (loadingDescriptionSubmit) {
+    // Cierra el formulario de requisito.
+    const closeRequirementDialog = () => {
+        if (loadingRequirementSubmit) {
             return;
         }
 
-        setOpenDescriptionDialog(false);
-        resetDescriptionForm();
+        setOpenRequirementDialog(false);
+        resetRequirementForm();
     };
 
     // Abre el formulario para agregar una competencia.
@@ -659,27 +659,27 @@ export const usePositionProfileRevisions = ({
         resetCompetencyForm();
     };
 
-    // Abre la confirmación para eliminar una descripción.
-    const openDeleteDescriptionConfirmation = (
+    // Abre la confirmación para eliminar un requisito.
+    const openDeleteRequirementConfirmation = (
         requirementId: number,
-        description: PositionRequirementDescription
+        requirement: PositionRequirementEntry
     ) => {
-        setDescriptionToDelete({
+        setRequirementToDelete({
             requirementId,
-            description,
+            requirement,
         });
 
-        setOpenDeleteDescriptionDialog(true);
+        setOpenDeleteRequirementDialog(true);
     };
 
-    // Cierra la confirmación de eliminación de descripción.
-    const closeDeleteDescriptionConfirmation = () => {
-        if (loadingDescriptionDelete) {
+    // Cierra la confirmación de eliminación de requisito.
+    const closeDeleteRequirementConfirmation = () => {
+        if (loadingRequirementDelete) {
             return;
         }
 
-        setDescriptionToDelete(null);
-        setOpenDeleteDescriptionDialog(false);
+        setRequirementToDelete(null);
+        setOpenDeleteRequirementDialog(false);
     };
 
     // Cierra el mensaje visual.
@@ -959,8 +959,8 @@ export const usePositionProfileRevisions = ({
         }
     };
 
-    // Crea o actualiza una descripción de requisito.
-    const handleSubmitDescription = async (
+    // Crea o actualiza un requisito.
+    const handleSubmitRequirement = async (
         event: React.FormEvent<HTMLFormElement>
     ) => {
         event.preventDefault();
@@ -972,15 +972,15 @@ export const usePositionProfileRevisions = ({
             return;
         }
 
-        const formData: PositionRequirementDescriptionForm =
+        const formData: PositionRequirementForm =
         {
-            description: descriptionForm.description,
+            description: requirementForm.description,
         };
 
         try {
-            const validationSchema = editingDescription
-                ? updatePositionRequirementDescriptionSchema
-                : createPositionRequirementDescriptionSchema;
+            const validationSchema = editingRequirement
+                ? updatePositionRequirementSchema
+                : createPositionRequirementSchema;
 
             await validationSchema.validate(
                 formData,
@@ -989,10 +989,10 @@ export const usePositionProfileRevisions = ({
                 }
             );
 
-            setLoadingDescriptionSubmit(true);
+            setLoadingRequirementSubmit(true);
 
-            setDescriptionFormErrors(
-                initialDescriptionFormErrors
+            setRequirementFormErrors(
+                initialRequirementFormErrors
             );
 
             setMessage("");
@@ -1000,26 +1000,26 @@ export const usePositionProfileRevisions = ({
 
             const normalizedData = {
                 description:
-                    descriptionForm.description.trim(),
+                    requirementForm.description.trim(),
             };
 
-            if (editingDescription) {
+            if (editingRequirement) {
                 const response =
-                    await updatePositionRequirementDescription(
+                    await updatePositionRequirement(
                         positionProfileId,
                         selectedRevisionDetail.id,
                         selectedRequirementId,
-                        editingDescription.id,
+                        editingRequirement.id,
                         normalizedData
                     );
 
                 setMessage(
                     response.message ||
-                    "Descripción actualizada correctamente."
+                    "Requisito actualizado correctamente."
                 );
             } else {
                 const response =
-                    await createPositionRequirementDescription(
+                    await createPositionRequirement(
                         positionProfileId,
                         selectedRevisionDetail.id,
                         selectedRequirementId,
@@ -1028,7 +1028,7 @@ export const usePositionProfileRevisions = ({
 
                 setMessage(
                     response.message ||
-                    "Descripción registrada correctamente."
+                    "Requisito registrado correctamente."
                 );
             }
 
@@ -1039,19 +1039,19 @@ export const usePositionProfileRevisions = ({
             setMessageSeverity("success");
             setOpenMessage(true);
 
-            setOpenDescriptionDialog(false);
-            resetDescriptionForm();
+            setOpenRequirementDialog(false);
+            resetRequirementForm();
         } catch (error: unknown) {
             if (error instanceof ValidationError) {
-                const errors: PositionRequirementDescriptionFormErrors =
+                const errors: PositionRequirementFormErrors =
                 {
-                    ...initialDescriptionFormErrors,
+                    ...initialRequirementFormErrors,
                 };
 
                 error.inner.forEach(
                     (validationError) => {
                         const path =
-                            validationError.path as keyof PositionRequirementDescriptionFormErrors;
+                            validationError.path as keyof PositionRequirementFormErrors;
 
                         if (path) {
                             errors[path] =
@@ -1060,7 +1060,7 @@ export const usePositionProfileRevisions = ({
                     }
                 );
 
-                setDescriptionFormErrors(errors);
+                setRequirementFormErrors(errors);
                 setMessage("");
                 setOpenMessage(false);
                 return;
@@ -1071,51 +1071,51 @@ export const usePositionProfileRevisions = ({
             setMessage(
                 getErrorMessage(
                     error,
-                    editingDescription
-                        ? "Error al actualizar la descripción."
-                        : "Error al registrar la descripción."
+                    editingRequirement
+                        ? "Error al actualizar el requisito."
+                        : "Error al registrar el requisito."
                 )
             );
 
             setMessageSeverity("error");
             setOpenMessage(true);
         } finally {
-            setLoadingDescriptionSubmit(false);
+            setLoadingRequirementSubmit(false);
         }
     };
 
-    // Elimina lógicamente la descripción seleccionada.
-    const handleDeleteDescription = async () => {
+    // Elimina lógicamente el requisito seleccionado.
+    const handleDeleteRequirement = async () => {
         if (
             !selectedRevisionDetail ||
-            !descriptionToDelete
+            !requirementToDelete
         ) {
             return;
         }
 
         try {
-            setLoadingDescriptionDelete(true);
+            setLoadingRequirementDelete(true);
             setMessage("");
             setOpenMessage(false);
 
             const response =
-                await deletePositionRequirementDescription(
+                await deletePositionRequirement(
                     positionProfileId,
                     selectedRevisionDetail.id,
-                    descriptionToDelete.requirementId,
-                    descriptionToDelete.description.id
+                    requirementToDelete.requirementId,
+                    requirementToDelete.requirement.id
                 );
 
             await loadRevisionDetail(
                 selectedRevisionDetail.id
             );
 
-            setDescriptionToDelete(null);
-            setOpenDeleteDescriptionDialog(false);
+            setRequirementToDelete(null);
+            setOpenDeleteRequirementDialog(false);
 
             setMessage(
                 response.message ||
-                "Descripción eliminada correctamente."
+                "Requisito eliminado correctamente."
             );
 
             setMessageSeverity("success");
@@ -1126,14 +1126,14 @@ export const usePositionProfileRevisions = ({
             setMessage(
                 getErrorMessage(
                     error,
-                    "Error al eliminar la descripción."
+                    "Error al eliminar el requisito."
                 )
             );
 
             setMessageSeverity("error");
             setOpenMessage(true);
         } finally {
-            setLoadingDescriptionDelete(false);
+            setLoadingRequirementDelete(false);
         }
     };
 
@@ -1189,7 +1189,7 @@ export const usePositionProfileRevisions = ({
     // Actualiza una competencia de una revisión.
     const handleUpdateCompetency = async (
         revisionId: number,
-        competencyDescriptionId: number,
+        competencyId: number,
         data: {
             competency: string;
         }
@@ -1203,7 +1203,7 @@ export const usePositionProfileRevisions = ({
                 await updatePositionCompetency(
                     positionProfileId,
                     revisionId,
-                    competencyDescriptionId,
+                    competencyId,
                     data
                 );
 
@@ -1322,7 +1322,7 @@ export const usePositionProfileRevisions = ({
     // Elimina lógicamente una competencia de una revisión.
     const handleDeleteCompetency = async (
         revisionId: number,
-        competencyDescriptionId: number
+        competencyId: number
     ) => {
         try {
             setLoadingCompetencyDelete(true);
@@ -1333,7 +1333,7 @@ export const usePositionProfileRevisions = ({
                 await deletePositionCompetency(
                     positionProfileId,
                     revisionId,
-                    competencyDescriptionId
+                    competencyId
                 );
 
             await loadRevisionDetail(revisionId);
@@ -1392,9 +1392,9 @@ export const usePositionProfileRevisions = ({
     const isEditingRevision =
         Boolean(editingRevision);
 
-    // Indica si se está actualizando una descripción.
-    const isEditingDescription =
-        Boolean(editingDescription);
+    // Indica si se está actualizando un requisito.
+    const isEditingRequirement =
+        Boolean(editingRequirement);
 
     // Indica si se está actualizando una competencia.
     const isEditingCompetency =
@@ -1406,12 +1406,12 @@ export const usePositionProfileRevisions = ({
         (editingRevision.changeObservation ?? "")
         : true;
 
-    // Indica si el formulario de descripción tiene cambios.
-    const hasDescriptionFormChanges =
-        editingDescription
-            ? descriptionForm.description.trim() !==
-            editingDescription.description
-            : descriptionForm.description.trim() !== "";
+    // Indica si el formulario de requisito tiene cambios.
+    const hasRequirementFormChanges =
+        editingRequirement
+            ? requirementForm.description.trim() !==
+            editingRequirement.description
+            : requirementForm.description.trim() !== "";
 
     // Indica si el formulario de competencia tiene cambios.
     const hasCompetencyFormChanges =
@@ -1433,8 +1433,8 @@ export const usePositionProfileRevisions = ({
         revisionToPublish,
 
         selectedRequirementId,
-        editingDescription,
-        descriptionToDelete,
+        editingRequirement,
+        requirementToDelete,
 
         competencyForm,
         competencyFormErrors,
@@ -1443,14 +1443,14 @@ export const usePositionProfileRevisions = ({
         revisionForm,
         revisionFormErrors,
 
-        descriptionForm,
-        descriptionFormErrors,
+        requirementForm,
+        requirementFormErrors,
 
         openRevisionDialog,
         openDeleteRevisionDialog,
         openPublishRevisionDialog,
-        openDescriptionDialog,
-        openDeleteDescriptionDialog,
+        openRequirementDialog,
+        openDeleteRequirementDialog,
         openCompetencyDialog,
 
         loadingRevisions,
@@ -1458,8 +1458,8 @@ export const usePositionProfileRevisions = ({
         loadingRevisionSubmit,
         loadingRevisionDelete,
         loadingPublish,
-        loadingDescriptionSubmit,
-        loadingDescriptionDelete,
+        loadingRequirementSubmit,
+        loadingRequirementDelete,
         loadingCompetencySubmit,
         loadingCompetencyDelete,
 
@@ -1471,18 +1471,18 @@ export const usePositionProfileRevisions = ({
         messageSeverity,
 
         isEditingRevision,
-        isEditingDescription,
+        isEditingRequirement,
         isEditingCompetency,
 
         hasRevisionFormChanges,
-        hasDescriptionFormChanges,
+        hasRequirementFormChanges,
         hasCompetencyFormChanges,
 
         loadRevisions,
         loadRevisionDetail,
 
         handleChangeObservation,
-        handleDescriptionChange,
+        handleRequirementChange,
         handleCompetencyChange,
         handleCompetencyTypeChange,
 
@@ -1504,22 +1504,22 @@ export const usePositionProfileRevisions = ({
         closePublishRevisionConfirmation,
         handlePublishRevision,
 
-        openCreateDescriptionDialog,
-        openEditDescriptionDialog,
-        closeDescriptionDialog,
-        handleSubmitDescription,
+        openCreateRequirementDialog,
+        openEditRequirementDialog,
+        closeRequirementDialog,
+        handleSubmitRequirement,
 
         openCreateCompetencyDialog,
         openEditCompetencyDialog,
         closeCompetencyDialog,
 
-        openDeleteDescriptionConfirmation,
-        closeDeleteDescriptionConfirmation,
-        handleDeleteDescription,
+        openDeleteRequirementConfirmation,
+        closeDeleteRequirementConfirmation,
+        handleDeleteRequirement,
 
         closeMessage,
         resetRevisionForm,
-        resetDescriptionForm,
+        resetRequirementForm,
         resetCompetencyForm,
     };
 };

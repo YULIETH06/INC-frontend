@@ -26,8 +26,8 @@ export interface PositionProfileRevision {
     positionProfile?: PositionProfileRevisionPosition;
 }
 
-// Descripción registrada dentro de un requisito.
-export interface PositionRequirementDescription {
+// Registro de requisito asociado a una revisión.
+export interface PositionRequirementEntry {
     id: number;
     revisionId: number;
     requirementId: number;
@@ -41,7 +41,7 @@ export interface PositionRequirementDescription {
 export interface PositionRequirement {
     id: number;
     name: string;
-    descriptions: PositionRequirementDescription[];
+    descriptions: PositionRequirementEntry[];
 }
 
 // Competencia asociada a una revisión de perfil de cargo.
@@ -93,8 +93,8 @@ export interface UpdatePositionProfileRevisionData {
     changeObservation: string | null;
 }
 
-// Datos para registrar o actualizar una descripción.
-export interface PositionRequirementDescriptionData {
+// Datos para registrar o actualizar un requisito.
+export interface PositionRequirementData {
     description: string;
 }
 
@@ -108,13 +108,13 @@ export interface PositionProfileRevisionFormErrors {
     changeObservation: string;
 }
 
-// Datos manejados en el formulario de descripciones.
-export interface PositionRequirementDescriptionForm {
+// Datos manejados en el formulario de requisitos.
+export interface PositionRequirementForm {
     description: string;
 }
 
-// Errores de validación del formulario de descripciones.
-export interface PositionRequirementDescriptionFormErrors {
+// Errores de validación del formulario de requisitos.
+export interface PositionRequirementFormErrors {
     description: string;
 }
 
@@ -143,10 +143,10 @@ export interface PositionProfileRevisionDetailResponse {
     revision: PositionProfileRevisionDetail;
 }
 
-// Respuesta al crear, actualizar o eliminar una descripción.
-export interface PositionRequirementDescriptionResponse {
+// Respuesta al crear, actualizar o eliminar un requisito.
+export interface PositionRequirementResponse {
     message: string;
-    requirementDescription: PositionRequirementDescription & {
+    requirementDescription: PositionRequirementEntry & {
         requirement: {
             id: number;
             name: string;

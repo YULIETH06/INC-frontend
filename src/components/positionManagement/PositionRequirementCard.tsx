@@ -16,43 +16,43 @@ import { formatDate } from "../../utils/common/dateUtils";
 
 import type {
     PositionRequirement,
-    PositionRequirementDescription,
+    PositionRequirementEntry,
 } from "../../interfaces/positionManagement/positionProfileRevision.interface";
 
 interface PositionRequirementCardProps {
     requirement: PositionRequirement;
     canManage?: boolean;
 
-    onCreateDescription: (
+    onCreateRequirement: (
         requirementId: number
     ) => void;
 
-    onEditDescription: (
+    onEditRequirement: (
         requirementId: number,
-        description: PositionRequirementDescription
+        requirementItem: PositionRequirementEntry
     ) => void;
 
-    onDeleteDescription: (
+    onDeleteRequirement: (
         requirementId: number,
-        description: PositionRequirementDescription
+        requirementItem: PositionRequirementEntry
     ) => void;
 }
 
-// Tarjeta para mostrar un requisito y sus descripciones.
+// Tarjeta para mostrar un requisito y sus registros.
 const PositionRequirementCard = ({
     requirement,
     canManage = false,
-    onCreateDescription,
-    onEditDescription,
-    onDeleteDescription,
+    onCreateRequirement,
+    onEditRequirement,
+    onDeleteRequirement,
 }: PositionRequirementCardProps) => {
-    const hasDescriptions =
+    const hasRequirements =
         requirement.descriptions.length > 0;
 
-    const descriptionsLabel =
+    const requirementsLabel =
         requirement.descriptions.length === 1
-            ? "1 descripción"
-            : `${requirement.descriptions.length} descripciones`;
+            ? "1 requisito"
+            : `${requirement.descriptions.length} requisitos`;
 
     return (
         <Card
@@ -158,9 +158,9 @@ const PositionRequirementCard = ({
                             }}
                         >
                             <CustomChip
-                                label={descriptionsLabel}
+                                label={requirementsLabel}
                                 color={
-                                    hasDescriptions
+                                    hasRequirements
                                         ? "primary"
                                         : "warning"
                                 }
@@ -170,10 +170,10 @@ const PositionRequirementCard = ({
                             {canManage && (
                                 <ActionButton
                                     actionType="create"
-                                    tooltip="Agregar descripción"
+                                    tooltip="Agregar requisito"
                                     fullWidthOnMobile
                                     onClick={() =>
-                                        onCreateDescription(
+                                        onCreateRequirement(
                                             requirement.id
                                         )
                                     }
@@ -187,7 +187,7 @@ const PositionRequirementCard = ({
                     <Divider />
 
                     {/* Estado vacío del requisito. */}
-                    {!hasDescriptions && (
+                    {!hasRequirements && (
                         <Box
                             sx={{
                                 p: 2.5,
@@ -207,9 +207,9 @@ const PositionRequirementCard = ({
                                         "text.secondary",
                                 }}
                             >
-                                No hay descripciones
-                                registradas para este
-                                requisito.
+                                No hay requisitos
+                                registrados para este
+                                tipo de requisito.
                             </Typography>
 
                             {canManage && (
@@ -222,25 +222,25 @@ const PositionRequirementCard = ({
                                             "text.secondary",
                                     }}
                                 >
-                                    Agrega al menos una
-                                    descripción antes de
+                                    Agrega al menos un
+                                    requisito antes de
                                     publicar la revisión.
                                 </Typography>
                             )}
                         </Box>
                     )}
 
-                    {/* Descripciones registradas. */}
-                    {hasDescriptions && (
+                    {/* Requisitos registradas. */}
+                    {hasRequirements && (
                         <Stack spacing={1.5}>
                             {requirement.descriptions.map(
                                 (
-                                    description,
+                                    requirementItem,
                                     index
                                 ) => (
                                     <Box
                                         key={
-                                            description.id
+                                            requirementItem.id
                                         }
                                         sx={{
                                             p: 2,
@@ -290,7 +290,7 @@ const PositionRequirementCard = ({
                                                             fontWeight: 700,
                                                         }}
                                                     >
-                                                        Descripción{" "}
+                                                        Requisito{" "}
                                                         {index +
                                                             1}
                                                     </Typography>
@@ -305,7 +305,7 @@ const PositionRequirementCard = ({
                                                         }}
                                                     >
                                                         {
-                                                            description.description
+                                                            requirementItem.description
                                                         }
                                                     </Typography>
                                                 </Box>
@@ -324,12 +324,12 @@ const PositionRequirementCard = ({
                                                     >
                                                         <ActionButton
                                                             actionType="edit"
-                                                            tooltip="Editar descripción"
+                                                            tooltip="Editar requisito"
                                                             iconOnlyOnMobile
                                                             onClick={() =>
-                                                                onEditDescription(
+                                                                onEditRequirement(
                                                                     requirement.id,
-                                                                    description
+                                                                    requirementItem
                                                                 )
                                                             }
                                                         >
@@ -338,12 +338,12 @@ const PositionRequirementCard = ({
 
                                                         <ActionButton
                                                             actionType="delete"
-                                                            tooltip="Eliminar descripción"
+                                                            tooltip="Eliminar requisito"
                                                             iconOnlyOnMobile
                                                             onClick={() =>
-                                                                onDeleteDescription(
+                                                                onDeleteRequirement(
                                                                     requirement.id,
-                                                                    description
+                                                                    requirementItem
                                                                 )
                                                             }
                                                         >
@@ -363,7 +363,7 @@ const PositionRequirementCard = ({
                                                 Última
                                                 actualización:{" "}
                                                 {formatDate(
-                                                    description.updatedAt
+                                                    requirementItem.updatedAt
                                                 )}
                                             </Typography>
                                         </Stack>

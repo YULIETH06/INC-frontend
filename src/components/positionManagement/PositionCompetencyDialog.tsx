@@ -234,7 +234,7 @@ const PositionCompetencyDialog = ({
                             fullWidth
                             required
                             disabled={loadingSubmit}
-                            placeholder="Escribe la competencia."
+                            placeholder="Escribe la competencia aquí..."
                             multiline
                             minRows={3}
                             maxRows={6}

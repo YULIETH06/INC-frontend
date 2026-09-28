@@ -6,8 +6,8 @@ import type {
     PositionProfileRevisionDetailResponse,
     PositionProfileRevisionResponse,
     PositionProfileRevisionsResponse,
-    PositionRequirementDescriptionData,
-    PositionRequirementDescriptionResponse,
+    PositionRequirementData,
+    PositionRequirementResponse,
     UpdatePositionProfileRevisionData,
 } from "../../interfaces/positionManagement/positionProfileRevision.interface";
 
@@ -98,31 +98,32 @@ export const publishPositionProfileRevision = async (
     return response.data;
 };
 
-// Agrega una descripción a un requisito de una revisión.
-export const createPositionRequirementDescription = async (
+// Agrega un requisito a una revisión.
+export const createPositionRequirement = async (
     positionProfileId: number,
     revisionId: number,
     requirementId: number,
-    data: PositionRequirementDescriptionData
-): Promise<PositionRequirementDescriptionResponse> => {
+    data: PositionRequirementData
+): Promise<PositionRequirementResponse> => {
     const response =
-        await api.post<PositionRequirementDescriptionResponse>(
-            `/position-management/position-profiles/${positionProfileId}/revisions/${revisionId}/requirements/${requirementId}/descriptions`, data
+        await api.post<PositionRequirementResponse>(
+            `/position-management/position-profiles/${positionProfileId}/revisions/${revisionId}/requirements/${requirementId}/descriptions`,
+            data
         );
 
     return response.data;
 };
 
-// Actualiza una descripción de un requisito de una revisión.
-export const updatePositionRequirementDescription = async (
+// Actualiza un requisito de una revisión.
+export const updatePositionRequirement = async (
     positionProfileId: number,
     revisionId: number,
     requirementId: number,
     descriptionId: number,
-    data: PositionRequirementDescriptionData
-): Promise<PositionRequirementDescriptionResponse> => {
+    data: PositionRequirementData
+): Promise<PositionRequirementResponse> => {
     const response =
-        await api.patch<PositionRequirementDescriptionResponse>(
+        await api.patch<PositionRequirementResponse>(
             `/position-management/position-profiles/${positionProfileId}/revisions/${revisionId}/requirements/${requirementId}/descriptions/${descriptionId}`,
             data
         );
@@ -130,15 +131,15 @@ export const updatePositionRequirementDescription = async (
     return response.data;
 };
 
-// Elimina lógicamente una descripción de un requisito.
-export const deletePositionRequirementDescription = async (
+// Elimina lógicamente un requisito de una revisión.
+export const deletePositionRequirement = async (
     positionProfileId: number,
     revisionId: number,
     requirementId: number,
     descriptionId: number
-): Promise<PositionRequirementDescriptionResponse> => {
+): Promise<PositionRequirementResponse> => {
     const response =
-        await api.delete<PositionRequirementDescriptionResponse>(
+        await api.delete<PositionRequirementResponse>(
             `/position-management/position-profiles/${positionProfileId}/revisions/${revisionId}/requirements/${requirementId}/descriptions/${descriptionId}`
         );
 
@@ -162,17 +163,17 @@ export const createPositionCompetency = async (
     return response.data;
 };
 
-// Actualiza la descripción de una competencia de una revisión.
+// Actualiza una competencia de una revisión.
 export const updatePositionCompetency = async (
     positionProfileId: number,
     revisionId: number,
-    competencyDescriptionId: number,
+    competencyId: number,
     data: {
         competency: string;
     }
 ) => {
     const response = await api.patch(
-        `/position-management/position-profiles/${positionProfileId}/revisions/${revisionId}/competencies/${competencyDescriptionId}`,
+        `/position-management/position-profiles/${positionProfileId}/revisions/${revisionId}/competencies/${competencyId}`,
         data
     );
 
@@ -183,10 +184,10 @@ export const updatePositionCompetency = async (
 export const deletePositionCompetency = async (
     positionProfileId: number,
     revisionId: number,
-    competencyDescriptionId: number
+    competencyId: number
 ) => {
     const response = await api.delete(
-        `/position-management/position-profiles/${positionProfileId}/revisions/${revisionId}/competencies/${competencyDescriptionId}`
+        `/position-management/position-profiles/${positionProfileId}/revisions/${revisionId}/competencies/${competencyId}`
     );
 
     return response.data;

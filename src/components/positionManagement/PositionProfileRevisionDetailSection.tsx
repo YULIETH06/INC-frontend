@@ -18,7 +18,7 @@ import SectionCard from "../common/SectionCard";
 
 import PositionProfileRevisionDialog from "./PositionProfileRevisionDialog";
 import PositionRequirementCard from "./PositionRequirementCard";
-import PositionRequirementDescriptionDialog from "./PositionRequirementDescriptionDialog";
+import PositionRequirementDialog from "./PositionRequirementDialog";
 
 import { usePositionProfileRevisions } from "../../hooks/positionManagemen/usePositionProfileRevisions";
 
@@ -78,25 +78,24 @@ const PositionProfileRevisionDetailSection = ({
         revisionToPublish,
 
         selectedRequirementId,
-        editingDescription,
-        descriptionToDelete,
+        requirementToDelete,
 
         revisionForm,
         revisionFormErrors,
 
-        descriptionForm,
-        descriptionFormErrors,
+        requirementForm,
+        requirementFormErrors,
 
         openRevisionDialog,
         openPublishRevisionDialog,
-        openDescriptionDialog,
-        openDeleteDescriptionDialog,
+        openRequirementDialog,
+        openDeleteRequirementDialog,
 
         loadingRevisionDetail,
         loadingRevisionSubmit,
         loadingPublish,
-        loadingDescriptionSubmit,
-        loadingDescriptionDelete,
+        loadingRequirementSubmit,
+        loadingRequirementDelete,
 
         detailError,
 
@@ -105,14 +104,14 @@ const PositionProfileRevisionDetailSection = ({
         messageSeverity,
 
         isEditingRevision,
-        isEditingDescription,
+        isEditingRequirement,
         hasRevisionFormChanges,
-        hasDescriptionFormChanges,
+        hasRequirementFormChanges,
 
         loadRevisionDetail,
 
         handleChangeObservation,
-        handleDescriptionChange,
+        handleRequirementChange,
 
         openEditRevisionDialog,
         closeRevisionDialog,
@@ -122,14 +121,14 @@ const PositionProfileRevisionDetailSection = ({
         closePublishRevisionConfirmation,
         handlePublishRevision,
 
-        openCreateDescriptionDialog,
-        openEditDescriptionDialog,
-        closeDescriptionDialog,
-        handleSubmitDescription,
+        openCreateRequirementDialog,
+        openEditRequirementDialog,
+        closeRequirementDialog,
+        handleSubmitRequirement,
 
-        openDeleteDescriptionConfirmation,
-        closeDeleteDescriptionConfirmation,
-        handleDeleteDescription,
+        openDeleteRequirementConfirmation,
+        closeDeleteRequirementConfirmation,
+        handleDeleteRequirement,
 
         closeMessage,
     } = usePositionProfileRevisions({
@@ -158,7 +157,7 @@ const PositionProfileRevisionDetailSection = ({
                 selectedRequirementId
         )?.name ?? "";
 
-    // Identifica los requisitos sin descripciones.
+    // Identifica los tipos de requisito que aún no tienen requisitos registrados.
     const incompleteRequirements =
         selectedRevisionDetail?.requirements.filter(
             (requirement) =>
@@ -328,7 +327,7 @@ const PositionProfileRevisionDetailSection = ({
                                             actionType="save"
                                             tooltip={
                                                 hasIncompleteRequirements
-                                                    ? "Todos los requisitos deben tener al menos una descripción"
+                                                    ? "Todos los tipos de requisito deben tener al menos un requisito registrado para poder publicar la revisión."
                                                     : "Publicar revisión"
                                             }
                                             fullWidthOnMobile
@@ -407,10 +406,7 @@ const PositionProfileRevisionDetailSection = ({
                             {selectedRevisionIsDraft &&
                                 hasIncompleteRequirements && (
                                     <Alert severity="warning">
-                                        Para publicar esta
-                                        revisión debes registrar
-                                        al menos una descripción
-                                        en:{" "}
+                                        Para publicar esta revisión debes registrar al menos un requisito en:{" "}
                                         <Box
                                             component="span"
                                             sx={{
@@ -432,7 +428,7 @@ const PositionProfileRevisionDetailSection = ({
 
                             <Divider />
 
-                            {/* Requisitos y descripciones. */}
+                            {/* Requisitos del perfil de cargo. */}
                             <Box
                                 sx={{
                                     display: "grid",
@@ -453,14 +449,14 @@ const PositionProfileRevisionDetailSection = ({
                                             canManage={
                                                 canManageRevision
                                             }
-                                            onCreateDescription={
-                                                openCreateDescriptionDialog
+                                            onCreateRequirement={
+                                                openCreateRequirementDialog
                                             }
-                                            onEditDescription={
-                                                openEditDescriptionDialog
+                                            onEditRequirement={
+                                                openEditRequirementDialog
                                             }
-                                            onDeleteDescription={
-                                                openDeleteDescriptionConfirmation
+                                            onDeleteRequirement={
+                                                openDeleteRequirementConfirmation
                                             }
                                         />
                                     )
@@ -490,33 +486,33 @@ const PositionProfileRevisionDetailSection = ({
                 onClose={closeRevisionDialog}
             />
 
-            {/* Formulario para crear o editar una descripción. */}
-            <PositionRequirementDescriptionDialog
-                open={openDescriptionDialog}
+            {/* Formulario para crear o editar un requisito. */}
+            <PositionRequirementDialog
+                open={openRequirementDialog}
                 requirementName={
                     selectedRequirementName
                 }
-                form={descriptionForm}
+                form={requirementForm}
                 formErrors={
-                    descriptionFormErrors
+                    requirementFormErrors
                 }
                 isEditing={
-                    isEditingDescription
+                    isEditingRequirement
                 }
                 hasFormChanges={
-                    hasDescriptionFormChanges
+                    hasRequirementFormChanges
                 }
                 loadingSubmit={
-                    loadingDescriptionSubmit
+                    loadingRequirementSubmit
                 }
-                onDescriptionChange={
-                    handleDescriptionChange
+                onRequirementChange={
+                    handleRequirementChange
                 }
                 onSubmit={
-                    handleSubmitDescription
+                    handleSubmitRequirement
                 }
                 onClose={
-                    closeDescriptionDialog
+                    closeRequirementDialog
                 }
             />
 
@@ -564,21 +560,21 @@ const PositionProfileRevisionDetailSection = ({
                 }
             />
 
-            {/* Confirmación para eliminar una descripción. */}
+            {/* Confirmación para eliminar un requisito. */}
             <ConfirmActionDialog
                 open={
-                    openDeleteDescriptionDialog
+                    openDeleteRequirementDialog
                 }
-                title="Eliminar descripción"
-                message="Se eliminará la descripción seleccionada del requisito. Esta acción no se puede deshacer."
+                title="Eliminar requisito"
+                message="Se eliminará el requisito seleccionado. Esta acción no se puede deshacer."
                 actionType="delete"
                 confirmText="Eliminar"
                 loading={
-                    loadingDescriptionDelete
+                    loadingRequirementDelete
                 }
                 loadingText="Eliminando..."
                 infoContent={
-                    descriptionToDelete ? (
+                    requirementToDelete ? (
                         <Typography
                             variant="body2"
                             sx={{
@@ -589,18 +585,18 @@ const PositionProfileRevisionDetailSection = ({
                             }}
                         >
                             {
-                                descriptionToDelete
-                                    .description
+                                requirementToDelete
+                                    .requirement
                                     .description
                             }
                         </Typography>
                     ) : undefined
                 }
                 onClose={
-                    closeDeleteDescriptionConfirmation
+                    closeDeleteRequirementConfirmation
                 }
                 onConfirm={
-                    handleDeleteDescription
+                    handleDeleteRequirement
                 }
             />
 

@@ -20,23 +20,23 @@ import TextAreaInput from "../common/inputs/TextAreaInput";
 import { appIcons } from "../../icons/appIcons";
 
 import type {
-    PositionRequirementDescriptionForm,
-    PositionRequirementDescriptionFormErrors,
+    PositionRequirementForm,
+    PositionRequirementFormErrors,
 } from "../../interfaces/positionManagement/positionProfileRevision.interface";
 
-interface PositionRequirementDescriptionDialogProps {
+interface PositionRequirementDialogProps {
     open: boolean;
 
     requirementName: string;
 
-    form: PositionRequirementDescriptionForm;
-    formErrors: PositionRequirementDescriptionFormErrors;
+    form: PositionRequirementForm;
+    formErrors: PositionRequirementFormErrors;
 
     isEditing: boolean;
     hasFormChanges: boolean;
     loadingSubmit: boolean;
 
-    onDescriptionChange: (value: string) => void;
+    onRequirementChange: (value: string) => void;
 
     onSubmit: (
         event: FormEvent<HTMLFormElement>
@@ -45,8 +45,8 @@ interface PositionRequirementDescriptionDialogProps {
     onClose: () => void;
 }
 
-// Diálogo para registrar o actualizar una descripción de requisito.
-const PositionRequirementDescriptionDialog = ({
+// Diálogo para registrar o actualizar un requisito.
+const PositionRequirementDialog = ({
     open,
     requirementName,
     form,
@@ -54,10 +54,10 @@ const PositionRequirementDescriptionDialog = ({
     isEditing,
     hasFormChanges,
     loadingSubmit,
-    onDescriptionChange,
+    onRequirementChange,
     onSubmit,
     onClose,
-}: PositionRequirementDescriptionDialogProps) => {
+}: PositionRequirementDialogProps) => {
     const SaveIcon = appIcons.save;
     const CreateIcon = appIcons.create;
 
@@ -112,8 +112,8 @@ const PositionRequirementDescriptionDialog = ({
                                 }}
                             >
                                 {isEditing
-                                    ? "Actualizar descripción"
-                                    : "Agregar descripción"}
+                                    ? "Actualizar requisito"
+                                    : "Agregar requisito"}
                             </Typography>
 
                             <Typography
@@ -123,8 +123,8 @@ const PositionRequirementDescriptionDialog = ({
                                 }}
                             >
                                 {isEditing
-                                    ? "Modifica la descripción registrada para este requisito."
-                                    : "Registra una nueva descripción para este requisito."}
+                                    ? "Modifica el requisito registrado."
+                                    : "Registra un nuevo requisito."}
                             </Typography>
                         </Box>
                     </Stack>
@@ -178,13 +178,13 @@ const PositionRequirementDescriptionDialog = ({
                         </Box>
 
                         <TextAreaInput
-                            label="Descripción"
+                            label="Requisito"
                             value={form.description}
-                            onChange={onDescriptionChange}
+                            onChange={onRequirementChange}
                             rows={4}
                             required
                             disabled={loadingSubmit}
-                            placeholder="Escribe la formación, experiencia o conocimiento requerido."
+                            placeholder="Escribe el requisito aquí..."
                             error={Boolean(
                                 formErrors.description
                             )}
@@ -244,4 +244,4 @@ const PositionRequirementDescriptionDialog = ({
     );
 };
 
-export default PositionRequirementDescriptionDialog;
+export default PositionRequirementDialog;

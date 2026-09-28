@@ -5,8 +5,8 @@ const changeObservationSchema = Yup.string()
     .trim()
     .max(500, "Máximo 500 caracteres.");
 
-// Validación común para la descripción de un requisito.
-const requirementDescriptionSchema = Yup.string()
+// Validación común para el valor de un requisito.
+const requirementValueSchema = Yup.string()
     .trim()
     .required("Campo obligatorio.")
     .max(500, "Máximo 500 caracteres.");
@@ -24,14 +24,14 @@ export const updatePositionProfileRevisionSchema =
             changeObservationSchema.nullable(),
     });
 
-// Validación para registrar una descripción de requisito.
-export const createPositionRequirementDescriptionSchema =
+// Validación para registrar un requisito.
+export const createPositionRequirementSchema =
     Yup.object({
-        description: requirementDescriptionSchema,
+        description: requirementValueSchema,
     });
 
-// Validación para actualizar una descripción de requisito.
-export const updatePositionRequirementDescriptionSchema =
+// Validación para actualizar un requisito.
+export const updatePositionRequirementSchema =
     Yup.object({
-        description: requirementDescriptionSchema,
+        description: requirementValueSchema,
     });
