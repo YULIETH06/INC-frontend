@@ -403,23 +403,29 @@ Estos componentes se mantienen dentro de `components/positionManagement/` porque
 
 En esta carpeta se ubican los componentes visuales específicos del módulo de Talento Humano.
 
-Estos componentes dependen directamente de las requisiciones de personal, sus aprobaciones, la confirmación de contratación, el cargue de candidatos y la generación del formato imprimible.
+Estos componentes dependen directamente de los procesos de requisiciones de personal, aprobaciones, confirmación de contratación, cargue de candidatos, validación de candidatos y generación del formato imprimible.
 
-YULIETH
+##### `src/components/humanTalent/candidateSubmission/`
 
-| Componente                                  | Descripción                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | Uso dentro del proyecto                                                                                                                  |
-| ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `PersonnelApprovalCard.tsx`                 | Componente encargado de mostrar una aprobación de requisición o confirmación de contratación. Presenta la firma registrada, el nombre del cargo aprobador, la fecha de decisión y un estado pendiente cuando todavía no existe una firma.                                                                                                                                                                                                                                                                                                                                                                                                            | Se utiliza en la página de detalle de requisición para mostrar las aprobaciones del flujo inicial y los vistos buenos de Talento Humano. |
-| `PersonnelHiringConfirmationDialog.tsx`     | Componente encargado de mostrar el formulario de confirmación final de contratación. Permite completar los datos definitivos como tipo de contratación, tipo de contrato, duración, tipo de practicante y salario aprobado.                                                                                                                                                                                                                                                                                                                                                                                                                          | Se utiliza cuando Talento Humano debe registrar la información final de contratación de una requisición previamente aprobada.            |
-| `PersonnelCandidateSubmissionBatchesDialog.tsx` | Diálogo encargado de mostrar las fotografías históricas generadas en cada cierre del cargue de candidatos. Presenta cada cierre como `Cargue 1`, `Cargue 2`, etc. mediante `CustomAccordion`, mostrando fecha de cierre, usuario responsable y la lista exacta de candidatos existentes al momento del cierre. | Se abre desde `PersonnelRequisitionCandidatesSection.tsx` mediante **Ver historial de cargues** y permite consultar snapshots inmutables aunque posteriormente el cargue sea reabierto y cambie la lista actual de candidatos. |
-| `PersonnelCandidateSubmissionHistorySection.tsx` | Sección visual encargada de mostrar los movimientos posteriores a la presentación inicial del cargue. Presenta las acciones `REAPERTURA` y `CIERRE`, la fecha, el usuario responsable y el motivo cuando existe. No renderiza contenido mientras se está cargando o cuando no hay movimientos registrados. | Se utiliza desde `PersonnelRequisitionCandidatesSection.tsx` para mostrar la trazabilidad operativa posterior al primer cierre. |
-| `PersonnelRequisitionCandidateCard.tsx`     | Componente encargado de mostrar la información de un candidato registrado. Presenta nombre, identificación, fecha, observación, hoja de vida, tamaño del archivo y usuario que realizó el cargue. También muestra el estado temporal **Elegido** antes de confirmar una preselección y el estado permanente **Preseleccionado**, incluyendo usuario y fecha de preselección. Mantiene las acciones de editar y eliminar durante un cargue abierto cuando el usuario tiene permiso, y muestra **Seleccionar** o **Quitar** al creador de la requisición durante la etapa de preselección. | Se utiliza dentro de la sección de candidatos en el detalle de una requisición. |
-| `PersonnelRequisitionCandidateDialog.tsx`   | Diálogo utilizado para registrar o actualizar candidatos. Permite seleccionar el tipo de identificación, diligenciar el número de identificación, nombre, observación opcional y seleccionar o reemplazar la hoja de vida. Muestra errores de validación, archivo actual o seleccionado y estados de carga. | Se utiliza desde la sección de candidatos cuando el cargue se encuentra abierto y el usuario tiene permiso para gestionarlo. |
-| `PersonnelRequisitionCandidatesSection.tsx` | Componente coordinador del proceso de candidatos de una requisición. Consulta y presenta candidatos, administra el estado visual del cargue y coordina permisos, cierre, reapertura, selección temporal, confirmación de preselección y acceso al historial de cargues. Reutiliza `PersonnelRequisitionCandidateCard`, `PersonnelRequisitionCandidateDialog`, `PersonnelCandidateSubmissionHistorySection`, `PersonnelCandidateSubmissionBatchesDialog`, `ConfirmActionDialog`, `ActionButton`, `IconActionButton` y otros componentes comunes. | Se integra en `PersonnelRequisitionDetail.tsx` cuando el proceso de candidatos ya fue iniciado y actúa como coordinador visual del cargue, la preselección y la trazabilidad. |
-| `PersonnelRequisitionListItem.tsx`          | Componente encargado de mostrar una requisición en formato de tarjeta o elemento de lista. Presenta cargo, estado, área, ciudad, salario, tipo de contratación, fecha, solicitante, responsable actual y acciones disponibles según los permisos del usuario.                                                                                                                                                                                                                                                                                                                                                                                        | Se utiliza en el listado general de requisiciones para consultar, aprobar, rechazar, confirmar contratación o ingresar al detalle.       |
-| `PersonnelRequisitionStatusBadge.tsx`       | Componente encargado de mostrar el estado general de una requisición mediante un `CustomChip`. Cuando el estado es rechazado o cancelado y existe un comentario, muestra también un `InfoTooltip` con el motivo correspondiente.                                                                                                                                                                                                                                                                                                                                                                                                                     | Se utiliza junto al título de la página de detalle para identificar rápidamente el estado general de la requisición.                     |
+Esta subcarpeta contiene los componentes relacionados con el proceso de cargue, presentación y trazabilidad de candidatos asociados a una requisición de personal.
 
----
+```txt
+components/humanTalent/candidateSubmission/
+
+├── PersonnelCandidateSubmissionBatchesDialog.tsx
+├── PersonnelCandidateSubmissionHistorySection.tsx
+├── PersonnelRequisitionCandidateCard.tsx
+├── PersonnelRequisitionCandidateDialog.tsx
+└── PersonnelRequisitionCandidatesSection.tsx
+```
+
+| Componente | Descripción | Uso dentro del proyecto |
+| ---------- | ----------- | ----------------------- |
+| `PersonnelCandidateSubmissionBatchesDialog.tsx` | Diálogo encargado de mostrar los históricos generados durante los cierres del cargue de candidatos. Presenta cada cierre como un registro independiente con la fecha, usuario responsable y candidatos existentes en ese momento. | Se abre desde `PersonnelRequisitionCandidatesSection.tsx` mediante la opción de historial de cargues y permite consultar los registros históricos del proceso. |
+| `PersonnelCandidateSubmissionHistorySection.tsx` | Sección visual encargada de mostrar la trazabilidad posterior al cargue inicial de candidatos. Presenta movimientos como reaperturas y cierres, incluyendo fecha, usuario responsable y motivo cuando existe. | Se utiliza desde `PersonnelRequisitionCandidatesSection.tsx` para mostrar la evolución del proceso de cargue. |
+| `PersonnelRequisitionCandidateCard.tsx` | Componente encargado de representar la información de un candidato asociado a una requisición. Muestra datos personales, observaciones, hoja de vida, estados de selección y acciones disponibles según permisos y estado del proceso. | Se utiliza dentro de la sección de candidatos de una requisición. |
+| `PersonnelRequisitionCandidateDialog.tsx` | Diálogo utilizado para crear o actualizar candidatos asociados a una requisición. Permite diligenciar información personal, observaciones y gestionar el archivo de hoja de vida. | Se utiliza desde `PersonnelRequisitionCandidatesSection.tsx` cuando el cargue de candidatos se encuentra habilitado. |
+| `PersonnelRequisitionCandidatesSection.tsx` | Componente coordinador del proceso de candidatos de una requisición. Administra consulta de candidatos, permisos, cierre, reapertura, selección, confirmación de preselección y acceso al historial de cargues. | Se integra en `PersonnelRequisitionDetail.tsx` cuando el proceso de candidatos está activo. |
 
 ##### `src/components/humanTalent/candidateValidation/`
 
@@ -444,8 +450,6 @@ components/humanTalent/candidateValidation/
 | `CandidateTechnicalEvaluationStep.tsx` | Representa la **Fase 4: Evaluación Técnica**. Permite al Analista de Talento Humano registrar las calificaciones de entrevista y examen de forma independiente y adjuntar la evidencia del examen técnico en formato PDF. Cuando ambas calificaciones están registradas, la evaluación queda pendiente de aprobación. El usuario que creó la requisición puede revisar las calificaciones y confirmar si el postulante es apto o no para continuar. | Se renderiza después de completar la Fase 3 cuando el postulante fue considerado apto para continuar. |
 | `PersonnelCandidateValidationSection.tsx` | Componente coordinador del proceso de validación de cargo y postulante. Consulta la información del candidato, muestra el `ProcessStepper`, presenta la información general del cargo y del postulante, controla la etapa activa y delega las Fases 1, 2, 3 y 4 a sus componentes correspondientes. También controla la navegación entre etapas y presenta estados de carga, errores y mensajes del proceso. | Se utiliza en la página `PersonnelCandidateValidationDetail.tsx`. |
 
----
-
 ##### `src/components/humanTalent/requisitionFormat/`
 
 Esta subcarpeta contiene los componentes específicos utilizados para construir el formato imprimible de una requisición.
@@ -468,6 +472,26 @@ components/humanTalent/requisitionFormat/
 | `FormatSectionTitle.tsx`            | Componente encargado de mostrar los encabezados de cada sección del formato mediante bordes, fondo gris y texto en mayúsculas.                                                                                                                          | Se utiliza para separar visualmente información general, motivo, requerimientos, aprobaciones, confirmación y vistos buenos.                     |
 | `FormatSignatureBox.tsx`            | Componente encargado de mostrar el espacio de firma dentro del formato imprimible. Presenta la imagen de la firma, el cargo aprobador y la fecha de decisión; cuando no existe una firma, muestra el estado pendiente.                                  | Se utiliza en las aprobaciones de requisición y en los vistos buenos de Talento Humano.                                                          |
 | `PersonnelRequisitionWatermark.tsx` | Componente encargado de mostrar el estado general de la requisición como marca de agua dentro del formato. Utiliza un color según el estado y, cuando la requisición fue rechazada o cancelada, incluye también el comentario asociado con la decisión. | Se utiliza dentro de `PersonnelRequisitionFormat.tsx` para identificar visualmente el estado del documento tanto en pantalla como al imprimirlo. |
+
+##### src/components/humanTalent/requisitions/
+
+Esta subcarpeta contiene los componentes relacionados con la visualización y gestión general de las requisiciones de personal.
+
+```txt
+components/humanTalent/requisitions/
+
+├── PersonnelApprovalCard.tsx
+├── PersonnelHiringConfirmationDialog.tsx
+├── PersonnelRequisitionListItem.tsx
+└── PersonnelRequisitionStatusBadge.tsx
+```
+
+| Componente | Descripción | Uso dentro del proyecto |
+| ---------- | ----------- | ----------------------- |
+| `PersonnelApprovalCard.tsx` | Componente encargado de mostrar una aprobación de requisición o confirmación de contratación. Presenta firma registrada, cargo aprobador, fecha de decisión y estado pendiente cuando no existe una firma registrada. | Se utiliza en el detalle de requisición para mostrar aprobaciones del flujo y vistos buenos de Talento Humano. |
+| `PersonnelHiringConfirmationDialog.tsx` | Diálogo encargado de mostrar el formulario de confirmación final de contratación. Permite registrar la información definitiva del proceso de contratación. | Se utiliza cuando Talento Humano debe completar la información final de una requisición aprobada. |
+| `PersonnelRequisitionListItem.tsx` | Componente encargado de representar una requisición en formato de tarjeta o elemento de lista. Muestra información principal y acciones disponibles según permisos y estado del proceso. | Se utiliza en el listado general de requisiciones. |
+| `PersonnelRequisitionStatusBadge.tsx` | Componente encargado de mostrar el estado general de una requisición mediante etiquetas visuales. Puede mostrar información adicional cuando existen comentarios asociados al estado. | Se utiliza para identificar rápidamente el estado actual de una requisición. |
 
 Estos componentes se ubican en `components/humanTalent/` porque su estructura y comportamiento dependen directamente del flujo de requisiciones de personal y no corresponden a elementos generales del sistema.
 
