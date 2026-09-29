@@ -12,26 +12,32 @@ import PageContainer from "../../components/common/PageContainer";
 import PageHeader from "../../components/common/PageHeader";
 import ActionButton from "../../components/common/ActionButton";
 
-import PositionProfileRevisionCompetenciesSection from "../../components/positionManagement/PositionProfileRevisionCompetenciesSection";
+import PositionCompetenciesSection from "../../components/positionManagement/competencies/PositionCompetenciesSection";
 
-// Página para consultar y gestionar las competencias de una revisión.
+// Página para consultar y gestionar las competencias
+// de una revisión específica del perfil de cargo.
 const PositionProfileRevisionCompetencies = () => {
     const navigate = useNavigate();
 
     const [searchParams] = useSearchParams();
 
+    // Conserva el departamento para regresar
+    // al historial manteniendo el contexto actual.
     const departmentId =
         searchParams.get("departmentId") ?? "";
 
     const {
-        positionProfileId: positionProfileIdParam,
-        revisionId: revisionIdParam,
+        positionProfileId:
+        positionProfileIdParam,
+        revisionId:
+        revisionIdParam,
     } = useParams<{
         positionProfileId: string;
         revisionId: string;
     }>();
 
-    // Convierte los identificadores recibidos en la URL.
+    // Convierte los parámetros recibidos
+    // desde la URL a números.
     const positionProfileId = Number(
         positionProfileIdParam
     );
@@ -40,13 +46,14 @@ const PositionProfileRevisionCompetencies = () => {
         revisionIdParam
     );
 
-    // Valida los identificadores antes de consultar.
+    // Valida ambos identificadores.
     const validIdentifiers =
         Number.isInteger(positionProfileId) &&
         positionProfileId > 0 &&
         Number.isInteger(revisionId) &&
         revisionId > 0;
 
+    // Regresa al historial de revisiones.
     const handleGoBack = () => {
         const nextSearchParams =
             new URLSearchParams();
@@ -94,11 +101,11 @@ const PositionProfileRevisionCompetencies = () => {
 
             {!validIdentifiers ? (
                 <Alert severity="error">
-                    La dirección de las competencias no
-                    contiene identificadores válidos.
+                    La dirección de las competencias
+                    no contiene identificadores válidos.
                 </Alert>
             ) : (
-                <PositionProfileRevisionCompetenciesSection
+                <PositionCompetenciesSection
                     positionProfileId={
                         positionProfileId
                     }

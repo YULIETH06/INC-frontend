@@ -8,15 +8,16 @@ import {
     Typography,
 } from "@mui/material";
 
-import ActionButton from "../common/ActionButton";
-import CustomChip from "../common/CustomChip";
-import InfoItem from "../common/InfoItem";
+import ActionButton from "../../common/ActionButton";
+import CustomChip from "../../common/CustomChip";
+import InfoItem from "../../common/InfoItem";
 
-import { formatDate } from "../../utils/common/dateUtils";
+import { formatDate } from "../../../utils/common/dateUtils";
 
 import type {
     PositionProfileRevision,
-} from "../../interfaces/positionManagement/positionProfileRevision.interface";
+} from "../../../interfaces/positionManagement/positionProfileRevision.interface";
+import { revisionStatusConfig } from "../../../utils/positionManagement/revisionStatus";
 
 interface PositionProfileRevisionCardProps {
     revision: PositionProfileRevision;
@@ -53,28 +54,11 @@ const PositionProfileRevisionCard = ({
     onPublish,
     onDelete,
 }: PositionProfileRevisionCardProps) => {
-    // Solo las revisiones en borrador pueden modificarse.
     const isDraft =
         revision.status === "BORRADOR";
 
-    // Configuración visual según el estado de la revisión.
-    const statusConfig = {
-        BORRADOR: {
-            label: "Borrador",
-            color: "warning" as const,
-        },
-        VIGENTE: {
-            label: "Vigente",
-            color: "success" as const,
-        },
-        OBSOLETA: {
-            label: "Obsoleta",
-            color: "default" as const,
-        },
-    };
-
     const currentStatus =
-        statusConfig[revision.status];
+        revisionStatusConfig[revision.status];
 
     return (
         <Card
@@ -190,7 +174,7 @@ const PositionProfileRevisionCard = ({
                         />
                     </Box>
 
-                    {/* Observación o descripción general del cambio. */}
+                    {/* Observación del cambio. */}
                     <InfoItem
                         label="Observación del cambio"
                         value={
@@ -238,7 +222,7 @@ const PositionProfileRevisionCard = ({
                         }}
                     />
 
-                    {/* Acciones disponibles para la revisión. */}
+                    {/* Acciones de navegación y gestión de la revisión. */}
                     <Box
                         sx={{
                             display: "flex",
@@ -251,6 +235,7 @@ const PositionProfileRevisionCard = ({
                             gap: 1,
                         }}
                     >
+                        {/* Navegación hacia las gestiones específicas. */}
                         <Stack
                             direction={{
                                 xs: "column",
@@ -260,7 +245,7 @@ const PositionProfileRevisionCard = ({
                         >
                             <ActionButton
                                 actionType="open"
-                                tooltip="Ver requisitos de la revisión"
+                                tooltip="Gestionar requisitos de la revisión"
                                 fullWidthOnMobile
                                 onClick={() =>
                                     onViewRequirements(
@@ -273,7 +258,7 @@ const PositionProfileRevisionCard = ({
 
                             <ActionButton
                                 actionType="open"
-                                tooltip="Ver competencias de la revisión"
+                                tooltip="Gestionar competencias de la revisión"
                                 fullWidthOnMobile
                                 onClick={() =>
                                     onViewCompetencies(
@@ -285,6 +270,7 @@ const PositionProfileRevisionCard = ({
                             </ActionButton>
                         </Stack>
 
+                        {/* Acciones propias de una revisión en borrador. */}
                         {isDraft && (
                             <Stack
                                 direction={{

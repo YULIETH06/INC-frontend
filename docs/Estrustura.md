@@ -185,19 +185,31 @@ components/
 │       ├── PersonnelRequisitionListItem.tsx
 │       └── PersonnelRequisitionStatusBadge.tsx
 │
-├── positionManagement/
-│   ├── PositionProfileRevisionCard.tsx
-│   ├── PositionProfileRevisionDetailSection.tsx
-│   ├── PositionProfileRevisionDialog.tsx
-│   ├── PositionProfileRevisionsSection.tsx
-│   ├── PositionRequirementCard.tsx
-│   └── PositionRequirementDescriptionDialog.tsx
-│
 ├── layouts/
 │   ├── DashboardLayout.tsx
 │   ├── Header.tsx
 │   └── SidebarMenu.tsx
 │
+├── positionManagement/
+│   │
+│   ├── competencies/
+│   │   ├── PositionCompetenciesSection.tsx
+│   │   └── PositionCompetencyDialog.tsx
+│   │
+│   ├── requirements/
+│   │   ├── PositionRequirementDialog.tsx
+│   │   └── PositionRequirementsSection.tsx
+│   │
+│   ├── revision/
+│   │   ├── PositionProfileRevisionCard.tsx
+│   │   ├── PositionProfileRevisionDialog.tsx
+│   │   └── PositionProfileRevisionsSection.tsx
+│   │
+│   └── shared/
+│       ├── PositionRevisionEntryCard.tsx
+│       ├── PositionRevisionEntryDialog.tsx
+│       └── PositionRevisionEntrySection.tsx
+|
 ├── pqrs/
 │   ├── PqrAttachmentPreviewDialog.tsx
 │   ├── PqrChatView.tsx
@@ -305,6 +317,86 @@ components/layouts/
 | `SidebarMenu.tsx` | Representa el menú lateral de navegación y muestra las opciones disponibles de acuerdo con los módulos y permisos del usuario. | Se utiliza dentro del layout principal para navegar entre las diferentes secciones del sistema. |
 
 Estos componentes se mantienen en `components/layouts/` porque forman parte de la estructura y navegación global de las vistas protegidas, y no corresponden a componentes comunes independientes.
+
+---
+
+#### `src/components/positionManagement/`
+
+En esta carpeta se ubican los componentes visuales específicos del módulo de gestión de perfiles de cargo, revisiones, requisitos y competencias.
+
+Estos componentes permiten administrar la información asociada a los perfiles de cargo manteniendo separada la lógica visual de cada proceso.
+
+##### `src/components/positionManagement/competencies/`
+
+Esta subcarpeta contiene los componentes específicos para la gestión de competencias asociadas a una revisión del perfil de cargo.
+
+```txt
+components/positionManagement/competencies/
+
+├── PositionCompetenciesSection.tsx
+└── PositionCompetencyDialog.tsx
+```
+
+| Componente | Descripción | Uso dentro del proyecto |
+| ---------- | ----------- | ----------------------- |
+| `PositionCompetenciesSection.tsx` | Componente encargado de mostrar y administrar las competencias asociadas a una revisión del perfil de cargo. Permite consultar, crear, actualizar y eliminar competencias según la configuración del perfil. | Se utiliza dentro de la vista de competencias de una revisión específica. |
+| `PositionCompetencyDialog.tsx` | Diálogo utilizado para registrar o actualizar competencias asociadas al perfil de cargo. Mantiene la misma estructura visual y comportamiento de los formularios de requisitos. | Se utiliza desde `PositionCompetenciesSection.tsx` para gestionar las competencias del perfil. |
+
+
+##### `src/components/positionManagement/requirements/`
+
+Esta subcarpeta contiene los componentes específicos para la gestión de requisitos asociados a una revisión del perfil de cargo.
+
+```txt
+components/positionManagement/requirements/
+
+├── PositionRequirementDialog.tsx
+└── PositionRequirementsSection.tsx
+```
+
+| Componente | Descripción | Uso dentro del proyecto |
+| ---------- | ----------- | ----------------------- |
+| `PositionRequirementDialog.tsx` | Diálogo utilizado para registrar o actualizar requisitos asociados al perfil de cargo. Permite diligenciar la información requerida y ejecutar las validaciones correspondientes antes de enviar los datos. | Se utiliza desde `PositionRequirementsSection.tsx` para gestionar los registros de requisitos. |
+| `PositionRequirementsSection.tsx` | Componente encargado de mostrar y administrar los requisitos asociados a una revisión del perfil de cargo. Permite consultar, crear, actualizar y eliminar requisitos según la configuración del perfil. | Se utiliza dentro de la vista de requisitos de una revisión específica. |
+
+##### `src/components/positionManagement/revision/`
+
+Esta subcarpeta contiene los componentes relacionados con la administración de revisiones del perfil de cargo.
+
+```txt
+components/positionManagement/revision/
+
+├── PositionProfileRevisionCard.tsx
+├── PositionProfileRevisionDialog.tsx
+└── PositionProfileRevisionsSection.tsx
+```
+
+| Componente | Descripción | Uso dentro del proyecto |
+| ---------- | ----------- | ----------------------- |
+| `PositionProfileRevisionCard.tsx` | Componente encargado de mostrar una revisión del perfil de cargo en formato de tarjeta. Presenta información general de la revisión, estado, fecha, observación y acciones disponibles según el estado del registro. | Se utiliza dentro del listado de revisiones para representar cada revisión asociada a un perfil de cargo. |
+| `PositionProfileRevisionDialog.tsx` | Diálogo utilizado para crear o actualizar una revisión del perfil de cargo. Permite registrar la observación del cambio y controlar los estados de carga, validación y envío del formulario. | Se utiliza desde la gestión de revisiones para crear nuevas revisiones o modificar información existente. |
+| `PositionProfileRevisionsSection.tsx` | Componente encargado de consultar y mostrar las revisiones asociadas a un perfil de cargo. Coordina la carga de información, acciones disponibles y presentación de estados vacíos o cargando. | Se integra en las vistas de administración del perfil de cargo para gestionar el historial de revisiones. |
+
+##### `src/components/positionManagement/shared/`
+
+Esta subcarpeta contiene componentes compartidos entre los procesos relacionados con revisiones del perfil de cargo.
+
+```txt
+components/positionManagement/shared/
+
+├── PositionRevisionEntryCard.tsx
+├── PositionRevisionEntryDialog.tsx
+└── PositionRevisionEntrySection.tsx
+```
+
+| Componente | Descripción | Uso dentro del proyecto |
+| ---------- | ----------- | ----------------------- |
+| `PositionRevisionEntryCard.tsx` | Componente compartido encargado de representar visualmente registros asociados a una revisión, permitiendo reutilizar la estructura de tarjetas entre requisitos y competencias. | Se utiliza como base visual para componentes que presentan información relacionada con una revisión. |
+| `PositionRevisionEntryDialog.tsx` | Diálogo compartido utilizado para formularios de registros asociados a una revisión. Centraliza la estructura del modal, acciones de crear/actualizar, estados de carga y comportamiento del formulario. | Es utilizado por los diálogos específicos de requisitos y competencias para mantener una estructura uniforme. |
+| `PositionRevisionEntrySection.tsx` | Componente compartido encargado de manejar la estructura común de secciones relacionadas con registros de una revisión. | Permite reutilizar comportamiento y estructura entre diferentes tipos de información asociados al perfil de cargo. |
+
+Estos componentes se mantienen dentro de `components/positionManagement/` porque su responsabilidad está directamente relacionada con la gestión de perfiles de cargo y sus revisiones, y no corresponden a componentes generales reutilizables del sistema.
+
 ---
 
 #### `src/components/humanTalent/`
@@ -312,6 +404,8 @@ Estos componentes se mantienen en `components/layouts/` porque forman parte de l
 En esta carpeta se ubican los componentes visuales específicos del módulo de Talento Humano.
 
 Estos componentes dependen directamente de las requisiciones de personal, sus aprobaciones, la confirmación de contratación, el cargue de candidatos y la generación del formato imprimible.
+
+YULIETH
 
 | Componente                                  | Descripción                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | Uso dentro del proyecto                                                                                                                  |
 | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
@@ -325,68 +419,7 @@ Estos componentes dependen directamente de las requisiciones de personal, sus ap
 | `PersonnelRequisitionListItem.tsx`          | Componente encargado de mostrar una requisición en formato de tarjeta o elemento de lista. Presenta cargo, estado, área, ciudad, salario, tipo de contratación, fecha, solicitante, responsable actual y acciones disponibles según los permisos del usuario.                                                                                                                                                                                                                                                                                                                                                                                        | Se utiliza en el listado general de requisiciones para consultar, aprobar, rechazar, confirmar contratación o ingresar al detalle.       |
 | `PersonnelRequisitionStatusBadge.tsx`       | Componente encargado de mostrar el estado general de una requisición mediante un `CustomChip`. Cuando el estado es rechazado o cancelado y existe un comentario, muestra también un `InfoTooltip` con el motivo correspondiente.                                                                                                                                                                                                                                                                                                                                                                                                                     | Se utiliza junto al título de la página de detalle para identificar rápidamente el estado general de la requisición.                     |
 
-**Comportamiento visual actual del cargue y preselección de candidatos:**
-
-```txt
-Requisición APROBADA
-↓
-Cargue de candidatos ABIERTA
-├── Analista de Talento Humano
-│   ├── Registrar candidato
-│   ├── Editar candidato
-│   ├── Eliminar candidato
-│   └── Cerrar cargue
-↓
-Cargue CERRADA
-├── Se genera una fotografía histórica: Cargue N
-├── Analista → puede reabrir el cargue
-└── Creador de la requisición → puede realizar la preselección
-    ├── Seleccionar uno o varios candidatos
-    ├── Quitar una selección temporal
-    ├── Cancelar selección
-    └── Confirmar selección
-        ↓
-        Candidato queda marcado permanentemente como Preseleccionado
-```
-
-La selección temporal se representa mediante el estado **Elegido** y solo existe en el frontend hasta que el creador confirma. Una vez confirmada, la preselección es permanente y se muestran el usuario y la fecha correspondientes. Los candidatos preseleccionados no pueden ser desmarcados.
-
-El primer cierre permanece almacenado aunque el cargue sea reabierto. `PersonnelCandidateSubmissionHistorySection.tsx` representa únicamente los movimientos posteriores a la presentación inicial, mientras que `PersonnelCandidateSubmissionBatchesDialog.tsx` muestra las fotografías históricas completas generadas en cada cierre.
-
-Cada fotografía es independiente de la lista actual. Por ejemplo, si `Cargue 1` contenía Ana, Pedro y Luis, luego se reabre el cargue, se elimina a Luis y se agrega a Carlos, `Cargue 2` mostrará Ana, Pedro y Carlos, mientras `Cargue 1` permanecerá sin cambios.
-
-
-##### Reglas funcionales de preselección
-
-```txt
-Actor autorizado: creador de la requisición.
-Condición: requisición aprobada y cargue CERRADA.
-Selección: puede elegir uno o varios candidatos.
-Estado temporal: Elegido.
-Confirmación: la acción es definitiva y no puede deshacerse.
-Estado permanente: Preseleccionado.
-Datos visibles: usuario y fecha de preselección.
-Reapertura: los candidatos ya preseleccionados conservan su estado.
-Gestión durante reapertura: el backend impide editar o eliminar candidatos preseleccionados.
-Nueva ronda: al volver a cerrar el cargue, el creador puede preseleccionar otros candidatos no preseleccionados.
-```
-
-La preselección temporal se administra únicamente en el estado del frontend. El backend recibe la selección cuando el creador confirma la acción y registra de forma permanente `isPreselected`, `preselectedAt` y `preselectedById`.
-
-##### Diferencia entre historial de movimientos y fotografías históricas
-
-```txt
-Historial del cargue
-└── Registra eventos REAPERTURA y CIERRE posteriores al primer cierre.
-
-Historial de cargues
-└── Conserva una fotografía completa de los candidatos en cada cierre.
-```
-
-Son dos mecanismos diferentes y complementarios. El historial de movimientos explica qué ocurrió en el proceso, mientras que las fotografías permiten saber exactamente qué candidatos componían cada presentación cerrada.
-
 ---
-
 
 ##### `src/components/humanTalent/candidateValidation/`
 
@@ -419,6 +452,15 @@ Esta subcarpeta contiene los componentes específicos utilizados para construir 
 
 Se mantienen separados de los componentes normales del detalle porque utilizan dimensiones, tipografías y estilos optimizados para impresión.
 
+```txt
+components/humanTalent/requisitionFormat/
+├── FormatLine.tsx
+├── FormatOptionBox.tsx
+├── FormatSectionTitle.tsx
+├── FormatSignatureBox.tsx
+└── PersonnelRequisitionWatermark.tsx
+```
+
 | Componente                          | Descripción                                                                                                                                                                                                                                             | Uso dentro del proyecto                                                                                                                          |
 | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `FormatLine.tsx`                    | Componente reutilizable dentro del formato para mostrar una etiqueta y su valor sobre una línea inferior. Permite configurar el ancho reservado para la etiqueta.                                                                                       | Se utiliza para mostrar datos como fecha, área, cargo, ciudad, solicitante y salarios dentro del documento imprimible.                           |
@@ -428,26 +470,6 @@ Se mantienen separados de los componentes normales del detalle porque utilizan d
 | `PersonnelRequisitionWatermark.tsx` | Componente encargado de mostrar el estado general de la requisición como marca de agua dentro del formato. Utiliza un color según el estado y, cuando la requisición fue rechazada o cancelada, incluye también el comentario asociado con la decisión. | Se utiliza dentro de `PersonnelRequisitionFormat.tsx` para identificar visualmente el estado del documento tanto en pantalla como al imprimirlo. |
 
 Estos componentes se ubican en `components/humanTalent/` porque su estructura y comportamiento dependen directamente del flujo de requisiciones de personal y no corresponden a elementos generales del sistema.
-
----
-
-
-#### `src/components/positionManagement/`
-
-En esta carpeta se ubican los componentes visuales específicos del módulo de Gestión de Cargos.
-
-Estos componentes administran el historial de revisiones de los perfiles de cargo, los estados de cada revisión, los requisitos fijos y sus descripciones. No pertenecen al módulo de Talento Humano porque su responsabilidad es mantener y versionar la información propia de los cargos.
-
-| Componente                                 | Descripción                                                                                                                                                               | Uso dentro del proyecto                                                                 |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| `PositionProfileRevisionCard.tsx`          | Muestra la información general de una revisión, como número, fecha, estado, observación y acciones disponibles.                                                           | Se utiliza dentro del listado de revisiones de un perfil de cargo.                      |
-| `PositionProfileRevisionDetailSection.tsx` | Consulta y presenta el detalle de una revisión, sus requisitos y descripciones. También coordina las acciones de edición, publicación y eliminación de descripciones.     | Se utiliza en la página independiente del detalle de una revisión.                      |
-| `PositionProfileRevisionDialog.tsx`        | Diálogo utilizado para crear una nueva revisión en borrador o actualizar la observación de una revisión existente.                                                        | Se abre desde el listado o desde el detalle de revisiones.                              |
-| `PositionProfileRevisionsSection.tsx`      | Sección encargada de consultar, listar y gestionar las revisiones de un perfil de cargo. Controla la creación, edición, publicación, eliminación y navegación al detalle. | Se utiliza en `PositionProfileRevisions.tsx` después de seleccionar un perfil de cargo. |
-| `PositionRequirementCard.tsx`              | Muestra uno de los requisitos fijos del perfil de cargo y las descripciones registradas dentro de la revisión seleccionada.                                               | Se utiliza dentro del detalle de una revisión.                                          |
-| `PositionRequirementDescriptionDialog.tsx` | Diálogo utilizado para registrar o actualizar una descripción asociada con un requisito fijo.                                                                             | Se abre desde cada tarjeta de requisito cuando la revisión está en estado `BORRADOR`.   |
-
-Estos componentes deben importar sus tipos, hooks y servicios desde `positionManagement` y no desde `humanTalent`.
 
 ---
 
@@ -809,7 +831,7 @@ hooks/positionManagement/
 | Hook                                    | Descripción                                                                                                                                                                                                                                                                                  | Uso dentro del proyecto                                                                           |
 | --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
 | `usePositionProfileRevisionSelector.ts` | Maneja la selección del departamento y del perfil de cargo. Carga los departamentos disponibles, consulta los perfiles asociados con el departamento seleccionado y permite recuperar la selección almacenada en los parámetros de la URL.                                                   | Se utiliza en `PositionProfileRevisions.tsx`.                                                     |
-| `usePositionProfileRevisions.ts`        | Maneja la lógica completa de las revisiones de perfiles de cargo. Consulta el listado y el detalle, administra formularios, validaciones, diálogos, estados de carga y mensajes, y ejecuta las operaciones de crear, actualizar, eliminar, publicar y gestionar descripciones de requisitos. | Se utiliza en `PositionProfileRevisionsSection.tsx` y `PositionProfileRevisionDetailSection.tsx`. |
+| `usePositionProfileRevisions.ts` | Maneja la lógica principal de las revisiones de perfiles de cargo. Consulta el listado y detalle de revisiones, administra formularios, validaciones, diálogos, estados de carga y mensajes, y ejecuta las operaciones de crear, actualizar, eliminar y publicar revisiones. | Se utiliza en `PositionProfileRevisionsSection.tsx` y las páginas relacionadas con la gestión de revisiones del perfil de cargo. |
 
 La lógica de revisiones debe permanecer en `hooks/positionManagement/` y no en `hooks/humanTalent/`.
 
@@ -1051,10 +1073,10 @@ interfaces/positionManagement/
 └── positionProfileRevision.interface.ts
 ```
 
-| Archivo                                | Descripción                                                                                                                                                                                                                                                                                             | Uso dentro del proyecto                                                                                                                                            |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `positionProfile.interface.ts`         | Define los tipos básicos de perfiles de cargo y las respuestas utilizadas para consultar los perfiles activos asociados con un departamento.                                                                                                                                                            | Se utiliza en servicios, hooks y selectores del módulo de Gestión de Cargos, y puede ser importado por Talento Humano.                                             |
-| `positionProfileRevision.interface.ts` | Define los estados de revisión, datos generales, detalle, requisitos, descripciones, formularios, errores de validación y respuestas del backend relacionadas con revisiones de perfiles de cargo. También incluye la respuesta utilizada para consultar la revisión vigente de un perfil seleccionado. | Se utiliza en servicios, hooks, componentes y páginas de `positionManagement`, y en el formulario de creación de requisiciones para consultar la revisión vigente. |
+| Archivo | Descripción | Uso dentro del proyecto |
+| -------------------------------------- | ----------- | ----------------------- |
+| `positionProfile.interface.ts` | Define los tipos relacionados con los perfiles de cargo y las respuestas utilizadas para consultar los perfiles activos asociados con un departamento. | Se utiliza en servicios, hooks y componentes del módulo de Gestión de Cargos, además de procesos que requieren consultar información de perfiles de cargo. |
+| `positionProfileRevision.interface.ts` | Define los tipos relacionados con revisiones de perfiles de cargo, incluyendo estados de revisión, información general, detalle de revisiones, requisitos, competencias, formularios, errores de validación y respuestas provenientes del backend. También incluye las estructuras utilizadas para consultar la revisión vigente de un perfil seleccionado. | Se utiliza en servicios, hooks, componentes y páginas de `positionManagement`, incluyendo la gestión de revisiones, requisitos y competencias, además del formulario de creación de requisiciones cuando requiere consultar la revisión vigente. |
 
 ---
 
@@ -1134,7 +1156,8 @@ pages/
 │       └── PersonnelRequisitions.tsx
 │
 ├── positionManagement/
-│   ├── PositionProfileRevisionDetail.tsx
+│   ├── PositionProfileRevisionCompetencies.tsx
+│   ├── PositionProfileRevisionRequirements.tsx
 │   └── PositionProfileRevisions.tsx
 │
 ├── pqrs/
@@ -1234,14 +1257,18 @@ pages/humanTalent/
 
 ```txt
 pages/positionManagement/
-├── PositionProfileRevisionDetail.tsx
+├── PositionProfileRevisionCompetencies.tsx
+├── PositionProfileRevisionRequirements.tsx
 └── PositionProfileRevisions.tsx
 ```
 
-| Página                              | Descripción                                                                                                                                                                                                                                              |
-| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `PositionProfileRevisions.tsx`      | Muestra los selectores de departamento y perfil de cargo, conserva la selección mediante parámetros de la URL y renderiza el historial de revisiones del perfil seleccionado.                                                                            |
-| `PositionProfileRevisionDetail.tsx` | Muestra la vista independiente del detalle de una revisión. Obtiene los identificadores desde la ruta, permite regresar al historial conservando la selección anterior y utiliza `PositionProfileRevisionDetailSection.tsx` para gestionar el contenido. |
+| Página | Descripción |
+| ------ | ----------- |
+| `PositionProfileRevisions.tsx` | Página encargada de mostrar y administrar las revisiones asociadas a los perfiles de cargo. Permite consultar la información de las revisiones, crear nuevas versiones del perfil y acceder a las vistas específicas de requisitos y competencias relacionadas con una revisión seleccionada. Organiza la información utilizando los componentes correspondientes del módulo de gestión de cargos. |
+| `PositionProfileRevisionRequirements.tsx` | Página encargada de mostrar y gestionar los requisitos asociados a una revisión específica del perfil de cargo. Permite consultar los requisitos registrados, crear nuevos registros, actualizar información existente y administrar los datos relacionados mediante los componentes del módulo de requisitos. |
+| `PositionProfileRevisionCompetencies.tsx` | Página encargada de mostrar y gestionar las competencias asociadas a una revisión específica del perfil de cargo. Permite consultar las competencias registradas, crear nuevos registros, actualizar información existente y administrar los datos relacionados mediante los componentes del módulo de competencias. |
+
+Estas páginas se mantienen dentro de `pages/positionManagement/` porque representan vistas completas asociadas al flujo de gestión de perfiles de cargo. La lógica específica de presentación y administración se delega en componentes, hooks y servicios correspondientes, manteniendo separada la responsabilidad de cada capa.
 
 ---
 
@@ -1550,7 +1577,6 @@ preselectPersonnelRequisitionCandidates()
 
 ---
 
-
 #### Servicios del módulo de Gestión de Cargos
 
 ```txt
@@ -1562,7 +1588,7 @@ services/positionManagement/
 | Archivo                             | Descripción                                                                                                                                                                                       | Uso dentro del proyecto                                                                                   |
 | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
 | `positionProfileService.ts`         | Contiene las funciones HTTP utilizadas para consultar los perfiles de cargo activos desde el endpoint de Gestión de Cargos.                                                                       | Se utiliza en los selectores del módulo y también puede ser consumido por el formulario de requisiciones. |
-| `positionProfileRevisionService.ts` | Contiene todas las funciones HTTP relacionadas con revisiones, publicación, requisitos y descripciones de perfiles de cargo. También permite consultar la revisión vigente de un perfil de cargo. | Se utiliza desde `usePositionProfileRevisions.ts` y desde `useCreatePersonnelRequisition.ts`.             |
+| `positionProfileRevisionService.ts` | Contiene todas las funciones HTTP relacionadas con la gestión de revisiones de perfiles de cargo. Permite crear, consultar, actualizar, eliminar y publicar revisiones, además de administrar los requisitos y competencias asociados a una revisión. | Se utiliza desde los hooks y páginas relacionadas con la gestión de revisiones, requisitos y competencias del perfil de cargo. |
 
 ##### Funciones en `positionProfileService.ts`
 
@@ -1579,28 +1605,36 @@ getPositionProfiles()
 ```txt
 createPositionProfileRevision()
 getPositionProfileRevisions()
-getPositionProfileRevisionDetail()
 getCurrentPositionProfileRevision()
+getPositionProfileRevisionDetail()
 updatePositionProfileRevision()
 deletePositionProfileRevision()
 publishPositionProfileRevision()
-createPositionRequirementDescription()
-updatePositionRequirementDescription()
-deletePositionRequirementDescription()
+
+createPositionRequirement()
+updatePositionRequirement()
+deletePositionRequirement()
+
+createPositionCompetency()
+updatePositionCompetency()
+deletePositionCompetency()
 ```
 
-| Función                                                | Descripción                                                                                                                                                              |
-| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `createPositionProfileRevision()`                      | Crea una nueva revisión en estado `BORRADOR`.                                                                                                                            |
-| `getPositionProfileRevisions()`                        | Consulta el historial de revisiones de un perfil de cargo.                                                                                                               |
-| `getPositionProfileRevisionDetail()`                   | Consulta el detalle de una revisión, sus requisitos y descripciones.                                                                                                     |
-| `getCurrentPositionProfileRevision(positionProfileId)` | Consulta la revisión vigente asociada con un perfil de cargo. Cuando el perfil no tiene una revisión vigente, retorna `revision: null` junto con un mensaje informativo. |
-| `updatePositionProfileRevision()`                      | Actualiza la observación de una revisión en borrador.                                                                                                                    |
-| `deletePositionProfileRevision()`                      | Elimina lógicamente una revisión en borrador.                                                                                                                            |
-| `publishPositionProfileRevision()`                     | Publica una revisión y actualiza los estados de las versiones anteriores.                                                                                                |
-| `createPositionRequirementDescription()`               | Registra una descripción dentro de un requisito fijo.                                                                                                                    |
-| `updatePositionRequirementDescription()`               | Actualiza una descripción existente.                                                                                                                                     |
-| `deletePositionRequirementDescription()`               | Elimina lógicamente una descripción.                                                                                                                                     |
+| Función | Descripción |
+| -------- | ----------- |
+| `createPositionProfileRevision()` | Crea una nueva revisión del perfil de cargo en estado `BORRADOR`. |
+| `getPositionProfileRevisions()` | Consulta el historial de revisiones asociadas a un perfil de cargo. |
+| `getCurrentPositionProfileRevision(positionProfileId)` | Consulta la revisión vigente asociada a un perfil de cargo. Cuando no existe una revisión vigente, retorna la información correspondiente. |
+| `getPositionProfileRevisionDetail()` | Consulta el detalle completo de una revisión incluyendo requisitos, competencias y sus descripciones asociadas. |
+| `updatePositionProfileRevision()` | Actualiza la información editable de una revisión en estado `BORRADOR`. |
+| `deletePositionProfileRevision()` | Realiza la eliminación lógica de una revisión en estado `BORRADOR`. |
+| `publishPositionProfileRevision()` | Publica una revisión y la convierte en la revisión vigente del perfil de cargo. |
+| `createPositionRequirement()` | Agrega un requisito asociado a una revisión del perfil de cargo. |
+| `updatePositionRequirement()` | Actualiza la información de un requisito asociado a una revisión. |
+| `deletePositionRequirement()` | Elimina lógicamente un requisito asociado a una revisión. |
+| `createPositionCompetency()` | Agrega una competencia asociada a una revisión del perfil de cargo. |
+| `updatePositionCompetency()` | Actualiza la información de una competencia asociada a una revisión. |
+| `deletePositionCompetency()` | Elimina lógicamente una competencia asociada a una revisión. |
 
 ---
 
@@ -2109,6 +2143,33 @@ getRequisitionStatusComment()
 | `getRequisitionApprovalSlots(approvals)`   | Ordena las aprobaciones iniciales y las distribuye entre jefe de área, jefe de departamento y gerente general.                     |
 | `getHiringApprovalSlots(approvals)`        | Distribuye las aprobaciones de la confirmación de contratación entre el analista y el jefe de Talento Humano.                      |
 | `getRequisitionStatusComment(requisition)` | Obtiene el comentario más reciente relacionado con el rechazo o cancelación de una requisición y define cómo debe mostrarse.       |
+
+---
+
+#### Utilidades del módulo de Gestión de Cargos
+
+```txt
+utils/positionManagement/
+└── revisionStatus.ts
+```
+
+Los archivos ubicados en `utils/positionManagement/` contienen funciones y configuraciones auxiliares relacionadas con la presentación y manejo de información del módulo de gestión de cargos.
+
+| Archivo | Descripción | Uso dentro del proyecto |
+| -------- | ----------- | ----------------------- |
+| `revisionStatus.ts` | Contiene la configuración visual asociada a los estados de las revisiones de perfiles de cargo, incluyendo etiquetas y colores utilizados para representar cada estado dentro de la interfaz. | Se utiliza en componentes relacionados con revisiones, requisitos y competencias para mostrar de manera consistente el estado actual de una revisión. |
+
+---
+
+##### Configuración en `revisionStatus.ts`
+
+```txt
+revisionStatusConfig
+```
+
+| Configuración | Descripción |
+| ------------- | ----------- |
+| `revisionStatusConfig` | Define la relación entre el estado técnico de una revisión y su representación visual en la interfaz, incluyendo la etiqueta mostrada al usuario y el color asociado en los componentes visuales. |
 
 ---
 

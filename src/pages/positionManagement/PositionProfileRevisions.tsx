@@ -10,9 +10,8 @@ import FormGrid from "../../components/common/FormGrid";
 import FormSection from "../../components/common/FormSection";
 import SectionCard from "../../components/common/SectionCard";
 
-import PositionProfileRevisionsSection from "../../components/positionManagement/PositionProfileRevisionsSection";
-
 import { usePositionProfileRevisionSelector } from "../../hooks/positionManagemen/usePositionProfileRevisionSelector";
+import PositionProfileRevisionsSection from "../../components/positionManagement/revision/PositionProfileRevisionsSection";
 
 // Página para consultar y administrar las revisiones de perfiles de cargo.
 const PositionProfileRevisions = () => {
@@ -133,7 +132,7 @@ const PositionProfileRevisions = () => {
         <PageContainer>
             <PageHeader
                 title="Perfiles de cargo"
-                subtitle="Consulta y administra las revisiones, requisitos y descripciones de cada perfil de cargo."
+                subtitle="Consulta y administra las revisiones, requisitos y competencias de cada perfil de cargo."
             />
 
             <Stack spacing={3}>
@@ -149,7 +148,9 @@ const PositionProfileRevisions = () => {
                             value={departmentId}
                             clearable
                             options={departmentOptions}
-                            loading={loadingDepartments}
+                            loading={
+                                loadingDepartments
+                            }
                             loadingText="Cargando departamentos..."
                             emptyMessage="No hay departamentos disponibles."
                             onChange={
@@ -161,9 +162,15 @@ const PositionProfileRevisions = () => {
                             label="Perfil de cargo"
                             value={positionProfileId}
                             clearable
-                            options={positionProfileOptions}
-                            disabled={!departmentId}
-                            loading={loadingPositionProfiles}
+                            options={
+                                positionProfileOptions
+                            }
+                            disabled={
+                                !departmentId
+                            }
+                            loading={
+                                loadingPositionProfiles
+                            }
                             loadingText="Cargando perfiles de cargo..."
                             emptyMessage="No hay perfiles de cargo disponibles."
                             onChange={
@@ -173,7 +180,6 @@ const PositionProfileRevisions = () => {
                     </FormGrid>
                 </FormSection>
 
-                {/* Estado inicial antes de seleccionar un perfil. */}
                 {!hasSelectedPositionProfile ? (
                     <SectionCard
                         title="Revisiones del perfil"

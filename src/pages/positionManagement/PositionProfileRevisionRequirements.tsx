@@ -10,21 +10,23 @@ import {
 
 import PageContainer from "../../components/common/PageContainer";
 import PageHeader from "../../components/common/PageHeader";
-
-import PositionProfileRevisionDetailSection from "../../components/positionManagement/PositionProfileRevisionDetailSection";
 import ActionButton from "../../components/common/ActionButton";
 
-// Página para consultar y gestionar el detalle de una revisión.
-const PositionProfileRevisionDetail = () => {
+import PositionRequirementsSection from "../../components/positionManagement/requirements/PositionRequirementsSection";
+
+// Página para consultar y gestionar los requisitos de una revisión.
+const PositionProfileRevisionRequirements = () => {
     const navigate = useNavigate();
 
-    const [searchParams] = useSearchParams();
+    const [searchParams] =
+        useSearchParams();
 
     const departmentId =
         searchParams.get("departmentId") ?? "";
 
     const {
-        positionProfileId: positionProfileIdParam,
+        positionProfileId:
+        positionProfileIdParam,
         revisionId: revisionIdParam,
     } = useParams<{
         positionProfileId: string;
@@ -40,13 +42,14 @@ const PositionProfileRevisionDetail = () => {
         revisionIdParam
     );
 
-    // Valida los identificadores antes de consultar el backend.
+    // Valida los identificadores antes de consultar.
     const validIdentifiers =
         Number.isInteger(positionProfileId) &&
         positionProfileId > 0 &&
         Number.isInteger(revisionId) &&
         revisionId > 0;
 
+    // Regresa al historial de revisiones del perfil.
     const handleGoBack = () => {
         const nextSearchParams =
             new URLSearchParams();
@@ -78,8 +81,8 @@ const PositionProfileRevisionDetail = () => {
     return (
         <PageContainer>
             <PageHeader
-                title="Detalle de la revisión"
-                subtitle="Consulta los requisitos y administra las descripciones de la revisión seleccionada."
+                title="Requisitos de la revisión"
+                subtitle="Consulta y administra los requisitos de la revisión seleccionada."
                 actions={
                     <ActionButton
                         actionType="back"
@@ -94,11 +97,11 @@ const PositionProfileRevisionDetail = () => {
 
             {!validIdentifiers ? (
                 <Alert severity="error">
-                    La dirección del detalle no contiene
-                    identificadores válidos.
+                    La dirección de los requisitos no
+                    contiene identificadores válidos.
                 </Alert>
             ) : (
-                <PositionProfileRevisionDetailSection
+                <PositionRequirementsSection
                     positionProfileId={
                         positionProfileId
                     }
@@ -109,4 +112,4 @@ const PositionProfileRevisionDetail = () => {
     );
 };
 
-export default PositionProfileRevisionDetail;
+export default PositionProfileRevisionRequirements;

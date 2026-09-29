@@ -29,7 +29,7 @@ import UserSignature from "../pages/users/UserSignature";
 import ChangePassword from "../pages/users/ChangePassword";
 
 import PositionProfileRevisions from "../pages/positionManagement/PositionProfileRevisions";
-import PositionProfileRevisionDetail from "../pages/positionManagement/PositionProfileRevisionDetail";
+import PositionProfileRevisionRequirements from "../pages/positionManagement/PositionProfileRevisionRequirements";
 import PositionProfileRevisionCompetencies from "../pages/positionManagement/PositionProfileRevisionCompetencies";
 
 const AppRoutes = () => {
@@ -115,14 +115,20 @@ const AppRoutes = () => {
             element={<PositionProfileRevisions />}
           />
 
+          {/* Requisitos de una revisión */}
           <Route
-            path="/dashboard/position-management/position-profiles/:positionProfileId/revisions/:revisionId"
-            element={<PositionProfileRevisionDetail />}
+            path="/dashboard/position-management/position-profiles/:positionProfileId/revisions/:revisionId/requirements"
+            element={
+              <PositionProfileRevisionRequirements />
+            }
           />
 
+          {/* Competencias de una revisión */}
           <Route
             path="/dashboard/position-management/position-profiles/:positionProfileId/revisions/:revisionId/competencies"
-            element={<PositionProfileRevisionCompetencies />}
+            element={
+              <PositionProfileRevisionCompetencies />
+            }
           />
 
           {/* Usuario */}

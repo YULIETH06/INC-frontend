@@ -5,20 +5,23 @@ import {
     Typography,
 } from "@mui/material";
 
-import { useNavigate, useSearchParams } from "react-router-dom";
+import {
+    useNavigate,
+    useSearchParams,
+} from "react-router-dom";
 
-import ActionButton from "../common/ActionButton";
-import ConfirmActionDialog from "../common/ConfirmActionDialog";
-import CustomChip from "../common/CustomChip";
-import CustomSnackbar from "../common/CustomSnackbar";
-import EmptyState from "../common/EmptyState";
-import LoadingBox from "../common/LoadingBox";
-import SectionCard from "../common/SectionCard";
+import ActionButton from "../../common/ActionButton";
+import ConfirmActionDialog from "../../common/ConfirmActionDialog";
+import CustomChip from "../../common/CustomChip";
+import CustomSnackbar from "../../common/CustomSnackbar";
+import EmptyState from "../../common/EmptyState";
+import LoadingBox from "../../common/LoadingBox";
+import SectionCard from "../../common/SectionCard";
 
 import PositionProfileRevisionCard from "./PositionProfileRevisionCard";
 import PositionProfileRevisionDialog from "./PositionProfileRevisionDialog";
 
-import { usePositionProfileRevisions } from "../../hooks/positionManagemen/usePositionProfileRevisions";
+import { usePositionProfileRevisions } from "../../../hooks/positionManagemen/usePositionProfileRevisions";
 
 interface PositionProfileRevisionsSectionProps {
     positionProfileId: number;
@@ -87,7 +90,7 @@ const PositionProfileRevisionsSection = ({
         positionProfileId,
     });
 
-    // Navega a la administración de requisitos de la revisión.
+    // Navega a la gestión exclusiva de requisitos de la revisión.
     const goToRevisionRequirements = (
         revisionId: number
     ) => {
@@ -105,11 +108,11 @@ const PositionProfileRevisionsSection = ({
         );
 
         navigate(
-            `/dashboard/position-management/position-profiles/${positionProfileId}/revisions/${revisionId}?${nextSearchParams.toString()}`
+            `/dashboard/position-management/position-profiles/${positionProfileId}/revisions/${revisionId}/requirements?${nextSearchParams.toString()}`
         );
     };
 
-    // Navega a la administración de competencias de la revisión.
+    // Navega a la gestión exclusiva de competencias de la revisión.
     const goToRevisionCompetencies = (
         revisionId: number
     ) => {
@@ -242,7 +245,7 @@ const PositionProfileRevisionsSection = ({
                         revisions.length === 0 && (
                             <EmptyState
                                 title="No hay revisiones registradas"
-                                description="Crea la primera revisión del perfil de cargo para comenzar a registrar sus requisitos."
+                                description="Crea la primera revisión del perfil de cargo para comenzar a gestionar sus requisitos y competencias."
                             />
                         )}
 
