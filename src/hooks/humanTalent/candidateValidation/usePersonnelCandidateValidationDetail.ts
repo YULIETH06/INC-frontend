@@ -32,6 +32,10 @@ import {
     useTechnicalEvaluation,
 } from "./useTechnicalEvaluation";
 
+import {
+    useCompetencyEvaluation,
+} from "./useCompetencyEvaluation";
+
 interface UsePersonnelCandidateValidationDetailProps {
     candidateId: number;
     enabled?: boolean;
@@ -214,6 +218,16 @@ export const usePersonnelCandidateValidationDetail = ({
             showMessage,
         });
 
+    // Fase 5 - Evaluación de Competencias.
+    const competencyEvaluation =
+        useCompetencyEvaluation({
+            candidate,
+            reloadCandidateDetail:
+                loadCandidateDetail,
+            clearMessage,
+            showMessage,
+        });
+
     // Cierra el mensaje visual.
     const closeMessage = () => {
         setOpenMessage(false);
@@ -325,6 +339,37 @@ export const usePersonnelCandidateValidationDetail = ({
 
         handleApproveTechnicalEvaluation:
             technicalEvaluation.handleApproveTechnicalEvaluation,
+
+        // Fase 5.
+        competencyEvaluationForm:
+            competencyEvaluation.competencyEvaluationForm,
+
+        competencyEvaluationErrors:
+            competencyEvaluation.competencyEvaluationErrors,
+
+        loadingCompetencyEvaluation:
+            competencyEvaluation.loadingCompetencyEvaluation,
+
+        handleAddPsychotechnicalTest:
+            competencyEvaluation.handleAddPsychotechnicalTest,
+
+        handleRemovePsychotechnicalTest:
+            competencyEvaluation.handleRemovePsychotechnicalTest,
+
+        handlePsychotechnicalTestChange:
+            competencyEvaluation.handlePsychotechnicalTestChange,
+
+        handleCompetencyResultChange:
+            competencyEvaluation.handleCompetencyResultChange,
+
+        handleGeneralConceptChange:
+            competencyEvaluation.handleGeneralConceptChange,
+
+        handleCompetencyEvaluationSuitableChange:
+            competencyEvaluation.handleCompetencyEvaluationSuitableChange,
+
+        handleSaveCompetencyEvaluation:
+            competencyEvaluation.handleSaveCompetencyEvaluation,
 
         // Estado general.
         loadingDetail,

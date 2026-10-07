@@ -21,7 +21,7 @@ interface PersonnelRequisitionStatusBadgeProps {
     requisition: PersonnelRequisition;
 }
 
-// Muestra el estado general y su comentario cuando corresponde.YULI
+// Muestra el estado general y su comentario cuando corresponde.
 const PersonnelRequisitionStatusBadge = ({
     requisition,
 }: PersonnelRequisitionStatusBadgeProps) => {

@@ -121,3 +121,31 @@ export const candidatePositionTypeOptions = [
         label: "Cargo existente",
     },
 ];
+
+// Opciones del resultado de una competencia evaluada.
+export const candidateCompetencyResultOptions = [
+    {
+        value: "Destacada",
+        label: "Destacada",
+    },
+    {
+        value: "Por destacar",
+        label: "Por destacar",
+    },
+];
+
+// Opciones actuales del concepto general de la Evaluación de Competencias.
+export const candidateGeneralConceptOptions = [
+    {
+        value: "El candidato cumple con las competencias requeridas para ocupar cargo",
+        label: "El candidato cumple con las competencias requeridas para ocupar cargo",
+    },
+    {
+        value: "El candidato cumple con ciertas competencias, sin embargo se debe formar en otras para la óptima adecuación al cargo",
+        label: "El candidato cumple con ciertas competencias, sin embargo se debe formar en otras para la óptima adecuación al cargo",
+    },
+    {
+        value: "El candidato no cumple con las competencias requeridas para ocupar cargo",
+        label: "El candidato no cumple con las competencias requeridas para ocupar cargo",
+    },
+];

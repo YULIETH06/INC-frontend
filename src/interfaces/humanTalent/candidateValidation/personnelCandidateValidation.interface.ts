@@ -27,6 +27,11 @@ export type CandidateTechnicalEvaluationStatus =
     | "PENDIENTE_APROBACION"
     | "APROBADA";
 
+// Resultados permitidos para una competencia en la Fase 5.
+export type CandidateCompetencyResult =
+    | "Destacada"
+    | "Por destacar";
+
 // Estados calculados del proceso de validación.
 export type CandidateValidationStatus =
     | "SIN_INICIAR"
@@ -35,12 +40,18 @@ export type CandidateValidationStatus =
     | "VALIDACION_COMPLETADA"
     | "EVALUACION_TECNICA_EN_REGISTRO"
     | "EVALUACION_TECNICA_PENDIENTE_APROBACION"
-    | "EVALUACION_TECNICA_COMPLETADA";
+    | "EVALUACION_TECNICA_COMPLETADA"
+    | "EVALUACION_COMPETENCIAS_COMPLETADA";
 
 // Resumen de la Evaluación Técnica dentro del listado.
 export interface PersonnelCandidateTechnicalEvaluationSummary {
     status: CandidateTechnicalEvaluationStatus;
     isSuitable: boolean | null;
+}
+
+// Resumen de la Evaluación de Competencias dentro del listado.
+export interface PersonnelCandidateCompetencyEvaluationSummary {
+    isSuitable: boolean;
 }
 
 // Resumen de una validación dentro del listado.
@@ -53,8 +64,11 @@ export interface PersonnelCandidateValidationSummary {
     completedStep: number;
     validatedAt: string | null;
 
-    technicalEvaluation:
+    personnelCandidateTechnicalEvaluation:
     PersonnelCandidateTechnicalEvaluationSummary | null;
+
+    competencyEvaluation:
+    PersonnelCandidateCompetencyEvaluationSummary | null;
 }
 
 // Candidato mostrado en el listado de validaciones.
@@ -102,6 +116,17 @@ export interface CandidateValidationRequirementDescription {
     };
 }
 
+// Competencia configurada en la revisión del cargo.
+export interface CandidateValidationCompetencyDescription {
+    id: number;
+    competency: string;
+
+    competencyType: {
+        id: number;
+        name: string;
+    };
+}
+
 // Revisión exacta utilizada por la requisición.
 export interface CandidateValidationPositionRevision {
     id: number;
@@ -110,6 +135,9 @@ export interface CandidateValidationPositionRevision {
 
     requirementDescriptions:
     CandidateValidationRequirementDescription[];
+
+    positionCompetencyDescriptions:
+    CandidateValidationCompetencyDescription[];
 }
 
 // Evaluación ya registrada para una descripción.
@@ -156,6 +184,46 @@ export interface PersonnelCandidateTechnicalEvaluation {
     approvedAt: string | null;
 }
 
+// Prueba psicotécnica registrada en la Fase 5.
+export interface PersonnelCandidatePsychotechnicalTest {
+    id: number;
+    appliedTest: string;
+    appliedAt: string;
+    evaluationAspects: string;
+    resultDescription: string;
+    createdById: number;
+    createdAt: string;
+    updatedAt: string;
+
+    createdBy:
+    Pick<RequisitionUser, "id" | "name">;
+}
+
+// Competencia evaluada en la Fase 5.
+export interface PersonnelCandidateCompetencyValidation {
+    id: number;
+    competencyDescriptionId: number;
+    result: CandidateCompetencyResult;
+
+    competencyDescription:
+    CandidateValidationCompetencyDescription;
+}
+
+// Cierre general de la Fase 5.
+export interface PersonnelCandidateCompetencyEvaluation {
+    id: number;
+    candidateValidationId: number;
+    generalConcept: string;
+    isSuitable: boolean;
+    validatedAt: string;
+    performedById: number;
+    createdAt: string;
+    updatedAt: string;
+
+    performedBy:
+    Pick<RequisitionUser, "id" | "name">;
+}
+
 // Validación completa guardada para el candidato.
 export interface PersonnelCandidateValidation {
     id: number;
@@ -187,6 +255,15 @@ export interface PersonnelCandidateValidation {
 
     personnelCandidateTechnicalEvaluation:
     PersonnelCandidateTechnicalEvaluation | null;
+
+    psychotechnicalTests:
+    PersonnelCandidatePsychotechnicalTest[];
+
+    competencyValidations:
+    PersonnelCandidateCompetencyValidation[];
+
+    competencyEvaluation:
+    PersonnelCandidateCompetencyEvaluation | null;
 }
 
 // Candidato mostrado en el detalle.
@@ -318,6 +395,57 @@ export interface CandidateTechnicalEvaluationApprovalFormErrors {
     isSuitable: string;
 }
 
+// Prueba psicotécnica editable de la Fase 5.
+export interface CandidatePsychotechnicalTestForm {
+    appliedTest: string;
+    evaluationAspects: string;
+    resultDescription: string;
+}
+
+// Competencia editable de la Fase 5.
+export interface CandidateCompetencyValidationForm {
+    competencyDescriptionId: number;
+    result: CandidateCompetencyResult | "";
+}
+
+// Formulario de la Fase 5.
+export interface CandidateCompetencyEvaluationForm {
+    psychotechnicalTests:
+    CandidatePsychotechnicalTestForm[];
+
+    competencyValidations:
+    CandidateCompetencyValidationForm[];
+
+    generalConcept: string;
+
+    isSuitable: boolean | null;
+}
+
+// Errores de una prueba psicotécnica de la Fase 5.
+export interface CandidatePsychotechnicalTestFormErrors {
+    appliedTest: string;
+    evaluationAspects: string;
+    resultDescription: string;
+}
+
+// Errores de una competencia de la Fase 5.
+export interface CandidateCompetencyValidationFormErrors {
+    result: string;
+}
+
+// Errores Yup de la Fase 5.
+export interface CandidateCompetencyEvaluationFormErrors {
+    psychotechnicalTests:
+    CandidatePsychotechnicalTestFormErrors[];
+
+    competencyValidations:
+    CandidateCompetencyValidationFormErrors[];
+
+    generalConcept: string;
+
+    isSuitable: string;
+}
+
 // Datos enviados al backend en la Fase 1.
 export interface CreatePersonnelCandidateValidationData {
     applicationConcept:
@@ -351,6 +479,32 @@ export interface CompletePersonnelCandidateValidationData {
 
 // Datos enviados al confirmar la Fase 4.
 export interface ApprovePersonnelCandidateTechnicalEvaluationData {
+    isSuitable: boolean;
+}
+
+// Prueba psicotécnica enviada al backend en la Fase 5.
+export interface CandidatePsychotechnicalTestData {
+    appliedTest: string;
+    evaluationAspects: string;
+    resultDescription: string;
+}
+
+// Competencia enviada al backend en la Fase 5.
+export interface CandidateCompetencyValidationData {
+    competencyDescriptionId: number;
+    result: CandidateCompetencyResult;
+}
+
+// Datos enviados al backend en la Fase 5.
+export interface CompletePersonnelCandidateCompetencyEvaluationData {
+    psychotechnicalTests:
+    CandidatePsychotechnicalTestData[];
+
+    competencyValidations:
+    CandidateCompetencyValidationData[];
+
+    generalConcept: string;
+
     isSuitable: boolean;
 }
 

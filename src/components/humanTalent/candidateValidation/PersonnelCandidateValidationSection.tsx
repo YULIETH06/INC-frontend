@@ -17,6 +17,7 @@ import LoadingBox from "../../common/LoadingBox";
 import ProcessStepper from "../../common/ProcessStepper";
 
 import CandidateApplicationConceptStep from "./CandidateApplicationConceptStep";
+import CandidateCompetencyEvaluationStep from "./CandidateCompetencyEvaluationStep";
 import CandidatePositionValidationStep from "./CandidatePositionValidationStep";
 import CandidateTechnicalEvaluationStep from "./CandidateTechnicalEvaluationStep";
 import CandidateValidationStep from "./CandidateValidationStep";
@@ -53,12 +54,14 @@ const PersonnelCandidateValidationSection = ({
         candidateValidationForm,
         technicalEvaluationForm,
         technicalEvaluationApprovalForm,
+        competencyEvaluationForm,
 
         applicationConceptErrors,
         positionValidationErrors,
         candidateValidationErrors,
         technicalEvaluationErrors,
         technicalEvaluationApprovalErrors,
+        competencyEvaluationErrors,
 
         loadingDetail,
         loadingApplicationConcept,
@@ -66,6 +69,7 @@ const PersonnelCandidateValidationSection = ({
         loadingCandidateValidation,
         loadingTechnicalEvaluation,
         loadingTechnicalEvaluationApproval,
+        loadingCompetencyEvaluation,
 
         detailError,
 
@@ -88,11 +92,19 @@ const PersonnelCandidateValidationSection = ({
         handleExamEvidenceFileChange,
         handleTechnicalEvaluationSuitableChange,
 
+        handleAddPsychotechnicalTest,
+        handleRemovePsychotechnicalTest,
+        handlePsychotechnicalTestChange,
+        handleCompetencyResultChange,
+        handleGeneralConceptChange,
+        handleCompetencyEvaluationSuitableChange,
+
         handleSaveApplicationConcept,
         handleSavePositionValidation,
         handleSaveCandidateValidation,
         handleSaveTechnicalEvaluation,
         handleApproveTechnicalEvaluation,
+        handleSaveCompetencyEvaluation,
 
         closeMessage,
     } = usePersonnelCandidateValidationDetail({
@@ -103,14 +115,29 @@ const PersonnelCandidateValidationSection = ({
     const completedStep =
         candidate?.validation?.completedStep ?? 0;
 
+    // Resultado de aptitud de la Fase 3.
+    const phaseThreeSuitable =
+        candidate?.validation?.isSuitable === true;
+
+    // Resultado de aptitud confirmado en la Fase 4.
+    const phaseFourSuitable =
+        candidate?.validation
+            ?.personnelCandidateTechnicalEvaluation
+            ?.isSuitable === true;
+
     // Ubica al usuario en la siguiente etapa pendiente.
     useEffect(() => {
         if (!candidate) {
             return;
         }
 
-        const phaseThreeSuitable =
-            candidate.validation?.isSuitable === true;
+        if (
+            completedStep >= 4 &&
+            phaseFourSuitable
+        ) {
+            setActiveStep(4);
+            return;
+        }
 
         if (
             completedStep >= 3 &&
@@ -129,6 +156,8 @@ const PersonnelCandidateValidationSection = ({
     }, [
         candidate,
         completedStep,
+        phaseThreeSuitable,
+        phaseFourSuitable,
     ]);
 
     const steps = [
@@ -157,7 +186,15 @@ const PersonnelCandidateValidationSection = ({
                 completedStep >= 4,
             disabled:
                 completedStep < 3 ||
-                candidate?.validation?.isSuitable !== true,
+                !phaseThreeSuitable,
+        },
+        {
+            label: "Evaluación de competencias",
+            completed:
+                completedStep >= 5,
+            disabled:
+                completedStep < 4 ||
+                !phaseFourSuitable,
         },
     ];
 
@@ -183,7 +220,17 @@ const PersonnelCandidateValidationSection = ({
             step === 3 &&
             (
                 completedStep < 3 ||
-                candidate?.validation?.isSuitable !== true
+                !phaseThreeSuitable
+            )
+        ) {
+            return;
+        }
+
+        if (
+            step === 4 &&
+            (
+                completedStep < 4 ||
+                !phaseFourSuitable
             )
         ) {
             return;
@@ -459,6 +506,51 @@ const PersonnelCandidateValidationSection = ({
                                 }
                                 onApprove={
                                     handleApproveTechnicalEvaluation
+                                }
+                            />
+                        )}
+
+                        {/* Fase 5. */}
+                        {activeStep === 4 && (
+                            <CandidateCompetencyEvaluationStep
+                                candidate={
+                                    candidate
+                                }
+                                form={
+                                    competencyEvaluationForm
+                                }
+                                formErrors={
+                                    competencyEvaluationErrors
+                                }
+                                canManageValidation={
+                                    canManageValidation
+                                }
+                                completedStep={
+                                    completedStep
+                                }
+                                loading={
+                                    loadingCompetencyEvaluation
+                                }
+                                onAddPsychotechnicalTest={
+                                    handleAddPsychotechnicalTest
+                                }
+                                onRemovePsychotechnicalTest={
+                                    handleRemovePsychotechnicalTest
+                                }
+                                onPsychotechnicalTestChange={
+                                    handlePsychotechnicalTestChange
+                                }
+                                onCompetencyResultChange={
+                                    handleCompetencyResultChange
+                                }
+                                onGeneralConceptChange={
+                                    handleGeneralConceptChange
+                                }
+                                onSuitableChange={
+                                    handleCompetencyEvaluationSuitableChange
+                                }
+                                onSave={
+                                    handleSaveCompetencyEvaluation
                                 }
                             />
                         )}

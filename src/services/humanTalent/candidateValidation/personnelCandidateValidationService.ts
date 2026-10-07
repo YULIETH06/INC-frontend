@@ -2,6 +2,7 @@ import api from "../../../api/axios";
 
 import type {
     ApprovePersonnelCandidateTechnicalEvaluationData,
+    CompletePersonnelCandidateCompetencyEvaluationData,
     CompletePersonnelCandidateValidationData,
     CreatePersonnelCandidateValidationData,
     PersonnelCandidateValidationActionResponse,
@@ -61,7 +62,7 @@ export const updatePersonnelCandidatePositionValidation = async (
     return response.data;
 };
 
-// Completa la Fase 3.
+// Guarda la Fase 3.
 export const completePersonnelCandidateValidation = async (
     candidateId: number,
     data: CompletePersonnelCandidateValidationData
@@ -98,6 +99,20 @@ export const approvePersonnelCandidateTechnicalEvaluation = async (
     const response =
         await api.patch<PersonnelCandidateValidationActionResponse>(
             `/human-talent/candidate-validations/${candidateId}/technical-evaluation/approve`,
+            data
+        );
+
+    return response.data;
+};
+
+// Guarda la Fase 5.
+export const completePersonnelCandidateCompetencyEvaluation = async (
+    candidateId: number,
+    data: CompletePersonnelCandidateCompetencyEvaluationData
+): Promise<PersonnelCandidateValidationActionResponse> => {
+    const response =
+        await api.patch<PersonnelCandidateValidationActionResponse>(
+            `/human-talent/candidate-validations/${candidateId}/competency-evaluation`,
             data
         );
 

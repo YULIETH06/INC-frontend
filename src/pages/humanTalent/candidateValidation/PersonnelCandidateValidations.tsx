@@ -30,6 +30,11 @@ import {
     getTableStyles,
 } from "../../../styles/tableStyles";
 
+import {
+    getValidationStatusColor,
+    getValidationStatusLabel,
+} from "../../../utils/humanTalent/personnelCandidateValidationUtils";
+
 import DataTable from "../../../components/common/DataTable";
 import LoadingBox from "../../../components/common/LoadingBox";
 import EmptyState from "../../../components/common/EmptyState";
@@ -155,74 +160,6 @@ const PersonnelCandidateValidations = () => {
             candidates,
             searchTerm,
         ]);
-
-    // Obtiene la etiqueta visible del estado.
-    const getValidationStatusLabel = (
-        status:
-            PersonnelCandidateValidationListItem["validationStatus"]
-    ) => {
-        switch (status) {
-            case "SIN_INICIAR":
-                return "Sin iniciar";
-
-            case "CONCEPTO_APLICACION_COMPLETADO":
-                return "Concepto de aplicación";
-
-            case "VALIDACION_CARGO_COMPLETADA":
-                return "Validación de cargo";
-
-            case "VALIDACION_COMPLETADA":
-                return "Validación del postulante";
-
-            case "EVALUACION_TECNICA_EN_REGISTRO":
-                return "Evaluación técnica en registro";
-
-            case "EVALUACION_TECNICA_PENDIENTE_APROBACION":
-                return "Evaluación técnica pendiente";
-
-            case "EVALUACION_TECNICA_COMPLETADA":
-                return "Evaluación técnica completada";
-
-            default:
-                return status;
-        }
-    };
-
-    // Obtiene el color visual del estado.
-    const getValidationStatusColor = (
-        status:
-            PersonnelCandidateValidationListItem["validationStatus"]
-    ):
-        | "default"
-        | "warning"
-        | "info"
-        | "success" => {
-        switch (status) {
-            case "SIN_INICIAR":
-                return "default";
-
-            case "CONCEPTO_APLICACION_COMPLETADO":
-                return "warning";
-
-            case "VALIDACION_CARGO_COMPLETADA":
-                return "info";
-
-            case "VALIDACION_COMPLETADA":
-                return "success";
-
-            case "EVALUACION_TECNICA_EN_REGISTRO":
-                return "warning";
-
-            case "EVALUACION_TECNICA_PENDIENTE_APROBACION":
-                return "info";
-
-            case "EVALUACION_TECNICA_COMPLETADA":
-                return "success";
-
-            default:
-                return "default";
-        }
-    };
 
     // Navega al proceso de validación del candidato.
     const goToCandidateValidation = (
@@ -367,19 +304,33 @@ const PersonnelCandidateValidations = () => {
                         candidate.validationStatus ===
                         "EVALUACION_TECNICA_PENDIENTE_APROBACION";
 
+                    // Fase 3 completada como no apto: el proceso termina.
                     const phaseThreeNotSuitable =
                         candidate.validationStatus ===
                         "VALIDACION_COMPLETADA" &&
                         candidate.validation?.isSuitable === false;
 
+                    // Fase 4 confirmada como no apto: el proceso termina.
+                    const phaseFourNotSuitable =
+                        candidate.validationStatus ===
+                        "EVALUACION_TECNICA_COMPLETADA" &&
+                        candidate.validation
+                            ?.personnelCandidateTechnicalEvaluation
+                            ?.isSuitable !== true;
+
+                    // Fase 5 completada: ya no hay más fases.
+                    const isCompetencyEvaluationCompleted =
+                        candidate.validationStatus ===
+                        "EVALUACION_COMPETENCIAS_COMPLETADA";
+
                     const canContinue =
                         canManageValidation &&
                         candidate.validationStatus !==
                         "SIN_INICIAR" &&
-                        candidate.validationStatus !==
-                        "EVALUACION_TECNICA_COMPLETADA" &&
                         !isTechnicalApprovalPending &&
-                        !phaseThreeNotSuitable;
+                        !phaseThreeNotSuitable &&
+                        !phaseFourNotSuitable &&
+                        !isCompetencyEvaluationCompleted;
 
                     const tooltip =
                         canStart

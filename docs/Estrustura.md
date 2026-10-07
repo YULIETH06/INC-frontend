@@ -166,10 +166,12 @@ components/
 │   │
 │   ├── candidateValidation/
 │   │   ├── CandidateApplicationConceptStep.tsx
+│   │   ├── CandidateCompetencyEvaluationStep.tsx
+│   │   ├── CandidateCompetencyValidationTable.tsx
 │   │   ├── CandidatePositionValidationStep.tsx
 │   │   ├── CandidateRequirementValidationTable.tsx
-│   │   ├── CandidateValidationStep.tsx
 │   │   ├── CandidateTechnicalEvaluationStep.tsx
+│   │   ├── CandidateValidationStep.tsx
 │   │   └── PersonnelCandidateValidationSection.tsx
 │   │
 │   ├── requisitionFormat/
@@ -434,10 +436,12 @@ Esta subcarpeta contiene los componentes específicos del proceso **Validación 
 ```txt
 components/humanTalent/candidateValidation/
 ├── CandidateApplicationConceptStep.tsx
+├── CandidateCompetencyEvaluationStep.tsx
+├── CandidateCompetencyValidationTable.tsx
 ├── CandidatePositionValidationStep.tsx
 ├── CandidateRequirementValidationTable.tsx
-├── CandidateValidationStep.tsx
 ├── CandidateTechnicalEvaluationStep.tsx
+├── CandidateValidationStep.tsx
 └── PersonnelCandidateValidationSection.tsx
 ```
 
@@ -448,7 +452,9 @@ components/humanTalent/candidateValidation/
 | `CandidateRequirementValidationTable.tsx` | Tabla reutilizable dentro del flujo de validación. Agrupa las descripciones por requerimiento y permite evaluar cada descripción de forma independiente. Si el candidato cumple, solicita evidencia; si no cumple, solicita el cierre de brecha. | Se utiliza dentro de `CandidateValidationStep.tsx` para presentar de forma compacta Formación, Experiencia y Conocimientos específicos, incluyendo múltiples descripciones por requisito. |
 | `CandidateValidationStep.tsx` | Representa la **Fase 3: Validación del postulante**. Agrupa las descripciones de la revisión exacta utilizada por la requisición, delega su evaluación a `CandidateRequirementValidationTable.tsx`, solicita el resultado final de aptitud y muestra la fecha y el usuario que realizó la validación cuando el proceso fue completado. | Se renderiza después de completar la Fase 2. |
 | `CandidateTechnicalEvaluationStep.tsx` | Representa la **Fase 4: Evaluación Técnica**. Permite al Analista de Talento Humano registrar las calificaciones de entrevista y examen de forma independiente y adjuntar la evidencia del examen técnico en formato PDF. Cuando ambas calificaciones están registradas, la evaluación queda pendiente de aprobación. El usuario que creó la requisición puede revisar las calificaciones y confirmar si el postulante es apto o no para continuar. | Se renderiza después de completar la Fase 3 cuando el postulante fue considerado apto para continuar. |
-| `PersonnelCandidateValidationSection.tsx` | Componente coordinador del proceso de validación de cargo y postulante. Consulta la información del candidato, muestra el `ProcessStepper`, presenta la información general del cargo y del postulante, controla la etapa activa y delega las Fases 1, 2, 3 y 4 a sus componentes correspondientes. También controla la navegación entre etapas y presenta estados de carga, errores y mensajes del proceso. | Se utiliza en la página `PersonnelCandidateValidationDetail.tsx`. |
+| `CandidateCompetencyValidationTable.tsx` | Tabla utilizada dentro de la Evaluación de Competencias. Agrupa las competencias de la revisión del perfil de cargo por tipo de competencia y permite calificar cada una como `Destacada` o `Por destacar` mediante `RadioOptionGroup`. En modo lectura muestra los resultados guardados de forma bloqueada. | Se utiliza dentro de `CandidateCompetencyEvaluationStep.tsx`. |
+| `CandidateCompetencyEvaluationStep.tsx` | Representa la **Fase 5: Evaluación de Competencias**. Permite registrar una o varias pruebas psicotécnicas con la prueba aplicada, los aspectos evaluados y la descripción de los resultados, agregar o quitar pruebas (manteniendo mínimo una), calificar las competencias del cargo, seleccionar el concepto general y definir si el postulante es apto. Toda la información se guarda en una sola acción. En modo lectura presenta las pruebas, los resultados de las competencias, el concepto general, la fecha y el usuario que realizó la evaluación. | Se renderiza después de completar la Fase 4 cuando el postulante fue confirmado como apto. |
+| `PersonnelCandidateValidationSection.tsx` | Componente coordinador del proceso de validación de cargo y postulante. Consulta la información del candidato, muestra el `ProcessStepper`, presenta la información general del cargo y del postulante, controla la etapa activa y delega las Fases 1, 2, 3, 4 y 5 a sus componentes correspondientes. También controla la navegación entre etapas y presenta estados de carga, errores y mensajes del proceso. | Se utiliza en la página `PersonnelCandidateValidationDetail.tsx`. |
 
 ##### `src/components/humanTalent/requisitionFormat/`
 
@@ -660,6 +666,8 @@ El archivo `humanTalentOptions.ts` contiene las opciones estáticas utilizadas e
 | `requisitionStatusOptions`  | Contiene los estados disponibles para una requisición de personal.              | Se utilizará en listados, filtros o vistas donde se necesite mostrar o consultar el estado de la requisición. |
 | `candidateApplicationConceptOptions` | Contiene las opciones `Ingreso` y `Modificación de cargo` utilizadas en el concepto de aplicación. | Se utiliza en la Fase 1 de la validación de cargo y postulante. |
 | `candidatePositionTypeOptions` | Contiene las opciones `Nuevo cargo` y `Cargo existente`. | Se utiliza en la Fase 2 de la validación para clasificar el cargo del proceso. |
+| `candidateCompetencyResultOptions` | Contiene las opciones `Destacada` y `Por destacar` utilizadas para calificar cada competencia. | Se utiliza en la Fase 5 dentro de `CandidateCompetencyValidationTable.tsx`. |
+| `candidateGeneralConceptOptions` | Contiene las frases fijas disponibles para el concepto general de la Evaluación de Competencias. El valor se guarda como texto, por lo que la lista puede ampliarse sin cambiar la lógica del componente. | Se utiliza en la Fase 5 dentro de `CandidateCompetencyEvaluationStep.tsx`. |
 
 ---
 
@@ -727,6 +735,7 @@ hooks/
 │   ├── candidateValidation/
 │   │   ├── useApplicationConceptValidation.ts
 │   │   ├── useCandidateRequirementValidation.ts
+│   │   ├── useCompetencyEvaluation.ts
 │   │   ├── usePersonnelCandidateValidationDetail.ts
 │   │   ├── usePersonnelCandidateValidations.ts
 │   │   ├── usePositionValidation.ts
@@ -797,6 +806,7 @@ hooks/humanTalent/
 ├── candidateValidation/
 │   ├── useApplicationConceptValidation.ts
 │   ├── useCandidateRequirementValidation.ts
+│   ├── useCompetencyEvaluation.ts
 │   ├── usePersonnelCandidateValidationDetail.ts
 │   ├── usePersonnelCandidateValidations.ts
 │   ├── usePositionValidation.ts
@@ -817,7 +827,8 @@ hooks/humanTalent/
 | `usePositionValidation.ts` | Maneja la lógica exclusiva de la Fase 2: tipo de cargo, código de control de cambios, errores, validación Yup, guardado y sincronización con el detalle consultado. | Se utiliza internamente desde `usePersonnelCandidateValidationDetail.ts`. |
 | `useCandidateRequirementValidation.ts` | Maneja la lógica exclusiva de la Fase 3: evaluación de requisitos, cumplimiento, evidencia, cierre de brecha, resultado final de aptitud, errores, validación Yup y guardado. | Se utiliza internamente desde `usePersonnelCandidateValidationDetail.ts`. |
 | `useTechnicalEvaluation.ts` | Maneja la lógica exclusiva de la Fase 4: calificaciones de entrevista y examen, selección de la evidencia PDF del examen, errores, validación, guardado de notas y confirmación final de aptitud. | Se utiliza internamente desde `usePersonnelCandidateValidationDetail.ts`. |
-| `usePersonnelCandidateValidationDetail.ts` | Actúa como hook coordinador del detalle de validación. Consulta el candidato, administra permisos, carga general, errores y mensajes compartidos, y conecta los hooks independientes de las Fases 1, 2, 3 y 4. | Se utiliza en `PersonnelCandidateValidationSection.tsx`. |
+| `useCompetencyEvaluation.ts` | Maneja la lógica exclusiva de la Fase 5: pruebas psicotécnicas dinámicas (agregar, quitar y editar), resultados de competencias, concepto general, resultado de aptitud, errores por campo, validación Yup, limpieza de espacios y guardado unificado de toda la fase en una sola petición. | Se utiliza internamente desde `usePersonnelCandidateValidationDetail.ts`. |
+| `usePersonnelCandidateValidationDetail.ts` | Actúa como hook coordinador del detalle de validación. Consulta el candidato, administra permisos, carga general, errores y mensajes compartidos, y conecta los hooks independientes de las Fases 1, 2, 3, 4 y 5. | Se utiliza en `PersonnelCandidateValidationSection.tsx`. |
 | `usePersonnelRequisitionCandidates.ts` | Maneja la lógica completa del cargue y la preselección de candidatos. Consulta los candidatos registrados, los tipos de identificación, el historial de movimientos y las fotografías históricas de cada cargue cerrado. Controla el formulario de registro y edición, la carga de hojas de vida, la eliminación de candidatos, el cierre y la reapertura del cargue. También administra la selección temporal de candidatos, permite agregar o retirar candidatos de la selección y confirma la preselección definitiva. Controla las reglas relacionadas con el plazo de presentación inicial, las justificaciones requeridas cuando corresponde y los motivos de reapertura. Después de las acciones que modifican el proceso, actualiza la información necesaria para mantener la vista sincronizada sin recargar la página. | Se utiliza en `PersonnelRequisitionCandidatesSection.tsx`. |
 | `usePersonnelRequisitionDetail.ts`     | Maneja la consulta del detalle completo de una requisición de personal mediante su identificador. Controla el estado de carga, almacena la requisición obtenida, procesa errores de la petición y permite volver a cargar la información cuando sea necesario.                                                                                                                                                                                                                                                                                                            | Se utiliza en `PersonnelRequisitionDetail.tsx` y `PersonnelRequisitionFormat.tsx` para consultar la misma información desde la vista de detalle y el formato imprimible. |
 | `usePersonnelRequisitions.ts`          | Maneja la lógica principal del listado y flujo de requisiciones de personal. Consulta las requisiciones disponibles, controla estados de carga, selecciona la requisición sobre la que se realizará una acción y coordina las decisiones de aprobación o rechazo. También maneja la creación de la confirmación de contratación, las decisiones de Talento Humano, la apertura y cierre de diálogos y los mensajes mostrados mediante snackbar.                                                                                                                           | Se utiliza en la página `PersonnelRequisitions.tsx` para listar y gestionar las requisiciones según los permisos y el paso actual del usuario dentro del flujo.          |
@@ -1083,7 +1094,7 @@ interfaces/humanTalent/
 
 | Archivo                             | Descripción                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Uso dentro del proyecto                                                                                                                                                          |
 | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `personnelCandidateValidation.interface.ts` | Define la estructura de la información utilizada en el proceso de **Validación de cargo y postulante**. Incluye los datos del candidato, la requisición, el perfil de cargo, los requisitos evaluados y la información correspondiente a las Fases 1, 2, 3 y 4. También define los datos que el frontend recibe del backend y los que debe enviar al guardar cada fase, incluyendo las calificaciones de entrevista y examen y la decisión sobre si el postulante puede continuar. | Se utiliza en los servicios, hooks y componentes relacionados con la validación de candidatos. |
+| `personnelCandidateValidation.interface.ts` | Define la estructura de la información utilizada en el proceso de **Validación de cargo y postulante**. Incluye los datos del candidato, la requisición, el perfil de cargo, los requisitos y competencias evaluados y la información correspondiente a las Fases 1, 2, 3, 4 y 5. También define los estados calculados del listado, los datos que el frontend recibe del backend y los que debe enviar al guardar cada fase, incluyendo las calificaciones de la Evaluación Técnica, las pruebas psicotécnicas, los resultados de competencias y el concepto general de la Evaluación de Competencias. | Se utiliza en los servicios, hooks y componentes relacionados con la validación de candidatos. |
 | `personnelRequisition.interface.ts` | Define los tipos e interfaces utilizados en el flujo de requisiciones de personal. Incluye la estructura de las requisiciones, aprobaciones, confirmación de contratación, candidatos, estados del cargue, preselección, historial y demás datos necesarios para mantener un tipado consistente | Se utiliza en servicios, hooks, componentes y páginas relacionadas con la creación, consulta, aprobación, confirmación, cargue, preselección y trazabilidad de candidatos. |
 
 ---
@@ -1269,8 +1280,8 @@ pages/humanTalent/
 | Página                           | Descripción                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `CreatePersonnelRequisition.tsx` | Muestra el formulario para crear una requisición de personal. Utiliza `useCreatePersonnelRequisition.ts` para cargar departamentos, perfiles de cargo y ciudades, consultar y mostrar automáticamente la revisión vigente del cargo seleccionado, controlar los valores, validar la información y enviar la solicitud al backend.                                                                                                                                                                                                                    |
-| `PersonnelCandidateValidations.tsx` | Muestra el listado de candidatos disponibles para el proceso de validación de cargo y postulante mediante `DataTable`. Utiliza `ListToolbar` para buscar por nombre, identificación, cargo o área y actualizar el listado, y `IconActionButton` para iniciar, continuar o visualizar la validación. |
-| `PersonnelCandidateValidationDetail.tsx` | Muestra la vista independiente del proceso de validación de un candidato. Obtiene `candidateId` desde la ruta, presenta el encabezado de página y delega a `PersonnelCandidateValidationSection.tsx` el flujo de las cuatro fases implementadas, incluida la Evaluación Técnica. |
+| `PersonnelCandidateValidations.tsx` | Muestra el listado de candidatos disponibles para el proceso de validación de cargo y postulante mediante `DataTable`. Utiliza `ListToolbar` para buscar por nombre, identificación, cargo o área y actualizar el listado, y `IconActionButton` para iniciar, continuar o visualizar la validación según el estado del proceso y el resultado de aptitud de cada fase. Obtiene la etiqueta y el color de cada estado desde `personnelCandidateValidationUtils.ts`. |
+| `PersonnelCandidateValidationDetail.tsx` | Muestra la vista independiente del proceso de validación de un candidato. Obtiene `candidateId` desde la ruta, presenta el encabezado de página y delega a `PersonnelCandidateValidationSection.tsx` el flujo de las cinco fases implementadas, incluidas la Evaluación Técnica y la Evaluación de Competencias. |
 | `PersonnelRequisitions.tsx`      | Muestra el listado general de requisiciones de personal y las acciones disponibles según el usuario y el paso actual del flujo. Utiliza `usePersonnelRequisitions.ts` para consultar, aprobar, rechazar, cancelar y registrar o decidir la confirmación de contratación.                                                                                                                                                                                                                                                                             |
 | `PersonnelRequisitionDetail.tsx` | Página encargada de presentar el detalle completo de una requisición de personal. Organiza la información general, las condiciones de contratación, las aprobaciones, la confirmación de contratación y los vistos buenos de Talento Humano. Cuando el proceso de candidatos ha sido iniciado, integra la sección correspondiente para mostrar y gestionar el cargue, la preselección y la trazabilidad de los candidatos según el estado del proceso y los permisos del usuario. |
 | `PersonnelRequisitionFormat.tsx` | Construye la vista independiente utilizada para visualizar e imprimir el formato de requisición. Presenta la información general, el código y la revisión del perfil de cargo utilizada, opciones seleccionadas, firmas, fechas y estado general mediante una marca de agua. Reutiliza `usePersonnelRequisitionDetail.ts` y los componentes ubicados en `components/humanTalent/requisitionFormat/`.                                                                                                                                                 |
@@ -1529,7 +1540,7 @@ services/humanTalent/
 
 | Archivo                          | Descripción                                                                                                                                                                                                                                                                                                                                                              | Uso dentro del proyecto                                                                                                                                 |
 | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `personnelCandidateValidationService.ts` | Contiene las funciones HTTP del proceso de validación de cargo y postulante. Permite consultar el listado y el detalle, guardar las Fases 1, 2 y 3, registrar las calificaciones de la Fase 4 y confirmar la Evaluación Técnica. | Se utiliza desde los hooks de validación de candidatos. |
+| `personnelCandidateValidationService.ts` | Contiene las funciones HTTP del proceso de validación de cargo y postulante. Permite consultar el listado y el detalle, guardar las Fases 1, 2 y 3, registrar las calificaciones de la Fase 4, confirmar la Evaluación Técnica y completar la Evaluación de Competencias de la Fase 5. | Se utiliza desde los hooks de validación de candidatos. |
 | `personnelRequisitionService.ts` | Centraliza las peticiones HTTP del módulo de requisiciones de personal. Incluye operaciones para crear, consultar y gestionar requisiciones, confirmaciones de contratación y candidatos, además de cierre, reapertura, historial de movimientos, fotografías históricas y confirmación de preselección de candidatos. | Se utiliza desde los hooks del módulo de Talento Humano para comunicarse con los endpoints del backend relacionados con requisiciones, aprobaciones, contratación, cargue, preselección y trazabilidad de candidatos. |
 
 ---
@@ -1545,6 +1556,7 @@ updatePersonnelCandidatePositionValidation()
 completePersonnelCandidateValidation()
 savePersonnelCandidateTechnicalEvaluation()
 approvePersonnelCandidateTechnicalEvaluation()
+completePersonnelCandidateCompetencyEvaluation()
 ```
 
 | Función | Descripción |
@@ -1556,6 +1568,7 @@ approvePersonnelCandidateTechnicalEvaluation()
 | `completePersonnelCandidateValidation(candidateId, data)` | Completa la Fase 3 enviando el resultado final y la evaluación de cada descripción de requisito. |
 | `savePersonnelCandidateTechnicalEvaluation(candidateId, data)` | Registra las calificaciones de entrevista y examen de la Fase 4 y permite enviar la evidencia PDF del examen. Recibe los datos como `FormData`, enviando `interviewScore`, `examScore` y, cuando existe, el archivo mediante el campo `file`. Las notas pueden guardarse de forma independiente y, cuando ambas existen, la evaluación queda pendiente de aprobación. |
 | `approvePersonnelCandidateTechnicalEvaluation(candidateId, data)` | Confirma la Evaluación Técnica indicando si el postulante es apto o no apto para continuar. Esta acción corresponde al usuario que creó la requisición. |
+| `completePersonnelCandidateCompetencyEvaluation(candidateId, data)` | Completa la Fase 5 mediante `PATCH /human-talent/candidate-validations/:candidateId/competency-evaluation`. Envía en una sola petición las pruebas psicotécnicas, los resultados de competencias, el concepto general y si el postulante es apto. El backend guarda toda la información en una única transacción. |
 
 ---
 
@@ -1971,7 +1984,11 @@ utils/
 │   └── numberUtils.ts
 │
 ├── humanTalent/
+│   ├── personnelCandidateValidationUtils.ts
 │   └── personnelRequisitionUtils.ts
+│
+├── positionManagement/
+│   └── revisionStatus.ts
 │
 ├── pqrs/
 │   └── pqrUtils.ts
@@ -2137,14 +2154,30 @@ formatMoney()
 
 ```txt
 utils/humanTalent/
+├── personnelCandidateValidationUtils.ts
 └── personnelRequisitionUtils.ts
 ```
 
-Los archivos ubicados en `utils/humanTalent/` contienen funciones específicas relacionadas con el flujo y la presentación de las requisiciones de personal.
+Los archivos ubicados en `utils/humanTalent/` contienen funciones específicas relacionadas con la presentación de las requisiciones de personal y del proceso de validación de cargo y postulante.
 
 | Archivo                        | Descripción                                                                                                                      | Uso dentro del proyecto                                                                                                                        |
 | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `personnelCandidateValidationUtils.ts` | Contiene funciones auxiliares para presentar el estado del proceso de validación de cargo y postulante. | Se utiliza en `PersonnelCandidateValidations.tsx` para mostrar la etiqueta y el color de cada estado en el listado. |
 | `personnelRequisitionUtils.ts` | Contiene funciones auxiliares específicas para organizar, transformar y presentar la información de una requisición de personal. | Se utiliza en páginas de detalle, formatos imprimibles y componentes relacionados con aprobaciones, valores monetarios, estados y comentarios. |
+
+---
+
+##### Funciones en `personnelCandidateValidationUtils.ts`
+
+```txt
+getValidationStatusLabel()
+getValidationStatusColor()
+```
+
+| Función | Descripción |
+| ------- | ----------- |
+| `getValidationStatusLabel(status)` | Convierte el estado calculado de la validación en una etiqueta legible, como `Sin iniciar`, `Evaluación técnica` o `Evaluación de competencias`. Cuando no encuentra una coincidencia, retorna el valor recibido. |
+| `getValidationStatusColor(status)` | Retorna el color de Material UI correspondiente al estado de la validación para mostrarlo en `CustomChip`. Las fases completadas se muestran en verde, los registros en curso en amarillo y las etapas intermedias en azul. |
 
 ---
 
@@ -2358,7 +2391,7 @@ validations/humanTalent/
 
 ##### `personnelCandidateValidation.ts`
 
-Este archivo contiene los esquemas Yup utilizados en las cuatro fases actualmente implementadas de la validación de cargo y postulante.
+Este archivo contiene los esquemas Yup utilizados en las cinco fases actualmente implementadas de la validación de cargo y postulante.
 
 ```txt
 candidateApplicationConceptSchema
@@ -2366,6 +2399,9 @@ candidatePositionValidationSchema
 candidateValidationSchema
 candidateTechnicalEvaluationSchema
 candidateTechnicalEvaluationApprovalSchema
+candidatePsychotechnicalTestSchema
+candidateCompetencyValidationSchema
+candidateCompetencyEvaluationSchema
 ```
 
 | Esquema | Descripción | Uso dentro del proyecto |
@@ -2375,6 +2411,9 @@ candidateTechnicalEvaluationApprovalSchema
 | `candidateValidationSchema` | Valida el resultado final y cada descripción de requisito. Cuando `complies` es `true`, exige evidencia; cuando es `false`, exige cierre de brecha. | Se utiliza al completar la Fase 3. |
 | `candidateTechnicalEvaluationSchema` | Valida las calificaciones de entrevista y examen y el estado de la evidencia seleccionada para la Fase 4. Permite registrar una o ambas calificaciones y controla que los valores se encuentren dentro del rango permitido antes de construir el `FormData` para el envío. | Se utiliza cuando el Analista de Talento Humano guarda las calificaciones y la evidencia del examen de la Fase 4. |
 | `candidateTechnicalEvaluationApprovalSchema` | Valida que se indique si el postulante es apto o no apto antes de confirmar la Evaluación Técnica. | Se utiliza cuando el creador de la requisición confirma la Fase 4. |
+| `candidatePsychotechnicalTestSchema` | Valida cada prueba psicotécnica: la prueba aplicada, los aspectos evaluados y la descripción de resultados son obligatorios, con límites de 150, 1000 y 5000 caracteres respectivamente. | Se utiliza dentro de `candidateCompetencyEvaluationSchema`. |
+| `candidateCompetencyValidationSchema` | Valida que cada competencia tenga un resultado permitido: `Destacada` o `Por destacar`. | Se utiliza dentro de `candidateCompetencyEvaluationSchema`. |
+| `candidateCompetencyEvaluationSchema` | Valida la Fase 5 completa: exige mínimo una prueba, impide pruebas repetidas sin distinguir mayúsculas y minúsculas (marcando el error en el campo específico), exige el resultado de todas las competencias de la revisión y exige el concepto general y el resultado de aptitud. | Se utiliza en `useCompetencyEvaluation.ts` al guardar la Fase 5. |
 
 ---
 

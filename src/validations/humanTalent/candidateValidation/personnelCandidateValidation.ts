@@ -193,3 +193,131 @@ export const candidateTechnicalEvaluationApprovalSchema =
                 "Debe indicar si el postulante es apto para continuar."
             ),
     });
+
+// Validación de cada prueba psicotécnica de la Fase 5.
+const candidatePsychotechnicalTestSchema =
+    Yup.object({
+        appliedTest: Yup.string()
+            .trim()
+            .max(
+                150,
+                "Máximo 150 caracteres."
+            )
+            .required("Campo obligatorio."),
+
+        evaluationAspects: Yup.string()
+            .trim()
+            .max(
+                1000,
+                "Máximo 1000 caracteres."
+            )
+            .required("Campo obligatorio."),
+
+        resultDescription: Yup.string()
+            .trim()
+            .max(
+                5000,
+                "Máximo 5000 caracteres."
+            )
+            .required("Campo obligatorio."),
+    });
+
+// Validación de cada competencia evaluada en la Fase 5.
+const candidateCompetencyValidationSchema =
+    Yup.object({
+        competencyDescriptionId: Yup.number()
+            .integer()
+            .positive()
+            .required(),
+
+        result: Yup.string()
+            .oneOf(
+                [
+                    "Destacada",
+                    "Por destacar",
+                ],
+                "Campo obligatorio."
+            )
+            .required("Campo obligatorio."),
+    });
+
+// Validación de la Fase 5: evaluación de competencias.
+export const candidateCompetencyEvaluationSchema =
+    Yup.object({
+        psychotechnicalTests: Yup.array()
+            .of(
+                candidatePsychotechnicalTestSchema
+            )
+            .min(
+                1,
+                "Debe registrar por lo menos una prueba psicotécnica."
+            )
+            .required()
+            .test(
+                "unique-applied-test",
+                "La prueba psicotécnica está repetida.",
+                function (tests) {
+                    if (!tests) {
+                        return true;
+                    }
+
+                    const seenNames =
+                        new Set<string>();
+
+                    for (
+                        const [index, test]
+                        of tests.entries()
+                    ) {
+                        const normalizedName =
+                            test.appliedTest
+                                ?.trim()
+                                .toLowerCase();
+
+                        if (!normalizedName) {
+                            continue;
+                        }
+
+                        if (
+                            seenNames.has(
+                                normalizedName
+                            )
+                        ) {
+                            // Ubica el error en la prueba repetida.
+                            return this.createError({
+                                path: `psychotechnicalTests[${index}].appliedTest`,
+                                message:
+                                    "Esta prueba ya fue agregada.",
+                            });
+                        }
+
+                        seenNames.add(
+                            normalizedName
+                        );
+                    }
+
+                    return true;
+                }
+            ),
+
+        competencyValidations: Yup.array()
+            .of(
+                candidateCompetencyValidationSchema
+            )
+            .min(
+                1,
+                "Debe existir al menos una competencia para evaluar."
+            )
+            .required(),
+
+        generalConcept: Yup.string()
+            .trim()
+            .max(
+                500,
+                "Máximo 500 caracteres."
+            )
+            .required("Campo obligatorio."),
+
+        isSuitable: Yup.boolean()
+            .nullable()
+            .required("Campo obligatorio."),
+    });
