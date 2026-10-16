@@ -1,6 +1,5 @@
 import {
     Alert,
-    Autocomplete,
     Box,
     CircularProgress,
     Divider,
@@ -10,7 +9,6 @@ import {
     TableContainer,
     TableHead,
     TableRow,
-    TextField,
     Typography,
 } from "@mui/material";
 
@@ -31,6 +29,11 @@ import CustomDialog from "../common/CustomDialog";
 import ActionButton from "../common/ActionButton";
 import CustomChip from "../common/CustomChip";
 import ConfirmActionDialog from "../common/ConfirmActionDialog";
+import SearchableSelect from "../common/inputs/SearchableSelect";
+
+import type {
+    SearchableSelectOption,
+} from "../common/inputs/SearchableSelect";
 
 interface UserPositionAssignmentDialogProps {
     open: boolean;
@@ -100,27 +103,32 @@ const UserPositionAssignmentDialog = ({
         currentAssignment?.position.id &&
         !loadingAssignments;
 
-    // Ordena los cargos por área para agruparlos en el selector.
-    const sortedPositions = [
-        ...positions,
-    ].sort((a, b) => {
-        const departmentA =
-            a.homeDepartment?.name ??
-            "Sin área";
+    // Opciones del selector agrupadas por área.
+    // El cargo que el usuario ya tiene se muestra deshabilitado.
+    const positionOptions: SearchableSelectOption[] =
+        positions.map((position) => ({
+            value: String(position.id),
+            label: getPositionLabel(position),
+            group:
+                position.homeDepartment?.name ??
+                "Sin área",
+            disabled:
+                position.id ===
+                currentAssignment?.position.id,
+        }));
 
-        const departmentB =
-            b.homeDepartment?.name ??
-            "Sin área";
+    // Convierte el valor del selector en el cargo correspondiente.
+    const handleSelectChange = (
+        value: string
+    ) => {
+        const position =
+            positions.find(
+                (item) =>
+                    String(item.id) === value
+            ) ?? null;
 
-        return (
-            departmentA.localeCompare(
-                departmentB
-            ) ||
-            a.name.localeCompare(
-                b.name
-            )
-        );
-    });
+        onPositionChange(position);
+    };
 
     // Historial sin el cargo activo, para no repetirlo.
     const previousAssignments =
@@ -318,58 +326,35 @@ const UserPositionAssignmentDialog = ({
                         <Divider />
 
                         {/* Selección del nuevo cargo. */}
-                        <Autocomplete
-                            options={sortedPositions}
-                            value={selectedPosition}
-                            onChange={(_event, value) =>
-                                onPositionChange(value)
-                            }
-                            groupBy={(position) =>
-                                position.homeDepartment
-                                    ?.name ??
-                                "Sin área"
-                            }
-                            getOptionLabel={
-                                getPositionLabel
-                            }
-                            isOptionEqualToValue={(
-                                option,
-                                value
-                            ) =>
-                                option.id === value.id
-                            }
-                            getOptionDisabled={(
-                                position
-                            ) =>
-                                position.id ===
+                        <SearchableSelect
+                            label={
                                 currentAssignment
-                                    ?.position.id
+                                    ? "Nuevo cargo"
+                                    : "Cargo"
                             }
+                            value={
+                                selectedPosition
+                                    ? String(
+                                        selectedPosition.id
+                                    )
+                                    : ""
+                            }
+                            options={positionOptions}
+                            onChange={
+                                handleSelectChange
+                            }
+                            error={positionError}
+                            hint={
+                                currentAssignment
+                                    ? "Al cambiar el cargo, el actual quedará en el historial."
+                                    : undefined
+                            }
+                            placeholder="Buscar por código o nombre"
+                            size="small"
                             loading={loadingPositions}
                             loadingText="Cargando cargos..."
-                            noOptionsText="No se encontraron cargos"
+                            emptyMessage="No se encontraron cargos"
                             disabled={isBusy}
-                            size="small"
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    label={
-                                        currentAssignment
-                                            ? "Nuevo cargo"
-                                            : "Cargo"
-                                    }
-                                    placeholder="Buscar por código o nombre"
-                                    error={Boolean(
-                                        positionError
-                                    )}
-                                    helperText={
-                                        positionError ||
-                                        (currentAssignment
-                                            ? "Al cambiar el cargo, el actual quedará en el historial."
-                                            : undefined)
-                                    }
-                                />
-                            )}
                         />
 
                         {/* Historial de cargos anteriores. */}

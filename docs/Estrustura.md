@@ -123,7 +123,6 @@ components/
 ├── common/
 │   ├── ActionButton.tsx
 │   ├── BulkUploadDialog.tsx
-│   ├── ClearableSelect.tsx
 │   ├── ConfirmActionDialog.tsx
 │   ├── CustomAccordion.tsx
 │   ├── CustomChip.tsx
@@ -138,11 +137,13 @@ components/
 │   ├── InfoTooltip.tsx
 │   ├── IconActionButton.tsx
 │   ├── inputs/
+│   │   ├── ClearableSelect.tsx
 │   │   ├── DateInput.tsx
 │   │   ├── FileInput.tsx
 │   │   ├── MoneyInput.tsx
 │   │   ├── NumberInput.tsx
 │   │   ├── PasswordInput.tsx
+│   │   ├── SearchableSelect.tsx
 │   │   ├── TextAreaInput.tsx
 │   │   └── TextInput.tsx
 │   ├── ListToolbar.tsx
@@ -237,7 +238,6 @@ Estos componentes no pertenecen exclusivamente a un módulo, por lo tanto, puede
 | Componente                | Descripción                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | Reutilización dentro del proyecto                                                                                                                                                                      |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `BulkUploadDialog.tsx`    | Componente reutilizable para mostrar un modal de carga masiva de archivos. Permite seleccionar o cargar archivos, mostrar información del proceso y ejecutar acciones relacionadas con importaciones.                                                                                                                                                                                                                                                                                                                                                                      | Puede utilizarse en usuarios, PQR, reportes u otros módulos que requieran carga masiva de datos.                                                                                                       |
-| `ClearableSelect.tsx`     | Componente reutilizable de selección que permite escoger una opción y, cuando `clearable` está habilitado, limpiar el valor seleccionado. También puede utilizarse como un selector normal manteniendo `clearable` desactivado. | Puede utilizarse en filtros, formularios, búsquedas avanzadas o selección de estados, roles y tipos de PQR. |
 | `ActionButton.tsx`        | Componente reutilizable para representar las acciones principales del sistema mediante botones con estilos, íconos y comportamientos consistentes. Obtiene los íconos predeterminados desde el catálogo central `appIcons.ts`, manteniendo una representación uniforme para acciones como guardar, editar, aprobar, rechazar, cancelar, eliminar, visualizar, abrir, crear, cerrar o reabrir. También controla estados de carga, texto de ayuda y adaptación para dispositivos móviles. | Puede utilizarse en formularios, listados, páginas de detalle, diálogos, cargas de archivos y procesos de cualquier módulo. |
 | `ConfirmActionDialog.tsx` | Componente reutilizable que muestra un diálogo de confirmación antes de ejecutar una acción importante. Permite recibir mensajes de texto o contenido React, información adicional mediante alertas configurables, tipos de acción como eliminar, cerrar o reabrir, texto personalizado durante la carga y botones consistentes mediante `ActionButton`.                                                     | Puede utilizarse para aprobar, rechazar, cancelar, eliminar, guardar, cerrar, reabrir o confirmar acciones dentro de Talento Humano, PQR, usuarios y otros módulos.                           |
 | `CustomDialog.tsx`        | Componente reutilizable que centraliza la estructura base de los diálogos del sistema. Permite configurar tamaño, título, subtítulo, botón opcional de cierre, contenido, acciones y estilos específicos del contenido o del área de acciones. | Puede utilizarse en formularios, confirmaciones, detalles y procesos modales de cualquier módulo que requieran una estructura consistente. |
@@ -269,28 +269,32 @@ Esta subcarpeta agrupa los campos de entrada reutilizables del sistema y mantien
 
 ```txt
 components/common/inputs/
+├── ClearableSelect.tsx
 ├── DateInput.tsx
 ├── FileInput.tsx
 ├── MoneyInput.tsx
 ├── NumberInput.tsx
 ├── PasswordInput.tsx
+├── SearchableSelect.tsx
 ├── TextAreaInput.tsx
 └── TextInput.tsx
 ```
 
 | Componente | Uso principal |
 | ---------- | ------------- |
+| `ClearableSelect.tsx` | Selector reutilizable que permite escoger una opción y, cuando `clearable` está habilitado, limpiar el valor seleccionado. También puede utilizarse como un selector normal manteniendo `clearable` desactivado. Se utiliza en filtros, formularios y selección de estados, roles y tipos de PQR. Para listas largas que requieren buscador se utiliza `SearchableSelect.tsx`. |
 | `DateInput.tsx` | Captura fechas mediante un campo reutilizable `type="date"`. Permite definir fecha mínima y máxima, modo de solo lectura, errores y texto de ayuda, manteniendo una apariencia consistente en formularios y filtros. |
 | `FileInput.tsx` | Selección y visualización de archivos, incluyendo nombre, tamaño, eliminación, error y texto de ayuda. |
 | `MoneyInput.tsx` | Captura valores monetarios y presenta el valor con formato numérico. |
 | `NumberInput.tsx` | Captura valores numéricos enteros evitando caracteres no permitidos. |
 | `PasswordInput.tsx` | Captura contraseñas y permite mostrar u ocultar su contenido. |
+| `SearchableSelect.tsx` | Selector con buscador para listas largas de opciones, construido sobre `Autocomplete` de Material UI. Recibe y devuelve el valor como texto y permite agrupar las opciones (`group`), deshabilitar opciones (`disabled`), mostrar estado de carga, error y texto de ayuda. Se utiliza en `UserPositionAssignmentDialog.tsx` para buscar entre los cargos activos agrupados por área. |
 | `TextAreaInput.tsx` | Captura observaciones, motivos, comentarios y otros textos extensos. |
 | `TextInput.tsx` | Captura textos de una sola línea y permite mostrar información no editable mediante `readOnly`. |
 
 El objetivo de `components/common/` es centralizar todos los elementos visuales que pueden servir en varias partes del sistema. Por ejemplo, `DataTable.tsx` no debe ser una tabla exclusiva para usuarios, sino una tabla general que pueda adaptarse a usuarios, PQR, roles o cualquier otro listado.
 
-Para los listados, `ListToolbar.tsx` es el componente estándar para búsqueda, filtros y actualización. Los filtros categóricos deben utilizar `ClearableSelect.tsx` en lugar de `Select` y `MenuItem` directos cuando no exista una necesidad específica que lo impida. Los campos de fecha reutilizables deben utilizar `DateInput.tsx`.
+Para los listados, `ListToolbar.tsx` es el componente estándar para búsqueda, filtros y actualización. Los filtros categóricos deben utilizar `ClearableSelect.tsx` en lugar de `Select` y `MenuItem` directos cuando no exista una necesidad específica que lo impida. Cuando la lista de opciones es larga y el usuario necesita buscar, se debe utilizar `SearchableSelect.tsx` en lugar de `Autocomplete` directo. Los campos de fecha reutilizables deben utilizar `DateInput.tsx`.
 
 Regla funcional de búsqueda y filtros:
 
@@ -540,7 +544,7 @@ components/users/
 | `ChangeUserPasswordDialog.tsx` | Diálogo utilizado por el administrador para restablecer la contraseña de un usuario. Muestra el usuario seleccionado, solicita la nueva contraseña y su confirmación, y presenta los errores de validación correspondientes. | Se utiliza desde `AdminUsers.tsx` para ejecutar el restablecimiento administrativo de contraseña sin mezclar la lógica del formulario dentro de la página. |
 | `ChangeUserRoleDialog.tsx` | Diálogo utilizado para cambiar el rol de un usuario seleccionado. | Se utiliza en la administración de usuarios. |
 | `SettingsMenu.tsx` | Componente encargado de mostrar las opciones personales y de configuración del usuario autenticado mediante un menú desplegable. Centraliza accesos como la firma del usuario y el cambio de contraseña. | Se utiliza desde `Header.tsx` para acceder a configuraciones personales del usuario. |
-| `UserPositionAssignmentDialog.tsx` | Diálogo utilizado por el administrador para asignar, cambiar o retirar el cargo de un usuario. Muestra el usuario seleccionado, su cargo actual con la fecha de inicio, un selector con buscador de cargos activos agrupados por área y la tabla de cargos anteriores. Antes de retirar el cargo solicita confirmación mediante `ConfirmActionDialog`. | Se utiliza desde `AdminUsers.tsx` junto con `useUserPositionAssignment.ts`. |
+| `UserPositionAssignmentDialog.tsx` | Diálogo utilizado por el administrador para asignar, cambiar o retirar el cargo de un usuario. Muestra el usuario seleccionado, su cargo actual con la fecha de inicio, un selector con buscador (`SearchableSelect.tsx`) de cargos activos agrupados por área y la tabla de cargos anteriores. Antes de retirar el cargo solicita confirmación mediante `ConfirmActionDialog`. | Se utiliza desde `AdminUsers.tsx` junto con `useUserPositionAssignment.ts`. |
 | `UserRoleChip.tsx` | Componente visual que muestra el rol de un usuario mediante una etiqueta o chip con color, texto e ícono. | Se utiliza en tablas, listados o detalles donde se necesite mostrar el rol de un usuario. |
 | `UserSignatureUploader.tsx` | Componente encargado de registrar o actualizar la firma del usuario autenticado. Permite seleccionar una imagen, validar el archivo, mostrar una vista previa y enviarlo al backend mediante `multipart/form-data`. La firma guardada se utiliza posteriormente en aprobaciones, vistos buenos y formatos imprimibles. | Se utiliza para configurar la firma que será usada en procesos de aprobación y formatos del sistema. |
 
