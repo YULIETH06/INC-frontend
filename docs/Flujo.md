@@ -167,3 +167,24 @@
 El estado de la requisición se calcula a partir de las aprobaciones registradas.
 Esto evita duplicar información en la base de datos y permite conocer el avance real del proceso según los pasos aprobados o pendientes.
 ```
+---
+
+### Flujo de asignación de cargos a usuarios en frontend
+
+```txt
+1. El ADMIN ingresa a la administración de usuarios (AdminUsers).
+2. El listado muestra la columna "Cargo" con el cargo activo de cada usuario o "Sin cargo".
+3. El ADMIN pulsa el botón "Asignar cargo" en la fila del usuario.
+4. useUserPositionAssignment abre UserPositionAssignmentDialog y consulta por HTTP los cargos disponibles (solo la primera vez) y el cargo actual con su historial.
+5. El ADMIN busca y selecciona un cargo. El cargo que el usuario ya tiene aparece deshabilitado.
+6. Al guardar, el frontend envía el cargo mediante assignUserPosition().
+7. El backend cierra el cargo anterior, si existía, y crea la nueva asignación en una sola transacción.
+8. El hook recarga el cargo actual, el historial y el listado de usuarios, y muestra un mensaje de confirmación.
+9. Si el ADMIN pulsa "Retirar cargo", se muestra ConfirmActionDialog y, al confirmar, se llama a endUserPositionAssignment().
+```
+
+### Nota sobre las aprobaciones pendientes
+
+```txt
+La asignación de cargos no traslada las aprobaciones pendientes. Si un usuario cambia de cargo mientras tiene requisiciones o contrataciones por aprobar, esas aprobaciones siguen a su nombre. La limitación está documentada en la sección "Asignación de cargos a usuarios" de Endpoints.md del backend.
+```

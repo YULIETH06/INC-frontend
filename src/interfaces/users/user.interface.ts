@@ -1,3 +1,7 @@
+import type {
+  UserCurrentPosition,
+} from "./userPositionAssignment.interface";
+
 export type UserRole =
   | "USER"
   | "ADMIN"
@@ -8,6 +12,9 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
+
+  // Cargo activo del usuario. Solo llega en el listado de administración.
+  currentPosition?: UserCurrentPosition | null;
 }
 
 // Datos del formulario utilizado por el administrador

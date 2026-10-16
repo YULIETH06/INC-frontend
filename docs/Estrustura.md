@@ -222,6 +222,7 @@ components/
     ├── ChangeUserPasswordDialog.tsx
     ├── ChangeUserRoleDialog.tsx
     ├── SettingsMenu.tsx
+    ├── UserPositionAssignmentDialog.tsx
     ├── UserRoleChip.tsx
     └── UserSignatureUploader.tsx
 ```
@@ -529,6 +530,7 @@ components/users/
 ├── ChangeUserPasswordDialog.tsx
 ├── ChangeUserRoleDialog.tsx
 ├── SettingsMenu.tsx
+├── UserPositionAssignmentDialog.tsx
 ├── UserRoleChip.tsx
 └── UserSignatureUploader.tsx
 ```
@@ -538,6 +540,7 @@ components/users/
 | `ChangeUserPasswordDialog.tsx` | Diálogo utilizado por el administrador para restablecer la contraseña de un usuario. Muestra el usuario seleccionado, solicita la nueva contraseña y su confirmación, y presenta los errores de validación correspondientes. | Se utiliza desde `AdminUsers.tsx` para ejecutar el restablecimiento administrativo de contraseña sin mezclar la lógica del formulario dentro de la página. |
 | `ChangeUserRoleDialog.tsx` | Diálogo utilizado para cambiar el rol de un usuario seleccionado. | Se utiliza en la administración de usuarios. |
 | `SettingsMenu.tsx` | Componente encargado de mostrar las opciones personales y de configuración del usuario autenticado mediante un menú desplegable. Centraliza accesos como la firma del usuario y el cambio de contraseña. | Se utiliza desde `Header.tsx` para acceder a configuraciones personales del usuario. |
+| `UserPositionAssignmentDialog.tsx` | Diálogo utilizado por el administrador para asignar, cambiar o retirar el cargo de un usuario. Muestra el usuario seleccionado, su cargo actual con la fecha de inicio, un selector con buscador de cargos activos agrupados por área y la tabla de cargos anteriores. Antes de retirar el cargo solicita confirmación mediante `ConfirmActionDialog`. | Se utiliza desde `AdminUsers.tsx` junto con `useUserPositionAssignment.ts`. |
 | `UserRoleChip.tsx` | Componente visual que muestra el rol de un usuario mediante una etiqueta o chip con color, texto e ícono. | Se utiliza en tablas, listados o detalles donde se necesite mostrar el rol de un usuario. |
 | `UserSignatureUploader.tsx` | Componente encargado de registrar o actualizar la firma del usuario autenticado. Permite seleccionar una imagen, validar el archivo, mostrar una vista previa y enviarlo al backend mediante `multipart/form-data`. La firma guardada se utiliza posteriormente en aprobaciones, vistos buenos y formatos imprimibles. | Se utiliza para configurar la firma que será usada en procesos de aprobación y formatos del sistema. |
 
@@ -764,6 +767,7 @@ hooks/
 └── users/
     ├── useAdminUsers.ts
     ├── useChangeUserPassword.ts
+    ├── useUserPositionAssignment.ts
     └── useUserSignature.ts
 ```
 
@@ -914,6 +918,7 @@ hooks/pqrs/
 hooks/users/
 ├── useAdminUsers.ts
 ├── useChangeUserPassword.ts
+├── useUserPositionAssignment.ts
 └── useUserSignature.ts
 ```
 
@@ -921,6 +926,7 @@ hooks/users/
 | ---- | ----------- | ----------------------- |
 | `useAdminUsers.ts` | Maneja la administración general de usuarios. Controla la consulta del listado, el cambio de roles, la carga masiva y los mensajes asociados con esas operaciones. | Se utiliza en `AdminUsers.tsx`. |
 | `useChangeUserPassword.ts` | Maneja el restablecimiento administrativo de contraseña. Controla el usuario seleccionado, apertura y cierre del diálogo, nueva contraseña, confirmación, errores Yup, estado de carga, mensajes y envío de la solicitud al servicio de usuarios. | Se utiliza en `AdminUsers.tsx` junto con `ChangeUserPasswordDialog.tsx`. |
+| `useUserPositionAssignment.ts` | Maneja la asignación de cargos de un usuario. Controla la apertura y cierre del diálogo, la consulta de los cargos disponibles (una sola vez), la consulta del cargo actual y el historial, el cargo seleccionado, la validación antes de guardar, la asignación o cambio de cargo, la confirmación y el retiro del cargo, y los mensajes asociados. Después de cada cambio recarga el listado de usuarios mediante `onAssignmentChange`. | Se utiliza en `AdminUsers.tsx` junto con `UserPositionAssignmentDialog.tsx`. |
 | `useUserSignature.ts` | Maneja la lógica relacionada con el registro o actualización de la firma del usuario autenticado. Controla la selección del archivo, validación de formato, vista previa, estado de carga, envío mediante `multipart/form-data` y mensajes de éxito o error. | Se utiliza en `UserSignatureUploader.tsx` para permitir que el usuario configure la firma que será utilizada en aprobaciones y formatos del sistema. |
 
 ---
@@ -978,6 +984,7 @@ review
 chat
 rating
 play
+position
 ```
 
 También define el tipo `AppIconName`, utilizado para limitar los nombres de íconos permitidos en los componentes que consumen este catálogo.
@@ -1042,6 +1049,7 @@ interfaces/
 │
 └── users/
     ├── user.interface.ts
+    ├── userPositionAssignment.interface.ts
     ├── bulkUpload.interface.ts
     └── excel.interface.ts
 ```
@@ -1146,13 +1154,15 @@ interfaces/pqrs/
 ```txt
 interfaces/users/
 ├── user.interface.ts
+├── userPositionAssignment.interface.ts
 ├── bulkUpload.interface.ts
 └── excel.interface.ts
 ```
 
 | Archivo                   | Descripción                                                                                                                          | Uso dentro del proyecto                                                                                                     |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| `user.interface.ts`       | Define los tipos e interfaces relacionados con los usuarios, sus roles y las operaciones asociadas con su administración. | Se utiliza en administración de usuarios, servicios, hooks, componentes relacionados con roles, restablecimiento de contraseña y contexto de autenticación. |
+| `user.interface.ts`       | Define los tipos e interfaces relacionados con los usuarios, su rol, cargo y las operaciones asociadas con su administración. | Se utiliza en administración de usuarios, servicios, hooks, componentes relacionados con roles, restablecimiento de contraseña y contexto de autenticación. |
+| `userPositionAssignment.interface.ts` | Define los tipos de la asignación de cargos: cargo disponible para asignar, asignación activa o histórica, cargo actual del listado y respuestas del backend al consultar, asignar o retirar un cargo. | Se utiliza en `userPositionAssignmentService.ts`, `useUserPositionAssignment.ts`, `UserPositionAssignmentDialog.tsx` y `user.interface.ts`. |
 | `bulkUpload.interface.ts` | Define los tipos relacionados con carga masiva de usuarios, archivos seleccionados, resultados del proceso y errores de importación. | Se utiliza en componentes, hooks y servicios relacionados con la carga masiva de usuarios.                                  |
 | `excel.interface.ts`      | Define los tipos relacionados con la estructura y manejo de archivos Excel dentro del frontend.                                      | Se utiliza en funciones o plantillas encargadas de generar, leer o preparar archivos de Excel.                              |
 
@@ -1359,7 +1369,7 @@ pages/users/
 
 | Página | Descripción |
 | ------ | ----------- |
-| `AdminUsers.tsx` | Muestra la administración de usuarios del sistema. Permite consultar, buscar y filtrar registros, modificar roles, restablecer contraseñas, actualizar la información visible y realizar procesos de carga masiva. Su función principal es organizar la interfaz y coordinar las acciones disponibles para la gestión de usuarios. |
+| `AdminUsers.tsx` | Muestra la administración de usuarios del sistema. Permite consultar, buscar y filtrar registros, modificar roles, asignar o retirar cargos, restablecer contraseñas, actualizar la información visible y realizar procesos de carga masiva. Su función principal es organizar la interfaz y coordinar las acciones disponibles para la gestión de usuarios. |
 | `ChangePassword.tsx` | Muestra la configuración para cambiar la contraseña del usuario autenticado mediante `useChangePassword.ts` y los campos reutilizables de contraseña. |
 | `UserSignature.tsx` | Muestra la página de configuración de firma del usuario autenticado. Utiliza `UserSignatureUploader.tsx` y `useUserSignature.ts` para seleccionar, validar, previsualizar y cargar la imagen que será utilizada en aprobaciones y formatos del sistema. |
 
@@ -1449,6 +1459,7 @@ services/
 │   └── socketService.ts
 │
 └── users/
+    ├── userPositionAssignmentService.ts
     └── userService.ts
 ```
 
@@ -1808,11 +1819,13 @@ disconnectSocket()
 
 ```txt
 services/users/
+├── userPositionAssignmentService.ts
 └── userService.ts
 ```
 
 | Archivo          | Descripción                                                                                                                                                                                              | Uso dentro del proyecto                                                                                                                                           |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `userPositionAssignmentService.ts` | Contiene las funciones HTTP de la asignación de cargos a usuarios: consultar los cargos disponibles, consultar el cargo actual y el historial, asignar o cambiar el cargo y retirarlo. | Se utiliza desde `useUserPositionAssignment.ts`. |
 | `userService.ts` | Contiene las funciones HTTP relacionadas con la consulta y administración de usuarios, cambio de roles, restablecimiento administrativo de contraseña, registro de la firma del usuario autenticado y carga masiva de usuarios mediante archivos Excel. | Se utiliza desde los hooks del módulo de usuarios para consultar información, actualizar roles, restablecer contraseñas, cargar firmas y registrar usuarios de forma masiva. |
 
 ---
@@ -1836,6 +1849,24 @@ uploadUsersBulk()
 | `resetUserPassword(userId, data)` | Restablece la contraseña de un usuario mediante `PATCH /users/:id/password`. Recibe únicamente `newPassword`; la confirmación se valida en el frontend y no se envía al backend. |
 | `uploadUserSignature(file)` | Registra o actualiza la firma del usuario autenticado mediante un archivo enviado como `multipart/form-data`. |
 | `uploadUsersBulk(file)` | Registra varios usuarios mediante la carga de un archivo Excel enviado como `multipart/form-data`. |
+
+---
+
+##### Funciones en `userPositionAssignmentService.ts`
+
+```txt
+getAssignablePositions()
+getUserPositionAssignments()
+assignUserPosition()
+endUserPositionAssignment()
+```
+
+| Función | Descripción |
+| ------- | ----------- |
+| `getAssignablePositions()` | Consulta los cargos activos disponibles para asignar mediante `GET /users/position-assignments/positions`. |
+| `getUserPositionAssignments(userId)` | Consulta el cargo actual y el historial de cargos de un usuario mediante `GET /users/:id/position-assignments`. |
+| `assignUserPosition(userId, positionId)` | Asigna o cambia el cargo de un usuario mediante `POST /users/:id/position-assignments`. Si el usuario ya tenía un cargo, el backend lo cierra y lo deja en el historial. |
+| `endUserPositionAssignment(userId)` | Retira el cargo activo de un usuario mediante `PATCH /users/:id/position-assignments/current/end`. |
 
 ---
 

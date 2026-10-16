@@ -33,6 +33,7 @@ import RateReviewOutlinedIcon from "@mui/icons-material/RateReviewOutlined";
 import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
 import StarBorderOutlinedIcon from "@mui/icons-material/StarBorderOutlined";
 import PlayArrowOutlinedIcon from "@mui/icons-material/PlayArrowOutlined";
+import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
 
 export const appIcons = {
     save: SaveOutlinedIcon,
@@ -71,6 +72,7 @@ export const appIcons = {
     chat: ForumOutlinedIcon,
     rating: StarBorderOutlinedIcon,
     play: PlayArrowOutlinedIcon,
+    position: BadgeOutlinedIcon,
 };
 
 export type AppIconName =

@@ -1,76 +1,102 @@
-# Historial de Incidentes Frontend
+# Historial de incidentes del frontend
+
+## Descripción
+
+Este documento registra solo los incidentes **importantes** del frontend: los que costó entender por qué pasaban o los que conviene recordar para no repetirlos.
+
+Los errores comunes del día a día (un error de tipos, un import que falta, un ajuste pequeño) no se documentan aquí.
 
 ---
-# Incidente #001 — Error por uso duplicado de BrowserRouter
+
+# Índice
+
+| # | Incidente | Fecha | Estado |
+|---|---|---|---|
+| 001 | [Uso duplicado de BrowserRouter](#incidente-001--uso-duplicado-de-browserrouter) | 2026-05-11 | ✅ Resuelto |
+
+---
+
+# Incidente #001 — Uso duplicado de BrowserRouter
 
 ## Fecha
 
 2026-05-11
 
----
-
 ## Descripción del incidente
 
-Durante la configuración de rutas en el frontend se presentó un problema donde las vistas no se renderizaban correctamente al utilizar `BrowserRouter`.
-
-Después de revisar la estructura del proyecto, se identificó que el problema estaba relacionado con el uso duplicado de `BrowserRouter`.
-
----
+Durante la configuración de rutas, las vistas no se mostraban correctamente al navegar.
 
 ## Error presentado
-
-### Problema observado
 
 ```txt
 Las vistas no se renderizaban correctamente al navegar entre rutas.
 ```
 
----
-
 ## Causa identificada
 
-`BrowserRouter` estaba siendo utilizado más de una vez dentro de la aplicación.
+`BrowserRouter` estaba declarado en más de un archivo. React Router solo permite **una** instancia envolviendo toda la aplicación.
 
-React Router solo permite una única instancia de `BrowserRouter` envolviendo toda la aplicación.
+## Solución aplicada
 
-El problema ocurría porque estaba declarado en varios archivos al mismo tiempo.
-
----
-
-# Solución aplicada
-
-## Estructura corregida
-
-Se dejó `BrowserRouter` únicamente en el archivo principal:
+Se dejó `BrowserRouter` únicamente en `src/main.tsx`.
 
 ```txt
-src/main.tsx
+Regla: BrowserRouter solo va en main.tsx
+No debe repetirse en: App.tsx, AppRoutes.tsx ni otros componentes
 ```
-
----
-
-## Regla definida
-
-```txt
-BrowserRouter solo debe ir en main.tsx
-```
-
----
-
-## Archivos donde NO debe repetirse
-
-```txt
-App.tsx
-AppRoutes.tsx
-Otros componentes
-```
-
----
 
 ## Validación realizada
 
-Después de eliminar las instancias duplicadas de `BrowserRouter`, las rutas comenzaron a renderizarse correctamente.
+Al eliminar las instancias duplicadas, las rutas se mostraron correctamente y la navegación volvió a funcionar.
 
-La navegación volvió a funcionar de manera normal.
+## Resultado final
+
+- Una sola instancia de `BrowserRouter` en `main.tsx`.
+
+## Observaciones
+
+`AppRoutes.tsx` solo debe usar `Routes` y `Route`.
 
 ---
+
+# Plantilla para un incidente nuevo
+
+Agregar el incidente al **Índice** y copiar este bloque al final del documento, antes de esta plantilla.
+
+````markdown
+# Incidente #00X — Título corto
+
+## Fecha
+
+AAAA-MM-DD
+
+## Descripción del incidente
+
+Qué estaba haciendo y qué pasó.
+
+## Error presentado
+
+```txt
+Mensaje exacto del error
+```
+
+## Causa identificada
+
+Por qué ocurrió.
+
+## Solución aplicada
+
+Pasos y comandos ejecutados.
+
+## Validación realizada
+
+Cómo se comprobó que quedó resuelto.
+
+## Resultado final
+
+- …
+
+## Observaciones
+
+Qué hacer para que no vuelva a pasar.
+````

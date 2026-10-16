@@ -28,6 +28,10 @@ import {
 } from "../../hooks/users/useChangeUserPassword";
 
 import {
+  useUserPositionAssignment,
+} from "../../hooks/users/useUserPositionAssignment";
+
+import {
   userRoles,
 } from "../../data/userRoles";
 
@@ -48,6 +52,7 @@ import ClearableSelect from "../../components/common/ClearableSelect";
 import UserRoleChip from "../../components/users/UserRoleChip";
 import ChangeUserRoleDialog from "../../components/users/ChangeUserRoleDialog";
 import ChangeUserPasswordDialog from "../../components/users/ChangeUserPasswordDialog";
+import UserPositionAssignmentDialog from "../../components/users/UserPositionAssignmentDialog";
 
 import {
   filterStyles,
@@ -131,6 +136,45 @@ const AdminUsers = () => {
     closeMessage: closePasswordMessage,
   } = useChangeUserPassword();
 
+  // Asignación de cargos.
+  const {
+    selectedPositionUser,
+    openPositionDialog,
+
+    positions,
+    loadingPositions,
+
+    currentAssignment,
+    assignmentHistory,
+    loadingAssignments,
+    loadError: positionLoadError,
+
+    selectedPosition,
+    positionError,
+
+    savingPosition,
+    endingPosition,
+    openEndConfirm,
+
+    message: positionMessage,
+    messageType: positionMessageType,
+    openMessage: openPositionMessage,
+
+    openUserPositionDialog,
+    closeUserPositionDialog,
+    handlePositionChange,
+    handleAssignPosition,
+
+    openEndPositionConfirm,
+    closeEndPositionConfirm,
+    handleEndPosition,
+
+    closeMessage: closePositionMessage,
+  } = useUserPositionAssignment({
+    onAssignmentChange: () =>
+      loadUsers(false),
+  });
+
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -208,7 +252,7 @@ const AdminUsers = () => {
     setPage(0);
   };
 
-  // Filtra usuarios por nombre, correo y rol.
+  // Filtra usuarios por nombre, correo, cargo y rol.
   const filteredUsers =
     useMemo(() => {
       const normalizedSearch =
@@ -228,7 +272,14 @@ const AdminUsers = () => {
               .toLowerCase()
               .includes(
                 normalizedSearch
-              );
+              ) ||
+            Boolean(
+              user.currentPosition?.position.name
+                .toLowerCase()
+                .includes(
+                  normalizedSearch
+                )
+            );
 
           const matchesRole =
             roleFilter === "ALL" ||
@@ -297,6 +348,45 @@ const AdminUsers = () => {
         ),
       },
       {
+        id: "position",
+        label: "Cargo",
+        render: (user) =>
+          user.currentPosition ? (
+            <Box>
+              <Typography
+                variant="body2"
+                sx={{
+                  fontWeight: 600,
+                  color:
+                    "text.primary",
+                }}
+              >
+                {
+                  user.currentPosition
+                    .position.name
+                }
+              </Typography>
+
+              <Typography
+                variant="caption"
+                color="text.secondary"
+              >
+                {
+                  user.currentPosition
+                    .position.code
+                }
+              </Typography>
+            </Box>
+          ) : (
+            <Typography
+              variant="body2"
+              color="text.secondary"
+            >
+              Sin cargo
+            </Typography>
+          ),
+      },
+      {
         id: "action",
         label: "Acciones",
         align: "center",
@@ -326,6 +416,24 @@ const AdminUsers = () => {
               }
               sx={
                 tableStyles.primaryActionButton
+              }
+            />
+
+            {/* Asignación de cargo. */}
+            <IconActionButton
+              icon="position"
+              tooltip="Asignar cargo"
+              onClick={() =>
+                openUserPositionDialog(
+                  user
+                )
+              }
+              disabled={
+                updatingUserId ===
+                user.id
+              }
+              sx={
+                tableStyles.neutralActionButton
               }
             />
 
@@ -382,7 +490,7 @@ const AdminUsers = () => {
       ) : (
         <DataTable
           title="Usuarios registrados"
-          subtitle="Administra los usuarios registrados y sus roles dentro del sistema."
+          subtitle="Administra los usuarios registrados, sus roles y sus cargos dentro del sistema."
           actions={
             <ListToolbar
               searchValue={
@@ -391,7 +499,7 @@ const AdminUsers = () => {
               onSearchChange={
                 handleSearchChange
               }
-              searchPlaceholder="Buscar nombre o correo"
+              searchPlaceholder="Buscar nombre, correo o cargo"
               searchTooltip="Buscar usuario"
               filterActive={
                 roleFilter !==
@@ -482,7 +590,7 @@ const AdminUsers = () => {
           >
             <EmptyState
               title="No se encontraron usuarios"
-              description="Intenta buscar con otro nombre, correo o rol."
+              description="Intenta buscar con otro nombre, correo, cargo o rol."
             />
           </Box>
         )}
@@ -542,6 +650,65 @@ const AdminUsers = () => {
         }
       />
 
+      {/* Asignación de cargo. */}
+      <UserPositionAssignmentDialog
+        open={
+          openPositionDialog
+        }
+        selectedUser={
+          selectedPositionUser
+        }
+        positions={positions}
+        loadingPositions={
+          loadingPositions
+        }
+        currentAssignment={
+          currentAssignment
+        }
+        assignmentHistory={
+          assignmentHistory
+        }
+        loadingAssignments={
+          loadingAssignments
+        }
+        loadError={
+          positionLoadError
+        }
+        selectedPosition={
+          selectedPosition
+        }
+        positionError={
+          positionError
+        }
+        saving={
+          savingPosition
+        }
+        ending={
+          endingPosition
+        }
+        openEndConfirm={
+          openEndConfirm
+        }
+        onClose={
+          closeUserPositionDialog
+        }
+        onPositionChange={
+          handlePositionChange
+        }
+        onSave={
+          handleAssignPosition
+        }
+        onOpenEndConfirm={
+          openEndPositionConfirm
+        }
+        onCloseEndConfirm={
+          closeEndPositionConfirm
+        }
+        onConfirmEnd={
+          handleEndPosition
+        }
+      />
+
       {/* Carga masiva. */}
       <BulkUploadDialog
         open={
@@ -593,6 +760,22 @@ const AdminUsers = () => {
         }
         onClose={
           closeMessage
+        }
+      />
+
+      {/* Mensajes de la asignación de cargos. */}
+      <CustomSnackbar
+        open={
+          openPositionMessage
+        }
+        message={
+          positionMessage
+        }
+        severity={
+          positionMessageType
+        }
+        onClose={
+          closePositionMessage
         }
       />
 
