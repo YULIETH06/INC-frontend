@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 import PageHeader from "../../../components/common/PageHeader";
 import FormSection from "../../../components/common/FormSection";
 import FormGrid from "../../../components/common/FormGrid";
-import ClearableSelect from "../../../components/common/ClearableSelect";
+import ClearableSelect from "../../../components/common/inputs/ClearableSelect";
 import CustomSnackbar from "../../../components/common/CustomSnackbar";
 import LoadingBox from "../../../components/common/LoadingBox";
 import ActionButton from "../../../components/common/ActionButton";

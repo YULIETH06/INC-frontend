@@ -63,7 +63,7 @@ import EmptyState from "../../../components/common/EmptyState";
 import CustomSnackbar from "../../../components/common/CustomSnackbar";
 import StatsSummary from "../../../components/common/StatsSummary";
 import ListToolbar from "../../../components/common/ListToolbar";
-import ClearableSelect from "../../../components/common/ClearableSelect";
+import ClearableSelect from "../../../components/common/inputs/ClearableSelect";
 import ActionButton from "../../../components/common/ActionButton";
 
 import PqrRatingSummary from "../../../components/pqrs/PqrRatingSummary";

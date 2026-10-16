@@ -29,7 +29,7 @@ import {
 } from "../../utils/pqrs/pqrUtils";
 import { pqrPriorityOptions, pqrStatusOptions } from "../../data/pqrOptions";
 
-import ClearableSelect from "../common/ClearableSelect";
+import ClearableSelect from "../common/inputs/ClearableSelect";
 import PqrRatingSummary from "./PqrRatingSummary";
 
 type PqrTicketCardProps = {

@@ -49,7 +49,7 @@ import CustomSnackbar from "../../../components/common/CustomSnackbar";
 import StatsSummary from "../../../components/common/StatsSummary";
 import ViewToggleButtons from "../../../components/common/ViewToggleButtons";
 import ListToolbar from "../../../components/common/ListToolbar";
-import ClearableSelect from "../../../components/common/ClearableSelect";
+import ClearableSelect from "../../../components/common/inputs/ClearableSelect";
 import ActionButton from "../../../components/common/ActionButton";
 
 import {

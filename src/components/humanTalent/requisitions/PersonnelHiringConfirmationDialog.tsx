@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 
 import ActionButton from "../../common/ActionButton";
-import ClearableSelect from "../../common/ClearableSelect";
+import ClearableSelect from "../../common/inputs/ClearableSelect";
 
 import NumberInput from "../../common/inputs/NumberInput";
 import MoneyInput from "../../common/inputs/MoneyInput";

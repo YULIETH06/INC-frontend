@@ -47,7 +47,7 @@ import ListToolbar from "../../components/common/ListToolbar";
 import IconActionButton from "../../components/common/IconActionButton";
 import ActionButton from "../../components/common/ActionButton";
 import BulkUploadDialog from "../../components/common/BulkUploadDialog";
-import ClearableSelect from "../../components/common/ClearableSelect";
+import ClearableSelect from "../../components/common/inputs/ClearableSelect";
 
 import UserRoleChip from "../../components/users/UserRoleChip";
 import ChangeUserRoleDialog from "../../components/users/ChangeUserRoleDialog";

@@ -4,7 +4,7 @@ import { useSearchParams } from "react-router-dom";
 
 import PageContainer from "../../components/common/PageContainer";
 import PageHeader from "../../components/common/PageHeader";
-import ClearableSelect from "../../components/common/ClearableSelect";
+import ClearableSelect from "../../components/common/inputs/ClearableSelect";
 import EmptyState from "../../components/common/EmptyState";
 import FormGrid from "../../components/common/FormGrid";
 import FormSection from "../../components/common/FormSection";

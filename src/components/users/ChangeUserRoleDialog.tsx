@@ -17,7 +17,7 @@ import {
 
 import CustomDialog from "../common/CustomDialog";
 import ActionButton from "../common/ActionButton";
-import ClearableSelect from "../common/ClearableSelect";
+import ClearableSelect from "../common/inputs/ClearableSelect";
 
 import UserRoleChip from "./UserRoleChip";
 

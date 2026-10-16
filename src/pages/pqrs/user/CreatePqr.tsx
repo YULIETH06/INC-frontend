@@ -11,7 +11,7 @@ import { useCreatePqr } from "../../../hooks/pqrs/useCreatePqr";
 
 import { pqrCaseTypes } from "../../../data/pqrOptions";
 
-import ClearableSelect from "../../../components/common/ClearableSelect";
+import ClearableSelect from "../../../components/common/inputs/ClearableSelect";
 import CustomSnackbar from "../../../components/common/CustomSnackbar";
 import FileInput from "../../../components/common/inputs/FileInput";
 import TextAreaInput from "../../../components/common/inputs/TextAreaInput";
