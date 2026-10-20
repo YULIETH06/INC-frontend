@@ -246,6 +246,13 @@ export interface PersonnelRequisition {
     createdById: number;
     createdBy?: RequisitionUser;
 
+    // Cargo responsable de la requisición (cargo del creador al crearla).
+    ownerPositionId?: number | null;
+
+    // Indica si el usuario autenticado es hoy el responsable de la requisición.
+    // Solo llega en el detalle de la requisición.
+    isCurrentOwner?: boolean;
+
     approvals?: PersonnelRequisitionApproval[];
     hiringConfirmation?: PersonnelHiringConfirmation | null;
 
