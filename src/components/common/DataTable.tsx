@@ -29,6 +29,7 @@ interface DataTableProps<T> {
     rowsPerPage: number;
     onPageChange: (_event: unknown, newPage: number) => void;
     onRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    minWidth?: number | string;
 }
 
 // Muestra una tabla reutilizable con encabezado flotante, acciones y paginación
@@ -42,6 +43,7 @@ const DataTable = <T,>({
     rowsPerPage,
     onPageChange,
     onRowsPerPageChange,
+    minWidth,
 }: DataTableProps<T>) => {
     // Calcula los registros visibles según la página actual
     const visibleRows = rows.slice(
@@ -110,8 +112,7 @@ const DataTable = <T,>({
                 </Box>
             )}
 
-            <TableContainer
-                component={Paper}
+            <Paper
                 sx={{
                     borderRadius: "16px",
                     boxShadow: "none",
@@ -120,60 +121,75 @@ const DataTable = <T,>({
                     backgroundColor: "background.paper",
                 }}
             >
-                <Table>
-                    <TableHead
+                {/* Contenedor interno: permite el scroll horizontal cuando las columnas no caben. */}
+                <TableContainer
+                    sx={{
+                        overflowX: "auto",
+                    }}
+                >
+                    <Table
                         sx={{
-                            backgroundColor: "#f8fafc",
+                            minWidth,
                         }}
                     >
-                        <TableRow>
-                            {columns.map((column) => (
-                                <TableCell
-                                    key={column.id}
-                                    align={column.align || "left"}
-                                    sx={{
-                                        color: "#475569",
-                                        fontWeight: 800,
-                                        fontSize: "12px",
-                                        textTransform: "uppercase",
-                                        letterSpacing: "0.04em",
-                                        borderBottom: "1px solid #e5e7eb",
-                                    }}
-                                >
-                                    {column.label}
-                                </TableCell>
-                            ))}
-                        </TableRow>
-                    </TableHead>
-
-                    <TableBody>
-                        {visibleRows.map((row, index) => (
-                            <TableRow
-                                key={index}
-                                sx={{
-                                    "&:hover": {
-                                        backgroundColor: "primary.light",
-                                    },
-                                }}
-                            >
+                        <TableHead
+                            sx={{
+                                backgroundColor: "#f8fafc",
+                            }}
+                        >
+                            <TableRow>
                                 {columns.map((column) => (
                                     <TableCell
                                         key={column.id}
                                         align={column.align || "left"}
                                         sx={{
-                                            color: "text.primary",
-                                            fontSize: "14px",
-                                            borderBottom: "1px solid #f1f5f9",
+                                            color: "#475569",
+                                            fontWeight: 800,
+                                            fontSize: "12px",
+                                            textTransform: "uppercase",
+                                            letterSpacing: "0.04em",
+                                            borderBottom: "1px solid #e5e7eb",
+
+                                            // Evita que los títulos se partan en varias líneas.
+                                            whiteSpace: "nowrap",
                                         }}
                                     >
-                                        {column.render(row, page * rowsPerPage + index)}
+                                        {column.label}
                                     </TableCell>
                                 ))}
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
+                        </TableHead>
 
+                        <TableBody>
+                            {visibleRows.map((row, index) => (
+                                <TableRow
+                                    key={index}
+                                    sx={{
+                                        "&:hover": {
+                                            backgroundColor: "primary.light",
+                                        },
+                                    }}
+                                >
+                                    {columns.map((column) => (
+                                        <TableCell
+                                            key={column.id}
+                                            align={column.align || "left"}
+                                            sx={{
+                                                color: "text.primary",
+                                                fontSize: "14px",
+                                                borderBottom: "1px solid #f1f5f9",
+                                            }}
+                                        >
+                                            {column.render(row, page * rowsPerPage + index)}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+
+                {/* La paginación queda fuera del scroll para mantenerse siempre visible. */}
                 <TablePagination
                     component="div"
                     count={rows.length}
@@ -187,7 +203,7 @@ const DataTable = <T,>({
                         `${from}-${to} de ${count}`
                     }
                 />
-            </TableContainer>
+            </Paper>
         </Box>
     );
 };

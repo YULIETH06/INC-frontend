@@ -94,13 +94,13 @@ export const menuItems: MenuModule[] = [
           {
             label: "Ver requisiciones",
             path: "/dashboard/human-talent/requisitions",
-            roles: ["ADMIN", "USER"],
+            roles: ["ADMIN", "USER", "AGENT"],
             positionCodes: requisitionViewPositionCodes,
           },
           {
             label: "Crear requisición",
             path: "/dashboard/human-talent/requisitions/create",
-            roles: ["ADMIN", "USER"],
+            roles: ["USER", "AGENT"],
             positionCodes: requisitionCreatePositionCodes,
           },
         ],
@@ -111,7 +111,7 @@ export const menuItems: MenuModule[] = [
           {
             label: "Validación de cargo y postulante",
             path: "/dashboard/human-talent/candidate-validations",
-            roles: ["ADMIN", "USER"],
+            roles: ["ADMIN", "USER", "AGENT"],
             positionCodes: [
               ...requisitionCreatePositionCodes,
               "DPC-TH-0118", // Analista de Talento Humano
