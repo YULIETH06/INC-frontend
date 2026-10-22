@@ -420,6 +420,7 @@ const PersonnelCandidateValidations = () => {
                             refreshTooltip="Actualizar lista"
                         />
                     }
+                    minWidth={900}
                     columns={
                         columns
                     }

@@ -564,6 +564,7 @@ const AdminUsers = () => {
               }
             />
           }
+          minWidth={760}
           columns={columns}
           rows={filteredUsers}
           page={page}

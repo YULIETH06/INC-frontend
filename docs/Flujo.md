@@ -191,8 +191,5 @@ Esto evita duplicar información en la base de datos y permite conocer el avance
 3. Cuando alguien recibe el cargo, las aprobaciones pendientes se le asignan y se le notifican las que ya son su turno.
 4. Las requisiciones del cargo pasan al nuevo ocupante: él preselecciona candidatos, confirma la Evaluación Técnica y recibe las notificaciones del responsable.
 5. El usuario que dejó el cargo deja de ver esas requisiciones.
-6. El frontend no compara el creador de la requisición: usa isCurrentOwner, que envía el backend en el detalle.
-7. Los cargos del usuario se consultan al iniciar sesión y al recargar la página, así que después de un cambio de cargo el usuario debe recargar para ver el menú actualizado.
+6. Los cargos del usuario se consultan al iniciar sesión y al recargar la página, así que después de un cambio de cargo el usuario debe recargar para ver el menú actualizado.
 ```
-
-El detalle de las reglas está en la sección "Traslado de procesos al cambiar un cargo" de `Endpoints.md` del backend.

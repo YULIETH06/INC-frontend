@@ -40,8 +40,6 @@ interface PersonnelRequisitionCandidatesSectionProps {
     candidateSubmissionDeadlineAt: string | null;
     candidateSubmissionClosedAt: string | null;
     candidateSubmissionLateReason: string | null;
-
-    // Indica si el usuario autenticado es hoy el responsable de la requisición.
     isCurrentOwner: boolean;
 }
 
