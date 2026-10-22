@@ -28,8 +28,6 @@ import PersonnelRequisitionCandidateDialog from "./PersonnelRequisitionCandidate
 
 import { usePersonnelRequisitionCandidates } from "../../../hooks/humanTalent/requisitions/usePersonnelRequisitionCandidates";
 
-import { useAuth } from "../../../context/AuthContext";
-
 import { formatDate } from "../../../utils/common/dateUtils";
 
 import type {
@@ -42,7 +40,7 @@ interface PersonnelRequisitionCandidatesSectionProps {
     candidateSubmissionDeadlineAt: string | null;
     candidateSubmissionClosedAt: string | null;
     candidateSubmissionLateReason: string | null;
-    createdById: number;
+    isCurrentOwner: boolean;
 }
 
 // Sección encargada de mostrar y gestionar los candidatos de una requisición.
@@ -52,11 +50,8 @@ const PersonnelRequisitionCandidatesSection = ({
     candidateSubmissionDeadlineAt,
     candidateSubmissionClosedAt,
     candidateSubmissionLateReason,
-    createdById,
+    isCurrentOwner,
 }: PersonnelRequisitionCandidatesSectionProps) => {
-    // Usuario autenticado.
-    const { user } = useAuth();
-
     // Estado local del cargue para reflejar los cambios sin recargar la página.
     const [
         currentSubmissionStatus,
@@ -302,11 +297,11 @@ const PersonnelRequisitionCandidatesSection = ({
         !loadingCandidates &&
         !loadError;
 
-    // Solo el creador de la requisición puede realizar
-    // la preselección cuando el cargue está cerrado.
+    // Solo el responsable actual de la requisición (quien tiene hoy
+    // el cargo responsable) puede realizar la preselección cuando el cargue está cerrado.
     const canSelectCandidates =
         isSubmissionClosed &&
-        user?.id === createdById &&
+        isCurrentOwner &&
         !loadingCandidates &&
         !loadError;
 

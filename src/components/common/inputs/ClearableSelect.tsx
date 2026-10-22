@@ -42,7 +42,6 @@ const ClearableSelect = ({
     disabled = false,
     size = "medium",
     minWidth = "220px",
-    placeholder,
     clearable = false,
     loading = false,
     loadingText = "Cargando opciones...",

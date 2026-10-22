@@ -437,8 +437,10 @@ const PersonnelRequisitionDetail = () => {
                             candidateSubmissionLateReason={
                                 requisition.candidateSubmissionLateReason
                             }
-                            createdById={
-                                requisition.createdById
+                            isCurrentOwner={
+                                Boolean(
+                                    requisition.isCurrentOwner
+                                )
                             }
                         />
                     )}

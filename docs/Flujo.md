@@ -183,8 +183,13 @@ Esto evita duplicar información en la base de datos y permite conocer el avance
 9. Si el ADMIN pulsa "Retirar cargo", se muestra ConfirmActionDialog y, al confirmar, se llama a endUserPositionAssignment().
 ```
 
-### Nota sobre las aprobaciones pendientes
+### Flujo del traslado de procesos al cambiar un cargo
 
 ```txt
-La asignación de cargos no traslada las aprobaciones pendientes. Si un usuario cambia de cargo mientras tiene requisiciones o contrataciones por aprobar, esas aprobaciones siguen a su nombre. La limitación está documentada en la sección "Asignación de cargos a usuarios" de Endpoints.md del backend.
+1. El ADMIN retira el cargo a un usuario o lo cambia por otro.
+2. El backend traslada las aprobaciones pendientes de ese cargo al nuevo ocupante, o las deja sin responsable si el cargo queda vacío.
+3. Cuando alguien recibe el cargo, las aprobaciones pendientes se le asignan y se le notifican las que ya son su turno.
+4. Las requisiciones del cargo pasan al nuevo ocupante: él preselecciona candidatos, confirma la Evaluación Técnica y recibe las notificaciones del responsable.
+5. El usuario que dejó el cargo deja de ver esas requisiciones.
+6. Los cargos del usuario se consultan al iniciar sesión y al recargar la página, así que después de un cambio de cargo el usuario debe recargar para ver el menú actualizado.
 ```

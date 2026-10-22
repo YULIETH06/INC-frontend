@@ -178,12 +178,6 @@ const MyPqrs = () => {
     const hasActiveFilters =
         statusFilter !== "ALL";
 
-    // Indica si existe búsqueda o filtro activo.
-    // Se utiliza únicamente para el texto informativo.
-    const hasActiveCriteria =
-        searchTerm.trim() !== "" ||
-        hasActiveFilters;
-
     // Opciones disponibles para el filtro por estado.
     const statusFilterOptions = [
         {
