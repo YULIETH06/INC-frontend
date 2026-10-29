@@ -37,6 +37,7 @@ import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
 import AlternateEmailOutlinedIcon from "@mui/icons-material/AlternateEmailOutlined";
 import PersonOffOutlinedIcon from "@mui/icons-material/PersonOffOutlined";
 import HowToRegOutlinedIcon from "@mui/icons-material/HowToRegOutlined";
+import MoreVertOutlinedIcon from "@mui/icons-material/MoreVertOutlined";
 
 export const appIcons = {
     save: SaveOutlinedIcon,
@@ -79,6 +80,7 @@ export const appIcons = {
     email: AlternateEmailOutlinedIcon,
     deactivateUser: PersonOffOutlinedIcon,
     activateUser: HowToRegOutlinedIcon,
+    moreOptions: MoreVertOutlinedIcon,
 };
 
 export type AppIconName =

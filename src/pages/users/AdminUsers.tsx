@@ -61,6 +61,7 @@ import IconActionButton from "../../components/common/IconActionButton";
 import ActionButton from "../../components/common/ActionButton";
 import BulkUploadDialog from "../../components/common/BulkUploadDialog";
 import ClearableSelect from "../../components/common/inputs/ClearableSelect";
+import RowActionsMenu from "../../components/common/RowActionsMenu";
 
 import UserRoleChip from "../../components/users/UserRoleChip";
 import CustomChip from "../../components/common/CustomChip";
@@ -504,127 +505,73 @@ const AdminUsers = () => {
         id: "action",
         label: "Acciones",
         align: "center",
-        render: (user) => (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent:
-                "center",
-              alignItems:
-                "center",
-              gap: 0.5,
-            }}
-          >
-            {/* Cambio de rol. */}
-            <IconActionButton
-              icon="edit"
-              tooltip="Cambiar rol"
+        render: (user) => {
+          const isInactive =
+            user.isActive === false;
+
+          const isOwnUser =
+            user.id === authenticatedUser?.id;
+
+          return (
+            <RowActionsMenu
               loading={
                 updatingUserId ===
                 user.id
               }
-              onClick={() =>
-                openChangeRoleDialog(
-                  user
-                )
-              }
-              sx={
-                tableStyles.primaryActionButton
-              }
-            />
-
-            {/* Cambio de correo. */}
-            <IconActionButton
-              icon="email"
-              tooltip="Cambiar correo"
-              onClick={() =>
-                openEmailDialog(
-                  user
-                )
-              }
-              disabled={
-                updatingUserId ===
-                user.id
-              }
               sx={
                 tableStyles.neutralActionButton
               }
+              options={[
+                {
+                  label: "Cambiar rol",
+                  icon: "edit",
+                  onClick: () =>
+                    openChangeRoleDialog(user),
+                },
+                {
+                  label: "Cambiar correo",
+                  icon: "email",
+                  onClick: () =>
+                    openEmailDialog(user),
+                },
+                {
+                  label: "Asignar cargo",
+                  icon: "position",
+                  onClick: () =>
+                    openUserPositionDialog(user),
+                  disabled: isInactive,
+                  tooltip: isInactive
+                    ? "Activa el usuario para asignarle un cargo"
+                    : undefined,
+                },
+                {
+                  label: "Restablecer contraseña",
+                  icon: "changePassword",
+                  onClick: () =>
+                    openChangePasswordDialog(user),
+                },
+                isInactive
+                  ? {
+                    label: "Activar usuario",
+                    icon: "activateUser",
+                    onClick: () =>
+                      openStatusConfirm(user),
+                  }
+                  : {
+                    label: "Desactivar usuario",
+                    icon: "deactivateUser",
+                    onClick: () =>
+                      openStatusConfirm(user),
+                    disabled: isOwnUser,
+                    tooltip: isOwnUser
+                      ? "No puedes desactivar tu propio usuario"
+                      : undefined,
+                    color: "error",
+                  },
+              ]}
             />
-
-            {/* Asignación de cargo. */}
-            <IconActionButton
-              icon="position"
-              tooltip={
-                user.isActive === false
-                  ? "Activa el usuario para asignarle un cargo"
-                  : "Asignar cargo"
-              }
-              onClick={() =>
-                openUserPositionDialog(
-                  user
-                )
-              }
-              disabled={
-                updatingUserId ===
-                user.id ||
-                user.isActive === false
-              }
-              sx={
-                tableStyles.neutralActionButton
-              }
-            />
-
-            {/* Restablecimiento de contraseña. */}
-            <IconActionButton
-              icon="changePassword"
-              tooltip="Restablecer contraseña"
-              onClick={() =>
-                openChangePasswordDialog(
-                  user
-                )
-              }
-              disabled={
-                updatingUserId ===
-                user.id
-              }
-              sx={
-                tableStyles.neutralActionButton
-              }
-            />
-
-            {/* Activación o desactivación. El ADMIN no puede desactivarse a sí mismo. */}
-            <IconActionButton
-              icon={
-                user.isActive === false
-                  ? "activateUser"
-                  : "deactivateUser"
-              }
-              tooltip={
-                user.isActive === false
-                  ? "Activar usuario"
-                  : user.id === authenticatedUser?.id
-                    ? "No puedes desactivar tu propio usuario"
-                    : "Desactivar usuario"
-              }
-              onClick={() =>
-                openStatusConfirm(
-                  user
-                )
-              }
-              disabled={
-                updatingUserId ===
-                user.id ||
-                (
-                  user.isActive !== false &&
-                  user.id === authenticatedUser?.id
-                )
-              }
-              sx={
-                tableStyles.neutralActionButton
-              }
-            />
-          </Box>
-        ),
+          );
+        },
       },
     ];
 
