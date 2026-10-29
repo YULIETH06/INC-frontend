@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ValidationError } from "yup";
 
+import { SESSION_MESSAGE_KEY } from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
 import { loginUser } from "../../services/auth/authService";
 import { loginSchema } from "../../validations/auth/authValidation";
@@ -29,7 +30,15 @@ export const useLogin = () => {
     const [loading, setLoading] = useState(false);
 
     // Mensaje de error general.
-    const [error, setError] = useState("");
+    // Si la sesión se cerró desde el backend, inicia con ese mensaje.
+    const [error, setError] = useState(
+        () => sessionStorage.getItem(SESSION_MESSAGE_KEY) ?? ""
+    );
+
+    // Borra el mensaje guardado para que no vuelva a aparecer al recargar.
+    useEffect(() => {
+        sessionStorage.removeItem(SESSION_MESSAGE_KEY);
+    }, []);
 
     // Errores de validación por campo.
     const [formErrors, setFormErrors] =

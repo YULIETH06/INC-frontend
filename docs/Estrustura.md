@@ -96,6 +96,8 @@ Esta carpeta contiene la configuración base para la comunicación con el backen
 
 Aquí se ubican archivos como la instancia de Axios, donde se define la URL base de la API y los interceptores para enviar automáticamente el token de autenticación cuando el usuario ha iniciado sesión.
 
+También contiene un interceptor de respuesta que cierra la sesión cuando el backend responde `401` con `code: "USER_INACTIVE"`, es decir, cuando el usuario fue desactivado. El interceptor borra el token, guarda el mensaje en `sessionStorage` con la clave `SESSION_MESSAGE_KEY` y recarga la aplicación en el login.
+
 **Ejemplo de uso:**
 
 ```txt
@@ -531,6 +533,7 @@ Estos componentes dependen directamente de la información, acciones o configura
 
 ```txt
 components/users/
+├── ChangeUserEmailDialog.tsx
 ├── ChangeUserPasswordDialog.tsx
 ├── ChangeUserRoleDialog.tsx
 ├── SettingsMenu.tsx
@@ -541,6 +544,7 @@ components/users/
 
 | Componente | Descripción | Uso dentro del proyecto |
 | ---------- | ----------- | ----------------------- |
+| `ChangeUserEmailDialog.tsx` | Diálogo utilizado por el administrador para cambiar el correo de un usuario. Muestra el usuario seleccionado con su correo actual, solicita el nuevo correo y presenta los errores de validación. El texto de ayuda cambia según el usuario esté activo o desactivado.  | Se utiliza desde `AdminUsers.tsx` junto con `useUserAccountActions.ts`. |
 | `ChangeUserPasswordDialog.tsx` | Diálogo utilizado por el administrador para restablecer la contraseña de un usuario. Muestra el usuario seleccionado, solicita la nueva contraseña y su confirmación, y presenta los errores de validación correspondientes. | Se utiliza desde `AdminUsers.tsx` para ejecutar el restablecimiento administrativo de contraseña sin mezclar la lógica del formulario dentro de la página. |
 | `ChangeUserRoleDialog.tsx` | Diálogo utilizado para cambiar el rol de un usuario seleccionado. | Se utiliza en la administración de usuarios. |
 | `SettingsMenu.tsx` | Componente encargado de mostrar las opciones personales y de configuración del usuario autenticado mediante un menú desplegable. Centraliza accesos como la firma del usuario y el cambio de contraseña. | Se utiliza desde `Header.tsx` para acceder a configuraciones personales del usuario. |
@@ -771,6 +775,7 @@ hooks/
 └── users/
     ├── useAdminUsers.ts
     ├── useChangeUserPassword.ts
+    ├── useUserAccountActions.ts
     ├── useUserPositionAssignment.ts
     └── useUserSignature.ts
 ```
@@ -799,7 +804,7 @@ hooks/auth/
 | Hook | Descripción | Uso dentro del proyecto |
 | ---- | ----------- | ----------------------- |
 | `useChangePassword.ts` | Maneja los campos, validaciones, carga y mensajes del cambio de contraseña del usuario autenticado. | Se utiliza en `ChangePassword.tsx`. |
-| `useLogin.ts` | Maneja la lógica del inicio de sesión, validaciones, errores, carga y autenticación del usuario. | Se utiliza en `Login.tsx`. |
+| `useLogin.ts` | Maneja la lógica del inicio de sesión, validaciones, errores, carga y autenticación del usuario. Si la sesión se cerró porque el usuario fue desactivado, muestra el mensaje guardado en `sessionStorage` y luego lo borra. | Se utiliza en `Login.tsx`. |
 | `useRegister.ts` | Maneja los campos, validaciones, mensajes y estado de carga del registro de usuarios. | Se utiliza en `Register.tsx`. |
 
 ---
@@ -922,6 +927,7 @@ hooks/pqrs/
 hooks/users/
 ├── useAdminUsers.ts
 ├── useChangeUserPassword.ts
+├── useUserAccountActions.ts
 ├── useUserPositionAssignment.ts
 └── useUserSignature.ts
 ```
@@ -930,6 +936,7 @@ hooks/users/
 | ---- | ----------- | ----------------------- |
 | `useAdminUsers.ts` | Maneja la administración general de usuarios. Controla la consulta del listado, el cambio de roles, la carga masiva y los mensajes asociados con esas operaciones. | Se utiliza en `AdminUsers.tsx`. |
 | `useChangeUserPassword.ts` | Maneja el restablecimiento administrativo de contraseña. Controla el usuario seleccionado, apertura y cierre del diálogo, nueva contraseña, confirmación, errores Yup, estado de carga, mensajes y envío de la solicitud al servicio de usuarios. | Se utiliza en `AdminUsers.tsx` junto con `ChangeUserPasswordDialog.tsx`. |
+| `useUserAccountActions.ts` | Maneja la activación, la desactivación y el cambio de correo de un usuario. Controla el usuario seleccionado, la acción que se va a confirmar (activar o desactivar), el diálogo de cambio de correo, el nuevo correo, los errores Yup, los estados de carga y los mensajes. Después de cada cambio recarga el listado de usuarios mediante `onAccountChange`. | Se utiliza en `AdminUsers.tsx` junto con `ChangeUserEmailDialog.tsx` y `ConfirmActionDialog.tsx`. |
 | `useUserPositionAssignment.ts` | Maneja la asignación de cargos de un usuario. Controla la apertura y cierre del diálogo, la consulta de los cargos disponibles (una sola vez), la consulta del cargo actual y el historial, el cargo seleccionado, la validación antes de guardar, la asignación o cambio de cargo, la confirmación y el retiro del cargo, y los mensajes asociados. Después de cada cambio recarga el listado de usuarios mediante `onAssignmentChange`. | Se utiliza en `AdminUsers.tsx` junto con `UserPositionAssignmentDialog.tsx`. |
 | `useUserSignature.ts` | Maneja la lógica relacionada con el registro o actualización de la firma del usuario autenticado. Controla la selección del archivo, validación de formato, vista previa, estado de carga, envío mediante `multipart/form-data` y mensajes de éxito o error. | Se utiliza en `UserSignatureUploader.tsx` para permitir que el usuario configure la firma que será utilizada en aprobaciones y formatos del sistema. |
 
@@ -989,6 +996,9 @@ chat
 rating
 play
 position
+email
+deactivateUser
+activateUser
 ```
 
 También define el tipo `AppIconName`, utilizado para limitar los nombres de íconos permitidos en los componentes que consumen este catálogo.
@@ -1165,7 +1175,7 @@ interfaces/users/
 
 | Archivo                   | Descripción                                                                                                                          | Uso dentro del proyecto                                                                                                     |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| `user.interface.ts`       | Define los tipos e interfaces relacionados con los usuarios, su rol, cargo y las operaciones asociadas con su administración. | Se utiliza en administración de usuarios, servicios, hooks, componentes relacionados con roles, restablecimiento de contraseña y contexto de autenticación. |
+| `user.interface.ts`       | Define los tipos e interfaces relacionados con los usuarios, su rol, cargo, estado y las operaciones asociadas con su administración. | Se utiliza en administración de usuarios, servicios, hooks, componentes relacionados con roles, restablecimiento de contraseña y contexto de autenticación. |
 | `userPositionAssignment.interface.ts` | Define los tipos de la asignación de cargos: cargo disponible para asignar, asignación activa o histórica, cargo actual del listado y respuestas del backend al consultar, asignar o retirar un cargo. | Se utiliza en `userPositionAssignmentService.ts`, `useUserPositionAssignment.ts`, `UserPositionAssignmentDialog.tsx` y `user.interface.ts`. |
 | `bulkUpload.interface.ts` | Define los tipos relacionados con carga masiva de usuarios, archivos seleccionados, resultados del proceso y errores de importación. | Se utiliza en componentes, hooks y servicios relacionados con la carga masiva de usuarios.                                  |
 | `excel.interface.ts`      | Define los tipos relacionados con la estructura y manejo de archivos Excel dentro del frontend.                                      | Se utiliza en funciones o plantillas encargadas de generar, leer o preparar archivos de Excel.                              |
@@ -1373,7 +1383,7 @@ pages/users/
 
 | Página | Descripción |
 | ------ | ----------- |
-| `AdminUsers.tsx` | Muestra la administración de usuarios del sistema. Permite consultar, buscar y filtrar registros, modificar roles, asignar o retirar cargos, restablecer contraseñas, actualizar la información visible y realizar procesos de carga masiva. Su función principal es organizar la interfaz y coordinar las acciones disponibles para la gestión de usuarios. |
+| `AdminUsers.tsx` | Muestra la administración de usuarios del sistema. Permite consultar, buscar y filtrar registros por rol y estado, modificar roles, asignar o retirar cargos, restablecer contraseñas, cambiar correos, activar o desactivar usuarios, actualizar la información visible y realizar procesos de carga masiva. Su función principal es organizar la interfaz y coordinar las acciones disponibles para la gestión de usuarios. |
 | `ChangePassword.tsx` | Muestra la configuración para cambiar la contraseña del usuario autenticado mediante `useChangePassword.ts` y los campos reutilizables de contraseña. |
 | `UserSignature.tsx` | Muestra la página de configuración de firma del usuario autenticado. Utiliza `UserSignatureUploader.tsx` y `useUserSignature.ts` para seleccionar, validar, previsualizar y cargar la imagen que será utilizada en aprobaciones y formatos del sistema. |
 
@@ -1830,7 +1840,7 @@ services/users/
 | Archivo          | Descripción                                                                                                                                                                                              | Uso dentro del proyecto                                                                                                                                           |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `userPositionAssignmentService.ts` | Contiene las funciones HTTP de la asignación de cargos a usuarios: consultar los cargos disponibles, consultar el cargo actual y el historial, asignar o cambiar el cargo y retirarlo. | Se utiliza desde `useUserPositionAssignment.ts`. |
-| `userService.ts` | Contiene las funciones HTTP relacionadas con la consulta y administración de usuarios, cambio de roles, restablecimiento administrativo de contraseña, registro de la firma del usuario autenticado y carga masiva de usuarios mediante archivos Excel. | Se utiliza desde los hooks del módulo de usuarios para consultar información, actualizar roles, restablecer contraseñas, cargar firmas y registrar usuarios de forma masiva. |
+| `userService.ts` | Contiene las funciones HTTP relacionadas con la consulta y administración de usuarios, cambio de roles, restablecimiento administrativo de contraseña, activación, desactivación y cambio de correo, registro de la firma del usuario autenticado y carga masiva de usuarios mediante archivos Excel. | Se utiliza desde los hooks del módulo de usuarios para consultar información, actualizar roles, restablecer contraseñas, cargar firmas y registrar usuarios de forma masiva. |
 
 ---
 
@@ -1841,6 +1851,9 @@ getAllUsers()
 getAgents()
 updateUserRole()
 resetUserPassword()
+deactivateUser()
+activateUser()
+updateUserEmail()
 uploadUserSignature()
 uploadUsersBulk()
 ```
@@ -1851,6 +1864,9 @@ uploadUsersBulk()
 | `getAgents()` | Consulta únicamente los usuarios que tienen el rol `AGENT`. |
 | `updateUserRole(userId, role)` | Actualiza el rol de un usuario mediante su identificador. |
 | `resetUserPassword(userId, data)` | Restablece la contraseña de un usuario mediante `PATCH /users/:id/password`. Recibe únicamente `newPassword`; la confirmación se valida en el frontend y no se envía al backend. |
+| `deactivateUser(userId)` | Desactiva un usuario mediante `PATCH /users/:id/deactivate`. |
+| `activateUser(userId)` | Activa nuevamente un usuario desactivado mediante `PATCH /users/:id/activate`. |
+| `updateUserEmail(userId, email)` | Cambia el correo de un usuario mediante `PATCH /users/:id/email`. |
 | `uploadUserSignature(file)` | Registra o actualiza la firma del usuario autenticado mediante un archivo enviado como `multipart/form-data`. |
 | `uploadUsersBulk(file)` | Registra varios usuarios mediante la carga de un archivo Excel enviado como `multipart/form-data`. |
 
@@ -2029,7 +2045,8 @@ utils/
 │   └── pqrUtils.ts
 │
 └── users/
-    └── userRoleUtils.tsx
+    ├── userRoleUtils.tsx
+    └── userStatusUtils.ts
 ```
 
 ---
@@ -2298,14 +2315,16 @@ getCaseTypeLabel()
 
 ```txt
 utils/users/
-└── userRoleUtils.tsx
+├── userRoleUtils.tsx
+└── userStatusUtils.ts
 ```
 
-Los archivos ubicados en `utils/users/` contienen funciones específicas relacionadas con la presentación de los roles de usuario.
+Los archivos ubicados en `utils/users/` contienen funciones específicas relacionadas con la presentación de los roles y el estado de los usuarios.
 
 | Archivo             | Descripción                                                                                                | Uso dentro del proyecto                                                                                                    |
 | ------------------- | ---------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | `userRoleUtils.tsx` | Contiene funciones auxiliares relacionadas con la representación visual y textual de los roles de usuario. | Se utiliza en listas, tablas, tarjetas y componentes donde se necesita mostrar el color, ícono o nombre legible de un rol. |
+| `userStatusUtils.ts` | Contiene funciones auxiliares relacionadas con la representación visual y textual del estado del usuario (activo o desactivado). | Se utiliza en `AdminUsers.tsx` para mostrar el chip de la columna "Estado" y las opciones del filtro por estado. |
 
 ---
 
@@ -2322,6 +2341,20 @@ getUserRoleLabel()
 | `getUserRoleColor(role)` | Retorna el color de Material UI correspondiente al rol del usuario para mostrarlo en componentes como `Chip`. |
 | `getUserRoleIcon(role)`  | Retorna el ícono correspondiente al rol del usuario.                                                          |
 | `getUserRoleLabel(role)` | Convierte el valor técnico del rol en una etiqueta legible como `Administrador`, `Agente` o `Usuario`.        |
+
+---
+
+##### Funciones en `userStatusUtils.ts`
+
+```txt
+getUserStatusColor()
+getUserStatusLabel()
+```
+
+| Función | Descripción |
+| ------- | ----------- |
+| `getUserStatusColor(isActive)` | Retorna el color de Material UI correspondiente al estado del usuario: `success` si está activo y `default` si está desactivado. |
+| `getUserStatusLabel(isActive)` | Convierte el estado del usuario en una etiqueta legible: `Activo` o `Desactivado`. |
 
 ---
 
@@ -2552,11 +2585,13 @@ Este archivo contiene las reglas Yup específicas de la administración de usuar
 
 ```txt
 resetUserPasswordSchema()
+updateUserEmailSchema()
 ```
 
 | Esquema | Descripción | Uso dentro del proyecto |
 | ------- | ----------- | ----------------------- |
 | `resetUserPasswordSchema()` | Valida que la nueva contraseña sea obligatoria, tenga mínimo 6 caracteres y que la confirmación coincida con `newPassword`. No solicita la contraseña actual porque el flujo corresponde a un restablecimiento realizado por un administrador. | Se utiliza en `useChangeUserPassword.ts`. |
+| `updateUserEmailSchema()` | Valida que el nuevo correo sea obligatorio y tenga un formato válido. | Se utiliza en `useUserAccountActions.ts`. |
 
 ---
 

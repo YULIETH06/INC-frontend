@@ -34,6 +34,9 @@ import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
 import StarBorderOutlinedIcon from "@mui/icons-material/StarBorderOutlined";
 import PlayArrowOutlinedIcon from "@mui/icons-material/PlayArrowOutlined";
 import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
+import AlternateEmailOutlinedIcon from "@mui/icons-material/AlternateEmailOutlined";
+import PersonOffOutlinedIcon from "@mui/icons-material/PersonOffOutlined";
+import HowToRegOutlinedIcon from "@mui/icons-material/HowToRegOutlined";
 
 export const appIcons = {
     save: SaveOutlinedIcon,
@@ -73,6 +76,9 @@ export const appIcons = {
     rating: StarBorderOutlinedIcon,
     play: PlayArrowOutlinedIcon,
     position: BadgeOutlinedIcon,
+    email: AlternateEmailOutlinedIcon,
+    deactivateUser: PersonOffOutlinedIcon,
+    activateUser: HowToRegOutlinedIcon,
 };
 
 export type AppIconName =

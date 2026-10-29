@@ -12,6 +12,8 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
+  isActive?: boolean;
+  deactivatedAt?: string | null;
 
   // Cargo activo del usuario. Solo llega en el listado de administración.
   currentPosition?: UserCurrentPosition | null;
@@ -37,3 +39,26 @@ export type ResetUserPasswordErrors = Partial<
     string
   >
 >;
+
+// Datos del formulario utilizado por el administrador
+// para cambiar el correo de un usuario.
+export interface UpdateUserEmailFormData {
+  email: string;
+}
+
+// Errores de validación del formulario de cambio de correo.
+export type UpdateUserEmailErrors = Partial<
+  Record<
+    keyof UpdateUserEmailFormData,
+    string
+  >
+>;
+
+// Respuesta del backend al activar, desactivar o cambiar el correo de un usuario.
+export interface UserAccountResponse {
+  message: string;
+  user: Pick<
+    User,
+    "id" | "name" | "email" | "role" | "isActive" | "deactivatedAt"
+  >;
+}

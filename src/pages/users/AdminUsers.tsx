@@ -32,12 +32,25 @@ import {
 } from "../../hooks/users/useUserPositionAssignment";
 
 import {
+  useUserAccountActions,
+} from "../../hooks/users/useUserAccountActions";
+
+import {
+  useAuth,
+} from "../../context/AuthContext";
+
+import {
   userRoles,
 } from "../../data/userRoles";
 
 import {
   getUserRoleLabel,
 } from "../../utils/users/userRoleUtils";
+
+import {
+  getUserStatusColor,
+  getUserStatusLabel,
+} from "../../utils/users/userStatusUtils";
 
 import LoadingBox from "../../components/common/LoadingBox";
 import EmptyState from "../../components/common/EmptyState";
@@ -50,6 +63,9 @@ import BulkUploadDialog from "../../components/common/BulkUploadDialog";
 import ClearableSelect from "../../components/common/inputs/ClearableSelect";
 
 import UserRoleChip from "../../components/users/UserRoleChip";
+import CustomChip from "../../components/common/CustomChip";
+import ConfirmActionDialog from "../../components/common/ConfirmActionDialog";
+import ChangeUserEmailDialog from "../../components/users/ChangeUserEmailDialog";
 import ChangeUserRoleDialog from "../../components/users/ChangeUserRoleDialog";
 import ChangeUserPasswordDialog from "../../components/users/ChangeUserPasswordDialog";
 import UserPositionAssignmentDialog from "../../components/users/UserPositionAssignmentDialog";
@@ -175,6 +191,39 @@ const AdminUsers = () => {
       loadUsers(false),
   });
 
+  // Activación, desactivación y cambio de correo.
+  const {
+    statusUser,
+    statusAction,
+    updatingStatus,
+
+    emailUser,
+    newEmail,
+    emailErrors,
+    updatingEmail,
+
+    message: accountMessage,
+    messageType: accountMessageType,
+    openMessage: openAccountMessage,
+
+    openStatusConfirm,
+    closeStatusConfirm,
+    handleConfirmStatus,
+
+    openEmailDialog,
+    closeEmailDialog,
+    handleNewEmailChange,
+    handleSaveEmail,
+
+    closeMessage: closeAccountMessage,
+  } = useUserAccountActions({
+    onAccountChange: () =>
+      loadUsers(false),
+  });
+
+  // Usuario autenticado: el ADMIN no puede desactivarse a sí mismo.
+  const { user: authenticatedUser } = useAuth();
+
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -186,6 +235,29 @@ const AdminUsers = () => {
   ] = useState<
     "ALL" | UserRole
   >("ALL");
+
+  const [
+    statusFilter,
+    setStatusFilter,
+  ] = useState<
+    "ALL" | "ACTIVE" | "INACTIVE"
+  >("ALL");
+
+  // Opciones disponibles para filtrar usuarios por estado.
+  const statusFilterOptions = [
+    {
+      label: "Todos los estados",
+      value: "ALL",
+    },
+    {
+      label: getUserStatusLabel(true),
+      value: "ACTIVE",
+    },
+    {
+      label: getUserStatusLabel(false),
+      value: "INACTIVE",
+    },
+  ];
 
   // Opciones disponibles para filtrar usuarios por rol.
   const roleFilterOptions = [
@@ -246,11 +318,31 @@ const AdminUsers = () => {
     setPage(0);
   };
 
-  // Limpia el filtro por rol.
-  const clearRoleFilter = () => {
-    setRoleFilter("ALL");
+  // Actualiza el filtro por estado.
+  const handleStatusFilterChange = (
+    value: string
+  ) => {
+    setStatusFilter(
+      value as
+      | "ALL"
+      | "ACTIVE"
+      | "INACTIVE"
+    );
+
     setPage(0);
   };
+
+  // Limpia los filtros por rol y estado.
+  const clearRoleFilter = () => {
+    setRoleFilter("ALL");
+    setStatusFilter("ALL");
+    setPage(0);
+  };
+
+  // Indica si hay algún filtro aplicado.
+  const hasActiveFilters =
+    roleFilter !== "ALL" ||
+    statusFilter !== "ALL";
 
   // Filtra usuarios por nombre, correo, cargo y rol.
   const filteredUsers =
@@ -286,9 +378,18 @@ const AdminUsers = () => {
             user.role ===
             roleFilter;
 
+          const isActive =
+            user.isActive !== false;
+
+          const matchesStatus =
+            statusFilter === "ALL" ||
+            (statusFilter === "ACTIVE" && isActive) ||
+            (statusFilter === "INACTIVE" && !isActive);
+
           return (
             matchesSearch &&
-            matchesRole
+            matchesRole &&
+            matchesStatus
           );
         }
       );
@@ -296,6 +397,7 @@ const AdminUsers = () => {
       users,
       searchTerm,
       roleFilter,
+      statusFilter,
     ]);
 
   // Define las columnas de la tabla de usuarios.
@@ -344,6 +446,18 @@ const AdminUsers = () => {
         render: (user) => (
           <UserRoleChip
             role={user.role}
+          />
+        ),
+      },
+      {
+        id: "status",
+        label: "Estado",
+        render: (user) => (
+          <CustomChip
+            label={getUserStatusLabel(user.isActive)}
+            color={getUserStatusColor(user.isActive)}
+            size="small"
+            variant="outlined"
           />
         ),
       },
@@ -419,10 +533,32 @@ const AdminUsers = () => {
               }
             />
 
+            {/* Cambio de correo. */}
+            <IconActionButton
+              icon="email"
+              tooltip="Cambiar correo"
+              onClick={() =>
+                openEmailDialog(
+                  user
+                )
+              }
+              disabled={
+                updatingUserId ===
+                user.id
+              }
+              sx={
+                tableStyles.neutralActionButton
+              }
+            />
+
             {/* Asignación de cargo. */}
             <IconActionButton
               icon="position"
-              tooltip="Asignar cargo"
+              tooltip={
+                user.isActive === false
+                  ? "Activa el usuario para asignarle un cargo"
+                  : "Asignar cargo"
+              }
               onClick={() =>
                 openUserPositionDialog(
                   user
@@ -430,7 +566,8 @@ const AdminUsers = () => {
               }
               disabled={
                 updatingUserId ===
-                user.id
+                user.id ||
+                user.isActive === false
               }
               sx={
                 tableStyles.neutralActionButton
@@ -449,6 +586,38 @@ const AdminUsers = () => {
               disabled={
                 updatingUserId ===
                 user.id
+              }
+              sx={
+                tableStyles.neutralActionButton
+              }
+            />
+
+            {/* Activación o desactivación. El ADMIN no puede desactivarse a sí mismo. */}
+            <IconActionButton
+              icon={
+                user.isActive === false
+                  ? "activateUser"
+                  : "deactivateUser"
+              }
+              tooltip={
+                user.isActive === false
+                  ? "Activar usuario"
+                  : user.id === authenticatedUser?.id
+                    ? "No puedes desactivar tu propio usuario"
+                    : "Desactivar usuario"
+              }
+              onClick={() =>
+                openStatusConfirm(
+                  user
+                )
+              }
+              disabled={
+                updatingUserId ===
+                user.id ||
+                (
+                  user.isActive !== false &&
+                  user.id === authenticatedUser?.id
+                )
               }
               sx={
                 tableStyles.neutralActionButton
@@ -502,11 +671,10 @@ const AdminUsers = () => {
               searchPlaceholder="Buscar nombre, correo o cargo"
               searchTooltip="Buscar usuario"
               filterActive={
-                roleFilter !==
-                "ALL"
+                hasActiveFilters
               }
-              filterTitle="Filtrar por rol"
-              filterTooltip="Filtrar por rol"
+              filterTitle="Filtrar usuarios"
+              filterTooltip="Filtrar por rol o estado"
               filterContent={
                 <Box
                   sx={
@@ -528,6 +696,21 @@ const AdminUsers = () => {
                     minWidth="100%"
                   />
 
+                  <ClearableSelect
+                    label="Estado"
+                    value={
+                      statusFilter
+                    }
+                    options={
+                      statusFilterOptions
+                    }
+                    onChange={
+                      handleStatusFilterChange
+                    }
+                    size="small"
+                    minWidth="100%"
+                  />
+
                   <ActionButton
                     actionType="clear"
                     fullWidth
@@ -536,14 +719,13 @@ const AdminUsers = () => {
                       clearRoleFilter
                     }
                     disabled={
-                      roleFilter ===
-                      "ALL"
+                      !hasActiveFilters
                     }
                     sx={
                       filterStyles.clearFilterButton
                     }
                   >
-                    Limpiar filtro
+                    Limpiar filtros
                   </ActionButton>
                 </Box>
               }
@@ -564,7 +746,7 @@ const AdminUsers = () => {
               }
             />
           }
-          minWidth={760}
+          minWidth={880}
           columns={columns}
           rows={filteredUsers}
           page={page}
@@ -710,6 +892,71 @@ const AdminUsers = () => {
         }
       />
 
+      {/* Cambio de correo. */}
+      <ChangeUserEmailDialog
+        open={Boolean(emailUser)}
+        selectedUser={emailUser}
+        newEmail={newEmail}
+        errors={emailErrors}
+        loading={updatingEmail}
+        onClose={closeEmailDialog}
+        onNewEmailChange={
+          handleNewEmailChange
+        }
+        onSave={handleSaveEmail}
+      />
+
+      {/* Confirmación de activación o desactivación. */}
+      <ConfirmActionDialog
+        open={Boolean(statusUser)}
+        title={
+          statusAction === "deactivate"
+            ? "Desactivar usuario"
+            : "Activar usuario"
+        }
+        message={
+          <>
+            ¿Deseas{" "}
+            {statusAction === "deactivate"
+              ? "desactivar"
+              : "activar"}{" "}
+            a{" "}
+            <strong>
+              {statusUser?.name}
+            </strong>
+            ?
+          </>
+        }
+        infoContent={
+          statusAction === "deactivate"
+            ? "No podrá iniciar sesión y su sesión abierta se cerrará en su siguiente acción. Si tiene un cargo, se le retirará y sus aprobaciones pendientes quedarán esperando al próximo ocupante. Su correo quedará libre para un nuevo registro."
+            : "Podrá iniciar sesión nuevamente con su correo actual. Si otro usuario activo ya usa ese correo, primero debes cambiárselo. Los cargos no se restauran: si los necesita, asígnalos de nuevo."
+        }
+        infoSeverity={
+          statusAction === "deactivate"
+            ? "warning"
+            : "info"
+        }
+        actionType={
+          statusAction === "deactivate"
+            ? "lock"
+            : "unlock"
+        }
+        confirmText={
+          statusAction === "deactivate"
+            ? "Desactivar"
+            : "Activar"
+        }
+        loading={updatingStatus}
+        loadingText={
+          statusAction === "deactivate"
+            ? "Desactivando..."
+            : "Activando..."
+        }
+        onClose={closeStatusConfirm}
+        onConfirm={handleConfirmStatus}
+      />
+
       {/* Carga masiva. */}
       <BulkUploadDialog
         open={
@@ -777,6 +1024,22 @@ const AdminUsers = () => {
         }
         onClose={
           closePositionMessage
+        }
+      />
+
+      {/* Mensajes de activación, desactivación y cambio de correo. */}
+      <CustomSnackbar
+        open={
+          openAccountMessage
+        }
+        message={
+          accountMessage
+        }
+        severity={
+          accountMessageType
+        }
+        onClose={
+          closeAccountMessage
         }
       />
 
