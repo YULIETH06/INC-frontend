@@ -19,3 +19,13 @@ export const resetUserPasswordSchema = yup.object({
             "Las contraseñas no coinciden."
         ),
 });
+
+// Validación para cambiar el correo de un usuario
+// desde la administración de usuarios.
+export const updateUserEmailSchema = yup.object({
+    email: yup
+        .string()
+        .trim()
+        .required("Campo obligatorio")
+        .email("Ingresa un correo electrónico válido."),
+});

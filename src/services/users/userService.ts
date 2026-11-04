@@ -7,6 +7,7 @@ import type {
 import type {
   ResetUserPasswordData,
   User,
+  UserAccountResponse,
   UserRole,
 } from "../../interfaces/users/user.interface";
 
@@ -59,6 +60,43 @@ export const resetUserPassword = async (
   const response = await api.patch(
     `/users/${userId}/password`,
     data
+  );
+
+  return response.data;
+};
+
+// Desactiva un usuario. Endpoint usado por ADMIN.
+export const deactivateUser = async (
+  userId: number
+): Promise<UserAccountResponse> => {
+  const response = await api.patch<UserAccountResponse>(
+    `/users/${userId}/deactivate`
+  );
+
+  return response.data;
+};
+
+// Activa nuevamente un usuario desactivado. Endpoint usado por ADMIN.
+export const activateUser = async (
+  userId: number
+): Promise<UserAccountResponse> => {
+  const response = await api.patch<UserAccountResponse>(
+    `/users/${userId}/activate`
+  );
+
+  return response.data;
+};
+
+// Cambia el correo de un usuario. Endpoint usado por ADMIN.
+export const updateUserEmail = async (
+  userId: number,
+  email: string
+): Promise<UserAccountResponse> => {
+  const response = await api.patch<UserAccountResponse>(
+    `/users/${userId}/email`,
+    {
+      email,
+    }
   );
 
   return response.data;

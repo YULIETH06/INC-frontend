@@ -193,3 +193,38 @@ Esto evita duplicar información en la base de datos y permite conocer el avance
 5. El usuario que dejó el cargo deja de ver esas requisiciones.
 6. Los cargos del usuario se consultan al iniciar sesión y al recargar la página, así que después de un cambio de cargo el usuario debe recargar para ver el menú actualizado.
 ```
+
+### Flujo de activación y desactivación de usuarios en frontend
+
+```txt
+1. El ADMIN ingresa a la administración de usuarios (AdminUsers).
+2. El listado muestra la columna "Estado" con un chip "Activo" o "Desactivado", y el filtro permite mostrar solo los usuarios activos o desactivados.
+3. El ADMIN pulsa el botón "Desactivar usuario" o "Activar usuario" en la fila del usuario.
+4. useUserAccountActions abre ConfirmActionDialog con la acción que corresponde según el estado del usuario.
+5. Al confirmar, el frontend llama a deactivateUser() o activateUser().
+6. El hook recarga el listado de usuarios y muestra el mensaje del backend.
+7. El ADMIN no puede desactivar su propio usuario: el botón aparece deshabilitado en su fila.
+8. Un usuario desactivado no puede recibir cargos: el botón "Asignar cargo" aparece deshabilitado.
+9. Si al activar otro usuario activo ya usa el correo, el backend responde 409 y el mensaje se muestra en el snackbar. El ADMIN debe cambiar el correo antes de activarlo.
+```
+
+### Flujo del cambio de correo de un usuario en frontend
+
+```txt
+1. El ADMIN pulsa el botón "Cambiar correo" en la fila del usuario.
+2. useUserAccountActions abre ChangeUserEmailDialog con el usuario y su correo actual.
+3. Al guardar, el hook valida el correo con updateUserEmailSchema y revisa que sea diferente al actual.
+4. Si es válido, el frontend llama a updateUserEmail().
+5. El hook cierra el diálogo, recarga el listado de usuarios y muestra el mensaje del backend.
+```
+
+### Flujo del cierre de sesión de un usuario desactivado
+
+```txt
+1. El ADMIN desactiva a un usuario que tiene la sesión abierta.
+2. En su siguiente petición, el backend responde 401 con code "USER_INACTIVE".
+3. El interceptor de respuesta de axios.ts borra el token, guarda el mensaje en sessionStorage (SESSION_MESSAGE_KEY) y recarga la aplicación en el login.
+4. La recarga reinicia AuthContext y desconecta el socket.
+5. useLogin muestra el mensaje en el Alert del login y lo borra de sessionStorage, para que no vuelva a aparecer al recargar.
+6. Si el usuario intenta iniciar sesión con la contraseña correcta, el backend responde 403 con el mismo mensaje.
+```
