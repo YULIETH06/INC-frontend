@@ -46,19 +46,16 @@ const PositionProfileRevisionsSection = ({
         hasActiveDraft,
 
         editingRevision,
-        revisionToDelete,
         revisionToPublish,
 
         revisionForm,
         revisionFormErrors,
 
         openRevisionDialog,
-        openDeleteRevisionDialog,
         openPublishRevisionDialog,
 
         loadingRevisions,
         loadingRevisionSubmit,
-        loadingRevisionDelete,
         loadingPublish,
 
         loadError,
@@ -76,10 +73,6 @@ const PositionProfileRevisionsSection = ({
         openEditRevisionDialog,
         closeRevisionDialog,
         handleSubmitRevision,
-
-        openDeleteRevisionConfirmation,
-        closeDeleteRevisionConfirmation,
-        handleDeleteRevision,
 
         openPublishRevisionConfirmation,
         closePublishRevisionConfirmation,
@@ -292,9 +285,6 @@ const PositionProfileRevisionsSection = ({
                                             onPublish={
                                                 openPublishRevisionConfirmation
                                             }
-                                            onDelete={
-                                                openDeleteRevisionConfirmation
-                                            }
                                         />
                                     )
                                 )}
@@ -321,38 +311,6 @@ const PositionProfileRevisionsSection = ({
                 }
                 onSubmit={handleSubmitRevision}
                 onClose={closeRevisionDialog}
-            />
-
-            {/* Confirmación para eliminar una revisión. */}
-            <ConfirmActionDialog
-                open={openDeleteRevisionDialog}
-                title="Eliminar revisión"
-                message={
-                    <>
-                        Se eliminará la revisión{" "}
-                        <Box
-                            component="span"
-                            sx={{
-                                color:
-                                    "text.primary",
-                                fontWeight: 700,
-                            }}
-                        >
-                            {revisionToDelete
-                                ?.revisionNumber ?? ""}
-                        </Box>
-                        . Esta acción no se puede
-                        deshacer.
-                    </>
-                }
-                actionType="delete"
-                confirmText="Eliminar"
-                loading={loadingRevisionDelete}
-                loadingText="Eliminando..."
-                onClose={
-                    closeDeleteRevisionConfirmation
-                }
-                onConfirm={handleDeleteRevision}
             />
 
             {/* Confirmación para publicar una revisión. */}

@@ -881,7 +881,7 @@ hooks/positionManagement/
 | Hook                                    | Descripción                                                                                                                                                                                                                                                                                  | Uso dentro del proyecto                                                                           |
 | --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
 | `usePositionProfileRevisionSelector.ts` | Maneja la selección del departamento y del perfil de cargo. Carga los departamentos disponibles, consulta los perfiles asociados con el departamento seleccionado y permite recuperar la selección almacenada en los parámetros de la URL.                                                   | Se utiliza en `PositionProfileRevisions.tsx`.                                                     |
-| `usePositionProfileRevisions.ts` | Maneja la lógica principal de las revisiones de perfiles de cargo. Consulta el listado y detalle de revisiones, administra formularios, validaciones, diálogos, estados de carga y mensajes, y ejecuta las operaciones de crear, actualizar, eliminar y publicar revisiones. | Se utiliza en `PositionProfileRevisionsSection.tsx` y las páginas relacionadas con la gestión de revisiones del perfil de cargo. |
+| `usePositionProfileRevisions.ts` | Maneja la lógica principal de las revisiones de perfiles de cargo. Consulta el listado y detalle de revisiones, administra formularios, validaciones, diálogos, estados de carga y mensajes, y ejecuta las operaciones de crear, actualizar y publicar revisiones. | Se utiliza en `PositionProfileRevisionsSection.tsx` y las páginas relacionadas con la gestión de revisiones del perfil de cargo. |
 
 La lógica de revisiones debe permanecer en `hooks/positionManagement/` y no en `hooks/humanTalent/`.
 
@@ -1673,7 +1673,6 @@ getPositionProfileRevisions()
 getCurrentPositionProfileRevision()
 getPositionProfileRevisionDetail()
 updatePositionProfileRevision()
-deletePositionProfileRevision()
 publishPositionProfileRevision()
 
 createPositionRequirement()
@@ -1692,7 +1691,6 @@ deletePositionCompetency()
 | `getCurrentPositionProfileRevision(positionProfileId)` | Consulta la revisión vigente asociada a un perfil de cargo. Cuando no existe una revisión vigente, retorna la información correspondiente. |
 | `getPositionProfileRevisionDetail()` | Consulta el detalle completo de una revisión incluyendo requisitos, competencias y sus descripciones asociadas. |
 | `updatePositionProfileRevision()` | Actualiza la información editable de una revisión en estado `BORRADOR`. |
-| `deletePositionProfileRevision()` | Realiza la eliminación lógica de una revisión en estado `BORRADOR`. |
 | `publishPositionProfileRevision()` | Publica una revisión y la convierte en la revisión vigente del perfil de cargo. |
 | `createPositionRequirement()` | Agrega un requisito asociado a una revisión del perfil de cargo. |
 | `updatePositionRequirement()` | Actualiza la información de un requisito asociado a una revisión. |

@@ -74,18 +74,6 @@ export const updatePositionProfileRevision = async (
     return response.data;
 };
 
-// Elimina lógicamente una revisión en borrador.
-export const deletePositionProfileRevision = async (
-    positionProfileId: number,
-    revisionId: number
-): Promise<PositionProfileRevisionResponse> => {
-    const response = await api.delete<PositionProfileRevisionResponse>(
-        `/position-management/position-profiles/${positionProfileId}/revisions/${revisionId}`
-    );
-
-    return response.data;
-};
-
 // Publica una revisión y la convierte en la revisión vigente.
 export const publishPositionProfileRevision = async (
     positionProfileId: number,

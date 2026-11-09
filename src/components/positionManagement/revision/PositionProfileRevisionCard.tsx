@@ -38,10 +38,6 @@ interface PositionProfileRevisionCardProps {
     onPublish: (
         revision: PositionProfileRevision
     ) => void;
-
-    onDelete: (
-        revision: PositionProfileRevision
-    ) => void;
 }
 
 // Tarjeta para mostrar la información general de una revisión.
@@ -52,7 +48,6 @@ const PositionProfileRevisionCard = ({
     onViewCompetencies,
     onEdit,
     onPublish,
-    onDelete,
 }: PositionProfileRevisionCardProps) => {
     const isDraft =
         revision.status === "BORRADOR";
@@ -303,19 +298,6 @@ const PositionProfileRevisionCard = ({
                                     }
                                 >
                                     Publicar
-                                </ActionButton>
-
-                                <ActionButton
-                                    actionType="delete"
-                                    tooltip="Eliminar revisión"
-                                    iconOnlyOnMobile
-                                    onClick={() =>
-                                        onDelete(
-                                            revision
-                                        )
-                                    }
-                                >
-                                    Eliminar
                                 </ActionButton>
                             </Stack>
                         )}

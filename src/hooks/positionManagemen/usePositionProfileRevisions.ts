@@ -10,7 +10,6 @@ import {
     createPositionProfileRevision,
     createPositionRequirement,
     createPositionCompetency,
-    deletePositionProfileRevision,
     deletePositionRequirement,
     deletePositionCompetency,
     getPositionProfileRevisionDetail,
@@ -117,14 +116,6 @@ export const usePositionProfileRevisions = ({
         null
     );
 
-    // Revisión seleccionada para eliminar.
-    const [
-        revisionToDelete,
-        setRevisionToDelete,
-    ] = useState<PositionProfileRevision | null>(
-        null
-    );
-
     // Revisión seleccionada para publicar.
     const [
         revisionToPublish,
@@ -211,12 +202,6 @@ export const usePositionProfileRevisions = ({
         setOpenRevisionDialog,
     ] = useState(false);
 
-    // Controla la confirmación de eliminación de una revisión.
-    const [
-        openDeleteRevisionDialog,
-        setOpenDeleteRevisionDialog,
-    ] = useState(false);
-
     // Controla la confirmación de publicación.
     const [
         openPublishRevisionDialog,
@@ -257,12 +242,6 @@ export const usePositionProfileRevisions = ({
     const [
         loadingRevisionSubmit,
         setLoadingRevisionSubmit,
-    ] = useState(false);
-
-    // Controla la eliminación de una revisión.
-    const [
-        loadingRevisionDelete,
-        setLoadingRevisionDelete,
     ] = useState(false);
 
     // Controla la publicación de una revisión.
@@ -537,24 +516,6 @@ export const usePositionProfileRevisions = ({
 
         setOpenRevisionDialog(false);
         resetRevisionForm();
-    };
-
-    // Abre la confirmación para eliminar una revisión.
-    const openDeleteRevisionConfirmation = (
-        revision: PositionProfileRevision
-    ) => {
-        setRevisionToDelete(revision);
-        setOpenDeleteRevisionDialog(true);
-    };
-
-    // Cierra la confirmación de eliminación.
-    const closeDeleteRevisionConfirmation = () => {
-        if (loadingRevisionDelete) {
-            return;
-        }
-
-        setRevisionToDelete(null);
-        setOpenDeleteRevisionDialog(false);
     };
 
     // Abre la confirmación para publicar una revisión.
@@ -844,66 +805,6 @@ export const usePositionProfileRevisions = ({
             setOpenMessage(true);
         } finally {
             setLoadingRevisionSubmit(false);
-        }
-    };
-
-    // Elimina lógicamente la revisión seleccionada.
-    const handleDeleteRevision = async () => {
-        if (!revisionToDelete) {
-            return;
-        }
-
-        try {
-            setLoadingRevisionDelete(true);
-            setMessage("");
-            setOpenMessage(false);
-
-            const response =
-                await deletePositionProfileRevision(
-                    positionProfileId,
-                    revisionToDelete.id
-                );
-
-            setRevisions((previous) =>
-                previous.filter(
-                    (revision) =>
-                        revision.id !==
-                        revisionToDelete.id
-                )
-            );
-
-            if (
-                selectedRevisionDetail?.id ===
-                revisionToDelete.id
-            ) {
-                setSelectedRevisionDetail(null);
-                setDetailError("");
-            }
-
-            setRevisionToDelete(null);
-            setOpenDeleteRevisionDialog(false);
-
-            setMessage(
-                response.message ||
-                "Revisión eliminada correctamente."
-            );
-
-            setMessageSeverity("success");
-            setOpenMessage(true);
-        } catch (error: unknown) {
-            console.error(error);
-
-            setMessage(
-                getErrorMessage(
-                    error,
-                    "Error al eliminar la revisión."
-                )
-            );
-
-            setMessageSeverity("error");
-            setOpenMessage(true);
-        } finally {
-            setLoadingRevisionDelete(false);
         }
     };
 
@@ -1429,7 +1330,6 @@ export const usePositionProfileRevisions = ({
         selectedRevisionIsDraft,
 
         editingRevision,
-        revisionToDelete,
         revisionToPublish,
 
         selectedRequirementId,
@@ -1447,7 +1347,6 @@ export const usePositionProfileRevisions = ({
         requirementFormErrors,
 
         openRevisionDialog,
-        openDeleteRevisionDialog,
         openPublishRevisionDialog,
         openRequirementDialog,
         openDeleteRequirementDialog,
@@ -1456,7 +1355,6 @@ export const usePositionProfileRevisions = ({
         loadingRevisions,
         loadingRevisionDetail,
         loadingRevisionSubmit,
-        loadingRevisionDelete,
         loadingPublish,
         loadingRequirementSubmit,
         loadingRequirementDelete,
@@ -1495,10 +1393,6 @@ export const usePositionProfileRevisions = ({
         openEditRevisionDialog,
         closeRevisionDialog,
         handleSubmitRevision,
-
-        openDeleteRevisionConfirmation,
-        closeDeleteRevisionConfirmation,
-        handleDeleteRevision,
 
         openPublishRevisionConfirmation,
         closePublishRevisionConfirmation,
