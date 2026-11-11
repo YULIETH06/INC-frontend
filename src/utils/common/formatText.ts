@@ -16,3 +16,14 @@ export const getOptionLabel = (
 
     return options.find((option) => option.value === value)?.label ?? value;
 };
+
+// Normaliza un texto para búsquedas: minúsculas, sin tildes y sin espacios sobrantes.
+export const normalizeText = (text?: string | null) => {
+    if (!text) return "";
+
+    return text
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim();
+};
