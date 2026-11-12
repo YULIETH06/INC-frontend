@@ -2115,11 +2115,14 @@ getInitials()
 
 ```txt
 formatDate()
+isDateInRange()
 ```
 
 | Función             | Descripción                                                                                                                                                  |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `formatDate(value)` | Convierte una fecha en un formato numérico legible según la configuración regional de Colombia. Cuando no recibe una fecha válida, retorna `____/____/____`. |
+
+| `isDateInRange(value, startDate, endDate)` | Valida si una fecha se encuentra dentro de un rango. `startDate` y `endDate` se reciben en formato `YYYY-MM-DD`, como los entrega `DateInput.tsx`. Cuando un límite está vacío no se aplica, y cuando ambos están vacíos retorna `true`. Se utiliza en el filtro por fechas de `PersonnelRequisitions.tsx` y puede reutilizarse en cualquier listado con filtro de rango de fechas. |
 
 ---
 
@@ -2166,12 +2169,17 @@ downloadFile()
 ```txt
 capitalizeText()
 getOptionLabel()
+normalizeText()
 ```
 
 | Función                          | Descripción                                                                                                                                                                     |
 | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `capitalizeText(text)`           | Convierte un texto a minúsculas y deja únicamente la primera letra en mayúscula. Cuando recibe una cadena vacía, retorna una cadena vacía.                                      |
 | `getOptionLabel(value, options)` | Busca en una lista de opciones la etiqueta correspondiente a un valor. Cuando no encuentra una coincidencia, retorna el mismo valor; cuando no recibe un valor, retorna `null`. |
+
+| `normalizeText(text)`            | Prepara un texto para búsquedas: lo convierte a minúsculas, elimina las tildes y quita los espacios del inicio y del final. Por ejemplo, `"  Tecnología "` se convierte en `"tecnologia"`. Cuando no recibe un texto o recibe `null`, retorna una cadena vacía. Se utiliza en el buscador de `PersonnelRequisitions.tsx` y puede reutilizarse en cualquier buscador para comparar textos sin distinguir mayúsculas ni tildes. |
+
+
 
 ---
 
@@ -2379,6 +2387,8 @@ Esta carpeta contiene los esquemas de validación del proyecto, normalmente crea
 
 Las validaciones permiten controlar que los datos ingresados en los formularios cumplan con las reglas necesarias antes de ser enviados al backend. De esta manera, se evitan envíos incompletos, datos inválidos o errores que pueden prevenirse desde el frontend.
 
+También se utilizan para validar valores de filtros en los listados, mostrando el error en el campo correspondiente sin necesidad de enviar un formulario.
+
 ---
 
 #### Estructura
@@ -2388,6 +2398,9 @@ validations/
 │
 ├── auth/
 │   └── authValidation.ts
+│
+├── common/
+│   └── rangeValidation.ts
 │
 ├── humanTalent/
 │   ├── candidateSubmission/
@@ -2408,6 +2421,25 @@ validations/
 └── users/
     └── userValidation.ts
 ```
+
+---
+
+#### Validaciones comunes
+
+```txt
+validations/common/
+└── rangeValidation.ts
+```
+
+##### `rangeValidation.ts`
+
+```txt
+numberRangeSchema()
+```
+
+| Esquema | Descripción | Uso dentro del proyecto |
+| ------- | ----------- | ----------------------- |
+| `numberRangeSchema` | Valida un rango numérico con los campos `min` y `max`. cuando alguno de los dos está vacío no aplica la validación. Cuando el rango es inválido, el error queda en el campo `max` con el mensaje "Debe ser mayor o igual al valor mínimo." | Se utiliza en `PersonnelRequisitions.tsx` para validar el rango de salario del filtro. Puede reutilizarse en cualquier filtro o formulario con rango numérico, como montos, cuotas o salarios. |
 
 ---
 
