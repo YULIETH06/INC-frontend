@@ -153,4 +153,20 @@ export const menuItems: MenuModule[] = [
       },
     ],
   },
+
+  {
+    module: "Auditoría",
+    submodules: [
+      {
+        name: "Registro de acciones",
+        options: [
+          {
+            label: "Auditoría",
+            path: "/audit-logs",
+            roles: ["ADMIN"],
+          },
+        ],
+      },
+    ],
+  },
 ];

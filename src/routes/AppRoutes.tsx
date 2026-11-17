@@ -32,6 +32,8 @@ import PositionProfileRevisions from "../pages/positionManagement/PositionProfil
 import PositionProfileRevisionRequirements from "../pages/positionManagement/PositionProfileRevisionRequirements";
 import PositionProfileRevisionCompetencies from "../pages/positionManagement/PositionProfileRevisionCompetencies";
 
+import AuditLogs from "../pages/audit/AuditLogs";
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -145,6 +147,12 @@ const AppRoutes = () => {
           <Route
             path="/change-password"
             element={<ChangePassword />}
+          />
+
+          {/* Auditoría */}
+          <Route
+            path="/audit-logs"
+            element={<AuditLogs />}
           />
         </Route>
       </Route>
