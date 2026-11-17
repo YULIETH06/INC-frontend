@@ -102,6 +102,19 @@ export const updateUserEmail = async (
   return response.data;
 };
 
+// Obtiene la firma registrada del usuario autenticado.
+export const getUserSignature = async (): Promise<{
+  message: string;
+  signatureUrl: string | null;
+}> => {
+  const response = await api.get<{
+    message: string;
+    signatureUrl: string | null;
+  }>("/users/signature");
+
+  return response.data;
+};
+
 // Sube la firma del usuario autenticado.
 export const uploadUserSignature = async (
   file: File
