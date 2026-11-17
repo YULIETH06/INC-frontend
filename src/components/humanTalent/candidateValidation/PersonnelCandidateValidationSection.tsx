@@ -22,18 +22,25 @@ import CandidatePositionValidationStep from "./CandidatePositionValidationStep";
 import CandidateTechnicalEvaluationStep from "./CandidateTechnicalEvaluationStep";
 import CandidateValidationStep from "./CandidateValidationStep";
 
-import {
+import type {
     usePersonnelCandidateValidationDetail,
 } from "../../../hooks/humanTalent/candidateValidation/usePersonnelCandidateValidationDetail";
 import SectionCard from "../../common/SectionCard";
 
 interface PersonnelCandidateValidationSectionProps {
     candidateId: number;
+
+    // Detalle del candidato consultado desde la página
+    // mediante usePersonnelCandidateValidationDetail.
+    validationDetail: ReturnType<
+        typeof usePersonnelCandidateValidationDetail
+    >;
 }
 
 // Sección encargada de coordinar las etapas de validación del candidato.
 const PersonnelCandidateValidationSection = ({
     candidateId,
+    validationDetail,
 }: PersonnelCandidateValidationSectionProps) => {
     const validCandidateId =
         Number.isInteger(candidateId) &&
@@ -107,10 +114,7 @@ const PersonnelCandidateValidationSection = ({
         handleSaveCompetencyEvaluation,
 
         closeMessage,
-    } = usePersonnelCandidateValidationDetail({
-        candidateId,
-        enabled: validCandidateId,
-    });
+    } = validationDetail;
 
     const completedStep =
         candidate?.validation?.completedStep ?? 0;

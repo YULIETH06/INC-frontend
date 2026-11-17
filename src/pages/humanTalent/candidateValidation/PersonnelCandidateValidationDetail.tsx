@@ -8,10 +8,13 @@ import {
 } from "react-router-dom";
 
 import ActionButton from "../../../components/common/ActionButton";
+import IconActionButton from "../../../components/common/IconActionButton";
 import PageContainer from "../../../components/common/PageContainer";
 import PageHeader from "../../../components/common/PageHeader";
 
 import PersonnelCandidateValidationSection from "../../../components/humanTalent/candidateValidation/PersonnelCandidateValidationSection";
+
+import { usePersonnelCandidateValidationDetail } from "../../../hooks/humanTalent/candidateValidation/usePersonnelCandidateValidationDetail";
 
 // Página para consultar y gestionar el proceso de validación de un candidato.
 const PersonnelCandidateValidationDetail = () => {
@@ -33,6 +36,19 @@ const PersonnelCandidateValidationDetail = () => {
         Number.isInteger(candidateId) &&
         candidateId > 0;
 
+    // Consulta y gestiona el detalle del candidato y sus fases.
+    const validationDetail =
+        usePersonnelCandidateValidationDetail({
+            candidateId,
+            enabled: validCandidateId,
+        });
+
+    // Función y estado de carga que usa el botón de actualizar.
+    const {
+        loadingDetail,
+        loadCandidateDetail,
+    } = validationDetail;
+
     // Regresa al listado de candidatos disponibles para validación.
     const handleGoBack = () => {
         navigate(
@@ -46,14 +62,27 @@ const PersonnelCandidateValidationDetail = () => {
                 title="Validación de cargo y postulante"
                 subtitle="Consulta y completa las etapas correspondientes al candidato seleccionado."
                 actions={
-                    <ActionButton
-                        actionType="back"
-                        tooltip="Volver al listado de candidatos"
-                        fullWidthOnMobile
-                        onClick={handleGoBack}
-                    >
-                        Volver al listado
-                    </ActionButton>
+                    <>
+                        <ActionButton
+                            actionType="back"
+                            tooltip="Volver al listado de candidatos"
+                            fullWidthOnMobile
+                            onClick={handleGoBack}
+                        >
+                            Volver al listado
+                        </ActionButton>
+
+                        {validCandidateId && (
+                            <IconActionButton
+                                icon="refresh"
+                                tooltip="Actualizar información"
+                                loading={loadingDetail}
+                                onClick={() =>
+                                    void loadCandidateDetail()
+                                }
+                            />
+                        )}
+                    </>
                 }
             />
 
@@ -66,6 +95,9 @@ const PersonnelCandidateValidationDetail = () => {
                 <PersonnelCandidateValidationSection
                     candidateId={
                         candidateId
+                    }
+                    validationDetail={
+                        validationDetail
                     }
                 />
             )}
