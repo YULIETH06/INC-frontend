@@ -1,14 +1,15 @@
 import {
     Alert,
     Box,
-    Button,
     Paper,
     Stack,
     Typography,
 } from "@mui/material";
 
-import UploadFileOutlinedIcon from "@mui/icons-material/UploadFileOutlined";
-import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
+import ActionButton from "../common/ActionButton";
+import LoadingBox from "../common/LoadingBox";
+
+import { buildFileUrl } from "../../utils/common/fileUrl";
 
 import { useUserSignature } from "../../hooks/users/useUserSignature";
 
@@ -17,6 +18,8 @@ const UserSignatureUploader = () => {
     const {
         selectedFile,
         previewUrl,
+        savedSignatureUrl,
+        loadingSignature,
         loading,
         message,
         error,
@@ -24,6 +27,16 @@ const UserSignatureUploader = () => {
         handleFileChange,
         handleUploadSignature,
     } = useUserSignature();
+
+    // Si ya hay una firma registrada, se muestra esa.
+    // Si no, se muestra la vista previa de la imagen seleccionada.
+    const signatureImageUrl = savedSignatureUrl
+        ? buildFileUrl(savedSignatureUrl)
+        : previewUrl;
+
+    const signatureImageLabel = savedSignatureUrl
+        ? "Firma registrada"
+        : "Vista previa de la firma";
 
     // Captura la imagen seleccionada.
     const onFileChange = (
@@ -62,8 +75,9 @@ const UserSignatureUploader = () => {
                             mt: 0.5,
                         }}
                     >
-                        Sube una imagen clara de tu firma. Esta se usará en las
-                        aprobaciones de requisiciones.
+                        {savedSignatureUrl
+                            ? "Esta es la firma registrada que se usará en las aprobaciones de requisiciones."
+                            : "Sube una imagen clara de tu firma. Esta se usará en las aprobaciones de requisiciones."}
                     </Typography>
                 </Box>
 
@@ -79,7 +93,14 @@ const UserSignatureUploader = () => {
                     </Alert>
                 )}
 
-                {previewUrl && (
+                {loadingSignature && (
+                    <LoadingBox
+                        minHeight={120}
+                        size={28}
+                    />
+                )}
+
+                {signatureImageUrl && (
                     <Box
                         sx={{
                             p: 2,
@@ -97,13 +118,13 @@ const UserSignatureUploader = () => {
                                 color: "text.secondary",
                             }}
                         >
-                            Vista previa de la firma
+                            {signatureImageLabel}
                         </Typography>
 
                         <Box
                             component="img"
-                            src={previewUrl}
-                            alt="Vista previa de la firma"
+                            src={signatureImageUrl}
+                            alt={signatureImageLabel}
                             sx={{
                                 maxWidth: "260px",
                                 maxHeight: "120px",
@@ -126,11 +147,16 @@ const UserSignatureUploader = () => {
                     }}
                     spacing={1.5}
                 >
-                    <Button
-                        variant="outlined"
+                    <ActionButton
+                        actionType="upload"
                         component="label"
-                        startIcon={<UploadFileOutlinedIcon />}
-                        disabled={loading}
+                        size="medium"
+                        disabled={loading || Boolean(savedSignatureUrl)}
+                        tooltip={
+                            savedSignatureUrl
+                                ? "La firma ya fue registrada y no se puede cambiar."
+                                : undefined
+                        }
                     >
                         Seleccionar firma
                         <input
@@ -138,17 +164,20 @@ const UserSignatureUploader = () => {
                             type="file"
                             accept="image/png,image/jpeg,image/jpg,image/webp"
                             onChange={onFileChange}
+                            disabled={loading || Boolean(savedSignatureUrl)}
                         />
-                    </Button>
+                    </ActionButton>
 
-                    <Button
-                        variant="contained"
-                        startIcon={<SaveOutlinedIcon />}
-                        disabled={loading || !selectedFile}
+                    <ActionButton
+                        actionType="save"
+                        size="medium"
+                        loading={loading}
+                        loadingText="Guardando..."
+                        disabled={!selectedFile || Boolean(savedSignatureUrl)}
                         onClick={handleUploadSignature}
                     >
-                        {loading ? "Guardando..." : "Guardar firma"}
-                    </Button>
+                        Guardar firma
+                    </ActionButton>
                 </Stack>
             </Stack>
         </Paper>

@@ -5,11 +5,11 @@ import {
     TableContainer,
     TableHead,
     TableRow,
-    TextField,
     Typography,
 } from "@mui/material";
 
 import RadioOptionGroup from "../../common/RadioOptionGroup";
+import TextInput from "../../common/inputs/TextInput";
 
 import type {
     CandidateValidationForm,
@@ -45,11 +45,6 @@ interface CandidateRequirementValidationTableProps {
         index: number,
         value: string
     ) => void;
-
-    onGapClosureChange: (
-        index: number,
-        value: string
-    ) => void;
 }
 
 const compliesOptions = [
@@ -71,7 +66,6 @@ const CandidateRequirementValidationTable = ({
     disabled,
     onCompliesChange,
     onEvidenceChange,
-    onGapClosureChange,
 }: CandidateRequirementValidationTableProps) => {
     return (
         <TableContainer
@@ -293,19 +287,15 @@ const CandidateRequirementValidationTable = ({
 
                                                 {requirementForm.complies ===
                                                     true && (
-                                                        <TextField
+                                                        <TextInput
                                                             placeholder="Ingrese la evidencia de cumplimiento"
                                                             value={
                                                                 requirementForm.evidence
                                                             }
-                                                            onChange={(
-                                                                event
-                                                            ) =>
+                                                            onChange={(value) =>
                                                                 onEvidenceChange(
                                                                     index,
-                                                                    event
-                                                                        .target
-                                                                        .value
+                                                                    value
                                                                 )
                                                             }
                                                             error={Boolean(
@@ -317,7 +307,6 @@ const CandidateRequirementValidationTable = ({
                                                                     ?.evidence
                                                             }
                                                             required
-                                                            multiline
                                                             minRows={
                                                                 1
                                                             }
@@ -340,21 +329,12 @@ const CandidateRequirementValidationTable = ({
 
                                                 {requirementForm.complies ===
                                                     false && (
-                                                        <TextField
-                                                            placeholder="Ingrese el cierre de brecha"
+                                                        // Cierre de brecha automático: muestra la descripción del requisito y no permite escribir.
+                                                        <TextInput
                                                             value={
                                                                 requirementForm.gapClosure
                                                             }
-                                                            onChange={(
-                                                                event
-                                                            ) =>
-                                                                onGapClosureChange(
-                                                                    index,
-                                                                    event
-                                                                        .target
-                                                                        .value
-                                                                )
-                                                            }
+                                                            readOnly
                                                             error={Boolean(
                                                                 requirementErrors
                                                                     ?.gapClosure
@@ -364,7 +344,6 @@ const CandidateRequirementValidationTable = ({
                                                                     ?.gapClosure
                                                             }
                                                             required
-                                                            multiline
                                                             minRows={
                                                                 1
                                                             }

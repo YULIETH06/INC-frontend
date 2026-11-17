@@ -198,10 +198,16 @@ export const useCandidateRequirementValidation = ({
                                             ? requirement.evidence
                                             : "",
 
+                                    // Si no cumple, el cierre de brecha se llena
+                                    // automáticamente con la descripción del requisito.
                                     gapClosure:
                                         value
                                             ? ""
-                                            : requirement.gapClosure,
+                                            : candidate?.requisition.positionRevision.requirementDescriptions.find(
+                                                (description) =>
+                                                    description.id ===
+                                                    requirement.requirementDescriptionId
+                                            )?.description ?? "",
                                 }
                                 : requirement
                     ),
