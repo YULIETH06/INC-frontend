@@ -45,11 +45,6 @@ interface CandidateValidationStepProps {
         value: string
     ) => void;
 
-    onRequirementGapClosureChange: (
-        index: number,
-        value: string
-    ) => void;
-
     onSuitableChange: (
         value: boolean
     ) => void;
@@ -89,7 +84,6 @@ const CandidateValidationStep = ({
     loading,
     onRequirementCompliesChange,
     onRequirementEvidenceChange,
-    onRequirementGapClosureChange,
     onSuitableChange,
     onSave,
 }: CandidateValidationStepProps) => {
@@ -176,9 +170,6 @@ const CandidateValidationStep = ({
                     }
                     onEvidenceChange={
                         onRequirementEvidenceChange
-                    }
-                    onGapClosureChange={
-                        onRequirementGapClosureChange
                     }
                 />
 

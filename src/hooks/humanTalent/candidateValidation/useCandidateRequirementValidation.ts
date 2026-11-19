@@ -267,37 +267,6 @@ export const useCandidateRequirementValidation = ({
         );
     };
 
-    // Actualiza el cierre de brecha.
-    const handleRequirementGapClosureChange = (
-        index: number,
-        value: string
-    ) => {
-        setCandidateValidationForm(
-            (previous) => ({
-                ...previous,
-
-                requirementValidations:
-                    previous.requirementValidations.map(
-                        (
-                            requirement,
-                            requirementIndex
-                        ) =>
-                            requirementIndex === index
-                                ? {
-                                    ...requirement,
-                                    gapClosure: value,
-                                }
-                                : requirement
-                    ),
-            })
-        );
-
-        clearRequirementError(
-            index,
-            "gapClosure"
-        );
-    };
-
     // Actualiza el resultado final del postulante.
     const handleSuitableChange = (
         value: boolean
@@ -480,7 +449,6 @@ export const useCandidateRequirementValidation = ({
 
         handleRequirementCompliesChange,
         handleRequirementEvidenceChange,
-        handleRequirementGapClosureChange,
         handleSuitableChange,
 
         handleSaveCandidateValidation,

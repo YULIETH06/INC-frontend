@@ -294,9 +294,6 @@ export const usePersonnelCandidateValidationDetail = ({
         handleRequirementEvidenceChange:
             candidateRequirementValidation.handleRequirementEvidenceChange,
 
-        handleRequirementGapClosureChange:
-            candidateRequirementValidation.handleRequirementGapClosureChange,
-
         handleSuitableChange:
             candidateRequirementValidation.handleSuitableChange,
 

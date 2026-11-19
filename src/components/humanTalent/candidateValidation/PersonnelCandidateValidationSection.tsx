@@ -91,7 +91,6 @@ const PersonnelCandidateValidationSection = ({
 
         handleRequirementCompliesChange,
         handleRequirementEvidenceChange,
-        handleRequirementGapClosureChange,
         handleSuitableChange,
 
         handleInterviewScoreChange,
@@ -444,9 +443,6 @@ const PersonnelCandidateValidationSection = ({
                                 }
                                 onRequirementEvidenceChange={
                                     handleRequirementEvidenceChange
-                                }
-                                onRequirementGapClosureChange={
-                                    handleRequirementGapClosureChange
                                 }
                                 onSuitableChange={
                                     handleSuitableChange
