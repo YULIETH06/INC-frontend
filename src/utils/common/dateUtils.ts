@@ -28,3 +28,16 @@ export const isDateInRange = (
 
     return true;
 };
+
+// Formatea la fecha y la hora en español. Ejemplo: 06/11/2026, 2:30 p. m.
+export const formatDateTime = (value?: string | null) => {
+    if (!value) return "";
+
+    return new Date(value).toLocaleString("es-CO", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "numeric",
+        minute: "2-digit",
+    });
+};

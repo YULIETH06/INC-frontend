@@ -624,6 +624,7 @@ Ejemplos:
 ```txt
 data/
 ├── appBrand.ts
+├── auditOptions.ts
 ├── humanTalentOptions.ts
 ├── menuItems.ts
 ├── pqrOptions.ts
@@ -663,6 +664,18 @@ Su objetivo principal es centralizar los datos relacionados con el nombre de la 
 | `logoIcon`      | Contiene la ruta del ícono del logo a color.            | Se utiliza cuando se necesita una versión más pequeña del logo, por ejemplo en menús contraídos o vistas responsive. |
 | `logoIconWhite` | Contiene la ruta del ícono del logo en color blanco.    | Se utiliza en fondos oscuros, barras laterales o encabezados institucionales.                                        |
 | `logoAlt`       | Contiene el texto alternativo de la imagen.             | Mejora la accesibilidad y sirve como descripción si la imagen no carga.                                              |
+
+---
+
+#### `auditOptions.ts`
+
+Este archivo contiene las listas fijas de la auditoría: el nombre legible de cada módulo (`AUDIT_MODULE_LABELS`), el orden de las pestañas (`AUDIT_MODULE_ORDER`) y las acciones de cada módulo con su nombre legible (`AUDIT_ACTIONS_BY_MODULE`). Si el backend agrega una acción nueva, se debe agregar aquí.
+
+**Responsabilidad principal:**
+
+```txt
+Centralizar los módulos y acciones de la auditoría con sus nombres legibles.
+```
 
 ---
 
@@ -739,6 +752,9 @@ En lugar de manejar toda la lógica directamente dentro de las páginas, los hoo
 ```txt
 hooks/
 │
+├── audit/
+│   └── useAuditLogs.ts
+│
 ├── auth/
 │   ├── useChangePassword.ts
 │   ├── useLogin.ts
@@ -791,6 +807,19 @@ Separar la lógica de negocio, estado y eventos de los componentes visuales.
 ```
 
 Los hooks permiten que las páginas y componentes se enfoquen principalmente en mostrar la interfaz, mientras que la lógica de consulta, validación, envío de datos y manejo de respuestas queda centralizada en archivos reutilizables.
+
+---
+
+#### Hooks del módulo de auditoría
+
+```txt
+hooks/audit/
+└── useAuditLogs.ts
+```
+
+| Hook | Descripción | Uso dentro del proyecto |
+| ---- | ----------- | ----------------------- |
+| `useAuditLogs.ts` | Maneja la consulta de la auditoría. Controla la pestaña activa (todos los módulos o uno), los filtros de acción, usuario y fechas, la consulta al backend, los estados de carga y el error. Vuelve a consultar cada vez que cambia la pestaña o un filtro. Al cambiar de pestaña limpia el filtro de acción, porque cada módulo tiene acciones distintas. También carga una sola vez la lista de usuarios para el filtro "Usuario". | Se utiliza en `AuditLogs.tsx`. |
 
 ---
 
@@ -1039,6 +1068,9 @@ Las interfaces permiten que el frontend tenga un tipado más seguro, claro y fá
 ```txt
 interfaces/
 │
+├── audit/
+│   └── auditLog.interface.ts
+│
 ├── auth/
 │   └── auth.interface.ts
 │
@@ -1070,6 +1102,19 @@ interfaces/
     ├── bulkUpload.interface.ts
     └── excel.interface.ts
 ```
+
+---
+
+#### Interfaces del módulo de auditoría
+
+```txt
+interfaces/audit/
+└── auditLog.interface.ts
+```
+
+| Archivo | Descripción | Uso dentro del proyecto |
+| ------- | ----------- | ----------------------- |
+| `auditLog.interface.ts` | Define los tipos de la auditoría: los módulos (`AuditModule`), el registro tal como lo devuelve el backend (`AuditLog`), los filtros que se envían (`AuditLogFilters`) y la respuesta de la consulta (`AuditLogsResponse`), que incluye los registros, el total y el límite. | Se utiliza en `auditLogService.ts`, `useAuditLogs.ts`, `auditLogUtils.ts` y `AuditLogs.tsx`. |
 
 ---
 
@@ -1201,6 +1246,9 @@ Las páginas no deben realizar directamente peticiones HTTP ni concentrar lógic
 pages/
 │
 ├── Dashboard.tsx
+│
+├── audit/
+│   └── AuditLogs.tsx
 │
 ├── auth/
 │   ├── Login.tsx
@@ -1393,6 +1441,21 @@ pages/users/
 Estas páginas se ubican en `pages/users/` porque corresponden a la administración o configuración de usuarios y se mantienen separadas de los módulos funcionales como PQR o Talento Humano.
 ---
 
+#### Páginas del módulo de auditoría
+
+```txt
+pages/audit/
+└── AuditLogs.tsx
+```
+
+| Página | Descripción |
+| ------ | ----------- |
+| `AuditLogs.tsx` | Muestra la auditoría del sistema, solo para ADMIN y solo de lectura. Usa `ViewToggleButtons` para las pestañas por módulo (Todos, Inicio de sesión, Usuarios, PQR, Perfiles de cargo y Talento Humano) y `DataTable` con las columnas Fecha y hora, Usuario, Módulo (solo en "Todos"), Acción y Descripción. En `ListToolbar` tiene el buscador, que busca dentro de los registros recibidos, y los filtros de usuario, acción y fechas, que se envían al backend. Los intentos fallidos de inicio de sesión se muestran en rojo y, como no tienen usuario, muestran el correo escrito y "Sin sesión". Si hay más de 500 registros, muestra un aviso para usar los filtros. La tabla se muestra siempre, aunque no haya registros, para que los filtros sigan disponibles. |
+
+La página se ubica en `pages/audit/` porque registra acciones de todos los módulos y no pertenece a uno en particular. Se accede desde la ruta `/audit-logs` y la opción "Auditoría" del menú.
+
+---
+
 #### Regla de organización de páginas
 
 ```txt
@@ -1448,6 +1511,9 @@ Los servicios permiten mantener separada la lógica de comunicación con el back
 ```txt
 services/
 │
+├── audit/
+│   └── auditLogService.ts
+│
 ├── auth/
 │   └── authService.ts
 │
@@ -1491,6 +1557,31 @@ Separar las peticiones HTTP y la comunicación en tiempo real de los componentes
 Los componentes no deberían llamar directamente a Axios ni configurar directamente Socket.IO.
 
 Lo ideal es que usen funciones centralizadas en los servicios. Esto permite que páginas, hooks y componentes se enfoquen en mostrar información y manejar la interacción del usuario, mientras que los servicios se encargan de la comunicación con el backend.
+
+---
+
+#### Servicios del módulo de auditoría
+
+```txt
+services/audit/
+└── auditLogService.ts
+```
+
+| Archivo | Descripción | Uso dentro del proyecto |
+| ------- | ----------- | ----------------------- |
+| `auditLogService.ts` | Contiene la función HTTP para consultar la auditoría. | Se utiliza desde `useAuditLogs.ts`. |
+
+---
+
+##### Funciones en `auditLogService.ts`
+
+```txt
+getAuditLogs()
+```
+
+| Función | Descripción |
+| ------- | ----------- |
+| `getAuditLogs(filters)` | Consulta los registros de la auditoría mediante `GET /audit-logs`. Envía los filtros como parámetros de la URL; los que van vacíos no se envían. |
 
 ---
 
@@ -2026,6 +2117,9 @@ Los archivos ubicados en `utils/` no representan componentes visuales, páginas,
 ```txt
 utils/
 │
+├── audit/
+│   └── auditLogUtils.ts
+│
 ├── common/
 │   ├── avatarUtils.ts
 │   ├── dateUtils.ts
@@ -2116,13 +2210,14 @@ getInitials()
 
 ```txt
 formatDate()
+formatDateTime()
 isDateInRange()
 ```
 
 | Función             | Descripción                                                                                                                                                  |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `formatDate(value)` | Convierte una fecha en un formato numérico legible según la configuración regional de Colombia. Cuando no recibe una fecha válida, retorna `____/____/____`. |
-
+| `formatDateTime(value)` | Convierte una fecha en fecha y hora legibles según la configuración regional de Colombia, por ejemplo `06/11/2026, 2:30 p. m.` Cuando no recibe una fecha, retorna una cadena vacía. Se utiliza en la columna "Fecha y hora" de `AuditLogs.tsx` y puede reutilizarse donde se necesite mostrar la hora. |
 | `isDateInRange(value, startDate, endDate)` | Valida si una fecha se encuentra dentro de un rango. `startDate` y `endDate` se reciben en formato `YYYY-MM-DD`, como los entrega `DateInput.tsx`. Cuando un límite está vacío no se aplica, y cuando ambos están vacíos retorna `true`. Se utiliza en el filtro por fechas de `PersonnelRequisitions.tsx` y puede reutilizarse en cualquier listado con filtro de rango de fechas. |
 
 ---
@@ -2365,6 +2460,37 @@ getUserStatusLabel()
 | ------- | ----------- |
 | `getUserStatusColor(isActive)` | Retorna el color de Material UI correspondiente al estado del usuario: `success` si está activo y `default` si está desactivado. |
 | `getUserStatusLabel(isActive)` | Convierte el estado del usuario en una etiqueta legible: `Activo` o `Desactivado`. |
+
+---
+
+#### Utilidades del módulo de auditoría
+
+```txt
+utils/audit/
+└── auditLogUtils.ts
+```
+
+| Archivo | Descripción | Uso dentro del proyecto |
+| ------- | ----------- | ----------------------- |
+| `auditLogUtils.ts` | Contiene las funciones que convierten los códigos de módulos y acciones de la auditoría en textos legibles, y las opciones del filtro de acciones. | Se utiliza en `AuditLogs.tsx`. |
+
+---
+
+##### Funciones en `auditLogUtils.ts`
+
+```txt
+getAuditModuleLabel()
+getAuditActionLabel()
+getAuditActionOptions()
+isFailedAuditAction()
+```
+
+| Función | Descripción |
+| ------ | ----------- |
+| `getAuditModuleLabel(module)` | Convierte el código del módulo en un nombre legible. |
+| `getAuditActionLabel(action)` | Convierte el código de la acción en un nombre legible. Si la acción no está registrada, muestra el código. |
+| `getAuditActionOptions(moduleTab)` | Retorna las opciones del filtro "Acción" según la pestaña. En "Todos" retorna todas, agrupadas por módulo. |
+| `isFailedAuditAction(action)` | Indica si la acción es un intento fallido de inicio de sesión, para resaltarla en rojo. |
 
 ---
 

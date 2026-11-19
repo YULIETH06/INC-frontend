@@ -26,9 +26,6 @@ import type {
 } from "../../hooks/audit/useAuditLogs";
 
 import {
-    AUDIT_MODULE_LABELS,
-    AUDIT_MODULE_ORDER,
-    formatAuditDateTime,
     getAuditActionLabel,
     getAuditActionOptions,
     getAuditModuleLabel,
@@ -36,8 +33,14 @@ import {
 } from "../../utils/audit/auditLogUtils";
 
 import {
+    AUDIT_MODULE_LABELS,
+    AUDIT_MODULE_ORDER,
+} from "../../data/auditOptions";
+
+import {
     getUserRoleLabel,
 } from "../../utils/users/userRoleUtils";
+import { formatDateTime } from "../../utils/common/dateUtils";
 
 import LoadingBox from "../../components/common/LoadingBox";
 import EmptyState from "../../components/common/EmptyState";
@@ -193,7 +196,7 @@ const AuditLogs = () => {
                         whiteSpace: "nowrap",
                     }}
                 >
-                    {formatAuditDateTime(log.createdAt)}
+                    {formatDateTime(log.createdAt)}
                 </Typography>
             ),
         },

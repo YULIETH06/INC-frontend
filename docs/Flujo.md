@@ -228,3 +228,18 @@ Esto evita duplicar información en la base de datos y permite conocer el avance
 5. useLogin muestra el mensaje en el Alert del login y lo borra de sessionStorage, para que no vuelva a aparecer al recargar.
 6. Si el usuario intenta iniciar sesión con la contraseña correcta, el backend responde 403 con el mismo mensaje.
 ```
+
+### Flujo de la pantalla de Auditoría en frontend
+
+```txt
+1. El ADMIN ingresa a la opción "Auditoría" del menú (ruta /audit-logs). Los demás roles no ven la opción.
+2. useAuditLogs consulta GET /audit-logs con la pestaña "Todos" y sin filtros, y carga la lista de usuarios para el filtro "Usuario".
+3. La tabla muestra los registros del más reciente al más antiguo, con las columnas Fecha y hora, Usuario, Módulo, Acción y Descripción.
+4. Al cambiar de pestaña, el hook consulta solo ese módulo, limpia el filtro de acción y la columna Módulo se oculta.
+5. Al cambiar un filtro (usuario, acción o fechas), el hook vuelve a consultar el backend.
+6. El buscador filtra dentro de los registros ya recibidos, por nombre, correo, acción o descripción.
+7. Si el total es mayor que los registros recibidos (máximo 500), se muestra un aviso para usar los filtros.
+8. Los intentos fallidos de inicio de sesión se muestran en rojo, con el correo escrito y "Sin sesión".
+9. El botón de actualizar vuelve a consultar con la pestaña y los filtros actuales.
+10. La pantalla es solo de lectura: no permite editar ni eliminar registros.
+```
