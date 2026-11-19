@@ -33,6 +33,8 @@ export const AUDIT_ACTIONS_BY_MODULE: Record<
         { value: "LOGIN_FAILED", label: "Intento fallido" },
         { value: "USER_REGISTERED", label: "Se registró" },
         { value: "OWN_PASSWORD_CHANGED", label: "Cambió su contraseña" },
+        { value: "LOGOUT", label: "Cerró sesión" },
+        { value: "LOGOUT_INACTIVITY", label: "Cierre por inactividad" },
     ],
     USERS: [
         { value: "USER_ROLE_CHANGED", label: "Cambió rol" },

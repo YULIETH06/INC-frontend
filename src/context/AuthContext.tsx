@@ -1,17 +1,26 @@
 import { createContext, useContext, useEffect, useState } from "react";
+
 import api from "../api/axios";
+
 import {
     connectSocket,
     disconnectSocket,
 } from "../services/sockets/socketService";
-import type { AuthUser, ProfileResponse } from "../interfaces/auth/auth.interface";
+
+import { logoutUser } from "../services/auth/authService";
+
+import type {
+    AuthUser,
+    LogoutReason,
+    ProfileResponse,
+} from "../interfaces/auth/auth.interface";
 
 interface AuthContextType {
     user: AuthUser | null;
     token: string | null;
     loading: boolean;
     login: (token: string) => Promise<void>;
-    logout: () => void;
+    logout: (reason?: LogoutReason) => Promise<void>;
     isAuthenticated: boolean;
 }
 
@@ -44,11 +53,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         await getProfile();
     };
 
-    const logout = () => {
+    const logout = async (
+        reason: LogoutReason = "MANUAL"
+    ) => {
+        const currentToken = localStorage.getItem("token");
+
         disconnectSocket();
         localStorage.removeItem("token");
         setToken(null);
         setUser(null);
+
+        if (!currentToken) {
+            return;
+        }
+
+        try {
+            await logoutUser(reason, currentToken);
+        } catch (error) {
+            // Si el registro falla, la sesión ya quedó cerrada en el navegador.
+            console.error("Error al registrar el cierre de sesión:", error);
+        }
     };
 
     // Carga el perfil del usuario cuando existe un token
@@ -66,6 +90,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             connectSocket(token);
         }
     }, [token, user]);
+
+    // Si otra pestaña cierra la sesión (borra el token), esta también se cierra.
+    useEffect(() => {
+        const handleStorage = (event: StorageEvent) => {
+            if (event.key === "token" && !event.newValue) {
+                disconnectSocket();
+                setToken(null);
+                setUser(null);
+            }
+        };
+
+        window.addEventListener("storage", handleStorage);
+
+        return () => {
+            window.removeEventListener("storage", handleStorage);
+        };
+    }, []);
 
     return (
         <AuthContext.Provider

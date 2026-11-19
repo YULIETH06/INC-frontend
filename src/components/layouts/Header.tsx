@@ -33,8 +33,8 @@ const Header = ({ openSidebar, setOpenSidebar }: HeaderProps) => {
     const theme = useTheme();
 
     // Cierra la sesión del usuario.
-    const handleLogout = () => {
-        logout();
+    const handleLogout = async () => {
+        await logout();
         navigate("/dashboard");
     };
 

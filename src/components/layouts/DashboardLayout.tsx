@@ -1,15 +1,27 @@
 import { useState } from "react";
+import { Outlet } from "react-router-dom";
 import { Box, Drawer, useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+
 import Header from "./Header";
 import SidebarMenu from "./SidebarMenu";
-import { Outlet } from "react-router-dom";
+import InactivityWarningDialog from "./InactivityWarningDialog";
+
+import { useInactivityLogout } from "../../hooks/auth/useInactivityLogout";
 
 const DashboardLayout = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const [openSidebar, setOpenSidebar] = useState(true);
+
+  // Cierre de sesión por inactividad.
+  const {
+    showWarning,
+    secondsLeft,
+    continueSession,
+    logoutNow,
+  } = useInactivityLogout();
 
   const handleCloseSidebar = () => {
     if (isMobile) {
@@ -111,6 +123,13 @@ const DashboardLayout = () => {
           <Outlet />
         </Box>
       </Box>
+      {/* Aviso de cierre por inactividad. */}
+      <InactivityWarningDialog
+        open={showWarning}
+        secondsLeft={secondsLeft}
+        onContinue={continueSession}
+        onLogout={logoutNow}
+      />
     </Box>
   );
 };

@@ -1,11 +1,16 @@
 import axios from "axios";
 
 // Clave donde se guarda el mensaje que se mostrará en el login
-// cuando la sesión se cierra desde el backend.
+// cuando la sesión se cierra sin que el usuario lo pida.
 export const SESSION_MESSAGE_KEY = "sessionMessage";
 
-// Código que envía el backend cuando el usuario fue desactivado.
-const USER_INACTIVE_CODE = "USER_INACTIVE";
+// Códigos del backend que cierran la sesión, con su mensaje de respaldo.
+const SESSION_END_MESSAGES: Record<string, string> = {
+  USER_INACTIVE:
+    "Tu usuario está desactivado. Comunícate con el administrador.",
+  TOKEN_EXPIRED:
+    "Tu sesión expiró. Inicia sesión nuevamente.",
+};
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -21,14 +26,17 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Cierra la sesión si el backend indica que el usuario fue desactivado.
+// Cierra la sesión si el backend indica que el usuario fue desactivado o que el token venció.
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    const code = error?.response?.data?.code;
+
     if (
       axios.isAxiosError(error) &&
       error.response?.status === 401 &&
-      error.response.data?.code === USER_INACTIVE_CODE &&
+      typeof code === "string" &&
+      code in SESSION_END_MESSAGES &&
       localStorage.getItem("token")
     ) {
       localStorage.removeItem("token");
@@ -36,7 +44,7 @@ api.interceptors.response.use(
       sessionStorage.setItem(
         SESSION_MESSAGE_KEY,
         error.response.data.message ||
-        "Tu usuario está desactivado. Comunícate con el administrador."
+        SESSION_END_MESSAGES[code]
       );
 
       window.location.replace("/");

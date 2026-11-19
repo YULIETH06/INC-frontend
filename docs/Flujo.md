@@ -243,3 +243,36 @@ Esto evita duplicar información en la base de datos y permite conocer el avance
 9. El botón de actualizar vuelve a consultar con la pestaña y los filtros actuales.
 10. La pantalla es solo de lectura: no permite editar ni eliminar registros.
 ```
+
+### Flujo del cierre de sesión por inactividad
+
+```txt
+1. Al entrar al sistema, DashboardLayout activa useInactivityLogout y guarda la hora actual como última actividad.
+2. Cada movimiento del mouse, tecla o desplazamiento actualiza la hora en localStorage (como máximo cada 5 segundos). Como localStorage es compartido, la actividad en una pestaña mantiene vivas las demás.
+3. Cada segundo, el hook calcula el tiempo restante con la hora guardada (15 minutos desde la última actividad).
+4. En el último minuto aparece InactivityWarningDialog con la cuenta regresiva. Mientras está abierto, mover el mouse no cuenta.
+5. Si el usuario pulsa "Seguir conectado", se guarda la hora actual y el aviso se cierra en todas las pestañas.
+6. Si pulsa "Cerrar sesión", se llama a logout("MANUAL").
+7. Si llega a cero, el hook guarda "Tu sesión se cerró por inactividad." en sessionStorage y llama a logout("INACTIVITY").
+8. logout borra el token, desconecta el socket y registra el cierre en la auditoría mediante POST /auth/logout.
+9. Las demás pestañas detectan el borrado del token (evento storage) y también vuelven al login.
+10. useLogin muestra el mensaje en el login y lo borra de sessionStorage.
+```
+
+### Flujo de la sesión vencida
+
+```txt
+1. El token dura 1 día desde el inicio de sesión.
+2. Cuando vence, el backend responde 401 con code "TOKEN_EXPIRED" en la siguiente petición.
+3. El interceptor de respuesta de axios.ts borra el token, guarda "Tu sesión expiró. Inicia sesión nuevamente." en sessionStorage y recarga la aplicación en el login.
+4. useLogin muestra el mensaje y lo borra de sessionStorage.
+```
+
+### Flujo del cierre de sesión manual
+
+```txt
+1. El usuario pulsa "Cerrar sesión" en el encabezado (Header).
+2. Header llama a logout() sin motivo, que usa "MANUAL".
+3. logout borra el token, desconecta el socket y registra "Cerró sesión" en la auditoría.
+4. Las demás pestañas detectan el borrado del token y también vuelven al login.
+```

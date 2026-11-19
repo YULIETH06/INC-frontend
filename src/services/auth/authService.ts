@@ -1,9 +1,11 @@
 import api from "../../api/axios";
+
 import type {
     ChangePasswordData,
     ChangePasswordResponse,
     LoginData,
     LoginResponse,
+    LogoutReason,
     RegisterData,
     RegisterResponse,
 } from "../../interfaces/auth/auth.interface";
@@ -36,4 +38,23 @@ export const changePassword = async (
     );
 
     return response.data;
+};
+
+// Registra el cierre de sesión en el backend.
+// Recibe el token porque se llama justo después de borrarlo del navegador.
+export const logoutUser = async (
+    reason: LogoutReason,
+    token: string
+): Promise<void> => {
+    await api.post(
+        "/auth/logout",
+        {
+            reason,
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
 };

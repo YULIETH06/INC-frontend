@@ -96,7 +96,7 @@ Esta carpeta contiene la configuración base para la comunicación con el backen
 
 Aquí se ubican archivos como la instancia de Axios, donde se define la URL base de la API y los interceptores para enviar automáticamente el token de autenticación cuando el usuario ha iniciado sesión.
 
-También contiene un interceptor de respuesta que cierra la sesión cuando el backend responde `401` con `code: "USER_INACTIVE"`, es decir, cuando el usuario fue desactivado. El interceptor borra el token, guarda el mensaje en `sessionStorage` con la clave `SESSION_MESSAGE_KEY` y recarga la aplicación en el login.
+También contiene un interceptor de respuesta que cierra la sesión cuando el backend responde `401` con `code: "USER_INACTIVE"` (el usuario fue desactivado) o `code: "TOKEN_EXPIRED"` (el token venció). Los códigos y sus mensajes de respaldo están en `SESSION_END_MESSAGES`. El interceptor borra el token, guarda el mensaje en `sessionStorage` con la clave `SESSION_MESSAGE_KEY` y recarga la aplicación en el login.
 
 **Ejemplo de uso:**
 
@@ -194,6 +194,7 @@ components/
 ├── layouts/
 │   ├── DashboardLayout.tsx
 │   ├── Header.tsx
+│   ├── InactivityWarningDialog.tsx
 │   └── SidebarMenu.tsx
 │
 ├── positionManagement/
@@ -318,13 +319,15 @@ En esta carpeta se ubican los componentes encargados de definir la estructura vi
 components/layouts/
 ├── DashboardLayout.tsx
 ├── Header.tsx
+├── InactivityWarningDialog.tsx
 └── SidebarMenu.tsx
 ```
 
 | Componente | Descripción | Uso dentro del proyecto |
 | ---------- | ----------- | ----------------------- |
-| `DashboardLayout.tsx` | Define la estructura principal de las páginas internas del sistema y organiza el encabezado, el menú lateral y el área donde se renderiza el contenido de cada vista. | Se utiliza para envolver las páginas protegidas del sistema. |
+| `DashboardLayout.tsx` | Define la estructura principal de las páginas internas del sistema y organiza el encabezado, el menú lateral y el área donde se renderiza el contenido de cada vista. También usa `useInactivityLogout.ts` y muestra `InactivityWarningDialog.tsx` para cerrar la sesión por inactividad. | Se utiliza para envolver las páginas protegidas del sistema. |
 | `Header.tsx` | Representa el encabezado superior de las vistas protegidas. Controla la apertura del menú lateral y muestra elementos globales como la información del usuario autenticado, las notificaciones y el menú de configuración. | Se utiliza dentro de `DashboardLayout.tsx` para mantener un encabezado consistente en las páginas internas. |
+| `InactivityWarningDialog.tsx` | Aviso que aparece en el último minuto antes de cerrar la sesión por inactividad. Muestra la cuenta regresiva y los botones "Seguir conectado" y "Cerrar sesión". No se cierra al hacer clic fuera del aviso. | Se utiliza dentro de `DashboardLayout.tsx`. |
 | `SidebarMenu.tsx` | Representa el menú lateral de navegación y muestra las opciones disponibles de acuerdo con los módulos y permisos del usuario. | Se utiliza dentro del layout principal para navegar entre las diferentes secciones del sistema. |
 
 Estos componentes se mantienen en `components/layouts/` porque forman parte de la estructura y navegación global de las vistas protegidas, y no corresponden a componentes comunes independientes.
@@ -609,7 +612,9 @@ Cuando el usuario inicia sesión, el token se guarda en el `localStorage` y tamb
 
 Si el perfil se obtiene correctamente, se guarda la información del usuario en el estado global. Cuando ya existe un token válido y un usuario cargado, el sistema conecta Socket.IO para habilitar funcionalidades en tiempo real, como el chat de PQR y las notificaciones internas.
 
-Cuando el usuario cierra sesión, se desconecta Socket.IO, se elimina el token del `localStorage` y se limpia la información del usuario autenticado.
+Cuando el usuario cierra sesión, `logout(reason)` desconecta Socket.IO, elimina el token del `localStorage`, limpia la información del usuario y registra el cierre en la auditoría mediante `logoutUser()`. El motivo puede ser `MANUAL` (valor por defecto) o `INACTIVITY`. El token se borra antes de llamar al backend, para que el cierre se vea de inmediato y otra pestaña no registre el mismo cierre dos veces.
+
+El contexto también escucha el evento `storage`: si otra pestaña borra el token, esta pestaña también cierra la sesión.
 
 ---
 
@@ -628,6 +633,7 @@ data/
 ├── humanTalentOptions.ts
 ├── menuItems.ts
 ├── pqrOptions.ts
+├── sessionConfig.ts
 └── userRoles.ts
 ```
 
@@ -675,6 +681,25 @@ Este archivo contiene las listas fijas de la auditoría: el nombre legible de ca
 
 ```txt
 Centralizar los módulos y acciones de la auditoría con sus nombres legibles.
+```
+
+---
+
+#### `sessionConfig.ts`
+
+Este archivo contiene la configuración del cierre de sesión por inactividad:
+
+| Constante | Valor | Descripción |
+| --------- | ----- | ----------- |
+| `INACTIVITY_LIMIT_MS` | 15 minutos | Tiempo sin actividad antes de cerrar la sesión. |
+| `INACTIVITY_WARNING_MS` | 60 segundos | Tiempo antes del cierre en que aparece el aviso. |
+| `ACTIVITY_SAVE_INTERVAL_MS` | 5 segundos | Cada cuánto se guarda la actividad, para no escribir en cada movimiento del mouse. |
+| `LAST_ACTIVITY_KEY` | `lastActivityAt` | Clave del `localStorage` donde se guarda la hora de la última actividad, compartida entre pestañas. |
+
+**Responsabilidad principal:**
+
+```txt
+Centralizar los tiempos del cierre de sesión por inactividad para cambiarlos en un solo lugar.
 ```
 
 ---
@@ -757,6 +782,7 @@ hooks/
 │
 ├── auth/
 │   ├── useChangePassword.ts
+│   ├── useInactivityLogout.ts
 │   ├── useLogin.ts
 │   └── useRegister.ts
 │
@@ -828,6 +854,7 @@ hooks/audit/
 ```txt
 hooks/auth/
 ├── useChangePassword.ts
+├── useInactivityLogout.ts
 ├── useLogin.ts
 └── useRegister.ts
 ```
@@ -835,7 +862,8 @@ hooks/auth/
 | Hook | Descripción | Uso dentro del proyecto |
 | ---- | ----------- | ----------------------- |
 | `useChangePassword.ts` | Maneja los campos, validaciones, carga y mensajes del cambio de contraseña del usuario autenticado. | Se utiliza en `ChangePassword.tsx`. |
-| `useLogin.ts` | Maneja la lógica del inicio de sesión, validaciones, errores, carga y autenticación del usuario. Si la sesión se cerró porque el usuario fue desactivado, muestra el mensaje guardado en `sessionStorage` y luego lo borra. | Se utiliza en `Login.tsx`. |
+| `useInactivityLogout.ts` | Cierra la sesión por inactividad. Escucha la actividad del usuario (mouse, teclado, desplazamiento) y guarda la hora en `localStorage`, compartida entre pestañas. Cada segundo calcula el tiempo restante: en el último minuto muestra el aviso y al llegar a cero guarda el mensaje en `sessionStorage` y llama a `logout("INACTIVITY")`. Mientras el aviso está abierto, solo el botón "Seguir conectado" cuenta como actividad. | Se utiliza en `DashboardLayout.tsx`. |
+| `useLogin.ts` | Maneja la lógica del inicio de sesión, validaciones, errores, carga y autenticación del usuario. Si la sesión se cerró sin que el usuario lo pidiera (usuario desactivado, token vencido o inactividad), muestra el mensaje guardado en `sessionStorage` y luego lo borra. | Se utiliza en `Login.tsx`. |
 | `useRegister.ts` | Maneja los campos, validaciones, mensajes y estado de carga del registro de usuarios. | Se utiliza en `Register.tsx`. |
 
 ---
@@ -1127,7 +1155,7 @@ interfaces/auth/
 
 | Archivo             | Descripción                                                                                                                          | Uso dentro del proyecto                                                                       |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
-| `auth.interface.ts` | Define los tipos relacionados con autenticación, inicio de sesión, registro, cambio de contraseña, respuestas del backend y datos del usuario autenticado. | Se utiliza en servicios, hooks, contexto y páginas relacionadas con autenticación y sesión. |
+| `auth.interface.ts` | Define los tipos relacionados con autenticación, inicio de sesión, registro, cambio de contraseña, cierre de sesión, respuestas del backend y datos del usuario autenticado. | Se utiliza en servicios, hooks, contexto y páginas relacionadas con autenticación y sesión. |
 
 ---
 
@@ -1604,6 +1632,7 @@ services/auth/
 loginUser()
 registerUser()
 changePassword()
+logoutUser()
 ```
 
 | Función | Descripción |
@@ -1611,6 +1640,7 @@ changePassword()
 | `loginUser(data)` | Envía el correo y la contraseña al backend para iniciar sesión. |
 | `registerUser(data)` | Envía la información necesaria para registrar un nuevo usuario en el sistema. |
 | `changePassword(data)` | Envía la contraseña actual y la nueva contraseña del usuario autenticado al backend. |
+| `logoutUser(reason, token)` | Registra el cierre de sesión en el backend mediante `POST /auth/logout`. Recibe el token porque se llama justo después de borrarlo del navegador. |
 
 ---
 

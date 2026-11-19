@@ -74,3 +74,6 @@ export interface ChangePasswordFormErrors {
     newPassword: string;
     confirmPassword: string;
 }
+
+// Motivo del cierre de sesión que se registra en la auditoría.
+export type LogoutReason = "MANUAL" | "INACTIVITY";
