@@ -13,21 +13,17 @@ import PositionRevisionEntryDialog from "../shared/PositionRevisionEntryDialog";
 import TextAreaInput from "../../common/inputs/TextAreaInput";
 
 import type {
-    PositionCompetency,
     PositionCompetencyForm,
     PositionCompetencyFormErrors,
-    PositionCompetencyType,
 } from "../../../interfaces/positionManagement/positionProfileRevision.interface";
 
 interface PositionCompetencyDialogProps {
     open: boolean;
 
-    competencyTypes: PositionCompetencyType[];
+    competencyTypeName: string;
 
     form: PositionCompetencyForm;
     formErrors: PositionCompetencyFormErrors;
-
-    editingCompetency: PositionCompetency | null;
 
     isEditing: boolean;
     hasFormChanges: boolean;
@@ -51,9 +47,9 @@ interface PositionCompetencyDialogProps {
 // Diálogo para registrar o actualizar una competencia.
 const PositionCompetencyDialog = ({
     open,
+    competencyTypeName,
     form,
     formErrors,
-    editingCompetency,
     isEditing,
     hasFormChanges,
     loadingSubmit,
@@ -82,7 +78,7 @@ const PositionCompetencyDialog = ({
             onClose={onClose}
         >
             <Stack spacing={3}>
-                {editingCompetency && (
+                {competencyTypeName && (
                     <Box
                         sx={{
                             p: 2,
@@ -98,8 +94,7 @@ const PositionCompetencyDialog = ({
                             sx={{
                                 display: "block",
                                 mb: 0.5,
-                                color:
-                                    "text.secondary",
+                                color: "text.secondary",
                             }}
                         >
                             Competencia
@@ -111,9 +106,7 @@ const PositionCompetencyDialog = ({
                                 fontWeight: 700,
                             }}
                         >
-                            {
-                                editingCompetency.competency
-                            }
+                            {competencyTypeName}
                         </Typography>
                     </Box>
                 )}

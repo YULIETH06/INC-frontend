@@ -52,7 +52,6 @@ const PositionCompetenciesSection = ({
 
         competencyForm,
         competencyFormErrors,
-        editingCompetency,
 
         openCompetencyDialog,
 
@@ -110,6 +109,14 @@ const PositionCompetenciesSection = ({
         revisionId,
         loadRevisionDetail,
     ]);
+
+    // Busca el nombre de la competencia seleccionado.
+    const selectedCompetencyTypeName =
+        selectedRevisionDetail?.competencies.find(
+            (competencyType) =>
+                competencyType.id ===
+                competencyForm.competencyTypeId
+        )?.name ?? "";
 
     // Determina si la revisión puede ser modificada.
     const canManageRevision =
@@ -405,16 +412,12 @@ const PositionCompetenciesSection = ({
             {/* Formulario para crear o editar una competencia. */}
             <PositionCompetencyDialog
                 open={openCompetencyDialog}
-                competencyTypes={
-                    selectedRevisionDetail?.competencies ??
-                    []
+                competencyTypeName={
+                    selectedCompetencyTypeName
                 }
                 form={competencyForm}
                 formErrors={
                     competencyFormErrors
-                }
-                editingCompetency={
-                    editingCompetency
                 }
                 isEditing={
                     isEditingCompetency
