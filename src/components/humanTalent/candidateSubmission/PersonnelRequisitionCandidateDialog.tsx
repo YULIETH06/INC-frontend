@@ -1,36 +1,18 @@
-import {
-    useEffect,
-    useRef,
-} from "react";
-
 import type {
-    ChangeEvent,
     FormEvent,
 } from "react";
 
 import {
-    Box,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Divider,
-    FormHelperText,
-    IconButton,
-    MenuItem,
     Stack,
-    TextField,
-    Typography,
 } from "@mui/material";
 
-import CloseIcon from "@mui/icons-material/Close";
-import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
-import PersonAddAltOutlinedIcon from "@mui/icons-material/PersonAddAltOutlined";
-import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
-
+import CustomDialog from "../../common/CustomDialog";
 import ActionButton from "../../common/ActionButton";
-
-import { formatFileSize } from "../../../utils/common/fileUtils";
+import FilePreviewCard from "../../common/FilePreviewCard";
+import ClearableSelect from "../../common/inputs/ClearableSelect";
+import TextInput from "../../common/inputs/TextInput";
+import TextAreaInput from "../../common/inputs/TextAreaInput";
+import FileInput from "../../common/inputs/FileInput";
 
 import type {
     PersonnelRequisitionCandidate,
@@ -88,41 +70,16 @@ const PersonnelRequisitionCandidateDialog = ({
     onSubmit,
     onClose,
 }: PersonnelRequisitionCandidateDialogProps) => {
-    const fileInputRef =
-        useRef<HTMLInputElement | null>(null);
 
-    // Limpia visualmente el input cuando se elimina el archivo seleccionado.
-    useEffect(() => {
-        if (!form.file && fileInputRef.current) {
-            fileInputRef.current.value = "";
-        }
-    }, [form.file]);
+    const formId =
+        "personnel-requisition-candidate-form";
 
-    // Limpia el input cada vez que se cierra el diálogo.
-    useEffect(() => {
-        if (!open && fileInputRef.current) {
-            fileInputRef.current.value = "";
-        }
-    }, [open]);
-
-    // Recibe el archivo seleccionado por el usuario.
-    const handleFileInputChange = (
-        event: ChangeEvent<HTMLInputElement>
-    ) => {
-        const selectedFile =
-            event.target.files?.[0] ?? null;
-
-        onFileChange(selectedFile);
-    };
-
-    // Elimina el archivo seleccionado del formulario.
-    const handleClearSelectedFile = () => {
-        onFileChange(null);
-
-        if (fileInputRef.current) {
-            fileInputRef.current.value = "";
-        }
-    };
+    // Opciones del selector de tipo de identificación.
+    const identificationTypeOptions =
+        identificationTypes.map((type) => ({
+            label: `${type.code} - ${type.name}`,
+            value: String(type.id),
+        }));
 
     // Evita cerrar el diálogo mientras se envía el formulario.
     const handleDialogClose = () => {
@@ -134,401 +91,194 @@ const PersonnelRequisitionCandidateDialog = ({
     };
 
     return (
-        <Dialog
-            open={open}
-            onClose={handleDialogClose}
-            fullWidth
-            maxWidth="sm"
+        <form
+            id={formId}
+            onSubmit={onSubmit}
+            noValidate
         >
-            <Box
-                component="form"
-                onSubmit={onSubmit}
-                noValidate
-            >
-                <DialogTitle
-                    sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        gap: 2,
-                        pr: 1,
-                    }}
-                >
+            <CustomDialog
+                open={open}
+                title={
+                    isEditing
+                        ? "Actualizar candidato"
+                        : "Registrar candidato"
+                }
+                subtitle={
+                    isEditing
+                        ? "Modifica los datos o reemplaza la hoja de vida."
+                        : "Registra la información y la hoja de vida del candidato."
+                }
+                size="sm"
+                onClose={handleDialogClose}
+                actions={
                     <Stack
                         direction="row"
-                        spacing={1.5}
-                        sx={{
-                            alignItems: "center",
-                        }}
+                        spacing={1}
                     >
-                        {isEditing ? (
-                            <SaveOutlinedIcon color="primary" />
-                        ) : (
-                            <PersonAddAltOutlinedIcon color="primary" />
-                        )}
-
-                        <Box>
-                            <Typography
-                                variant="h6"
-                                sx={{
-                                    fontWeight: 700,
-                                }}
-                            >
-                                {isEditing
-                                    ? "Actualizar candidato"
-                                    : "Registrar candidato"}
-                            </Typography>
-
-                            <Typography
-                                variant="body2"
-                                sx={{
-                                    color: "text.secondary",
-                                }}
-                            >
-                                {isEditing
-                                    ? "Modifica los datos o reemplaza la hoja de vida."
-                                    : "Registra la información y la hoja de vida del candidato."}
-                            </Typography>
-                        </Box>
-                    </Stack>
-
-                    <IconButton
-                        onClick={handleDialogClose}
-                        disabled={loadingSubmit}
-                        aria-label="Cerrar formulario"
-                    >
-                        <CloseIcon />
-                    </IconButton>
-                </DialogTitle>
-
-                <Divider />
-
-                <DialogContent>
-                    <Stack
-                        spacing={2}
-                    >
-                        <TextField
-                            select
-                            label="Tipo de identificación"
-                            value={form.identificationTypeId}
-                            onChange={(event) =>
-                                onIdentificationTypeChange(
-                                    event.target.value
-                                )
+                        <ActionButton
+                            actionType="cancel"
+                            onClick={
+                                handleDialogClose
                             }
-                            error={Boolean(
-                                formErrors.identificationTypeId
-                            )}
-                            helperText={
-                                formErrors.identificationTypeId || " "
+                            disabled={
+                                loadingSubmit
                             }
-                            required
-                            fullWidth
-                            disabled={loadingSubmit}
                         >
-                            {identificationTypes.map((type) => (
-                                <MenuItem
-                                    key={type.id}
-                                    value={String(type.id)}
-                                >
-                                    {type.code} - {type.name}
-                                </MenuItem>
-                            ))}
-                        </TextField>
+                            Cancelar
+                        </ActionButton>
 
-                        <TextField
-                            label="Número de identificación"
-                            value={form.identificationNumber}
-                            onChange={(event) =>
-                                onIdentificationNumberChange(
-                                    event.target.value
-                                )
+                        <ActionButton
+                            type="submit"
+                            form={formId}
+                            actionType={
+                                isEditing
+                                    ? "save"
+                                    : "create"
                             }
-                            error={Boolean(
-                                formErrors.identificationNumber
-                            )}
-                            helperText={
-                                formErrors.identificationNumber || " "
+                            loading={
+                                loadingSubmit
                             }
-                            required
-                            fullWidth
-                            disabled={loadingSubmit}
-                            slotProps={{
-                                htmlInput: {
-                                    maxLength: 50,
-                                },
-                            }}
-                        />
-                        
-                        <TextField
-                            label="Nombre completo"
-                            value={form.name}
-                            onChange={(event) =>
-                                onNameChange(
-                                    event.target.value
-                                )
+                            loadingText={
+                                isEditing
+                                    ? "Actualizando..."
+                                    : "Registrando..."
                             }
-                            error={Boolean(
-                                formErrors.name
-                            )}
-                            helperText={
-                                formErrors.name || " "
+                            disabled={
+                                !hasFormChanges
                             }
-                            required
-                            fullWidth
-                            disabled={loadingSubmit}
-                        />
+                        >
+                            {
+                                isEditing
+                                    ? "Actualizar"
+                                    : "Registrar"
+                            }
+                        </ActionButton>
+                    </Stack>
+                }
+            >
 
-                        <TextField
-                            label="Observación"
-                            value={form.observation}
-                            onChange={(event) =>
-                                onObservationChange(
-                                    event.target.value
-                                )
-                            }
-                            error={Boolean(
-                                formErrors.observation
-                            )}
-                            helperText={
-                                formErrors.observation ||
-                                `${form.observation.length}/500`
-                            }
-                            multiline
-                            minRows={3}
-                            maxRows={5}
-                            fullWidth
-                            disabled={loadingSubmit}
-                        // slotProps={{
-                        //     htmlInput: {
-                        //         maxLength: 500,
-                        //     },
-                        // }}
-                        />
+                <Stack
+                    spacing={2.5}
+                    sx={{ pt: 1 }}
+                >
+                    <ClearableSelect
+                        label="Tipo de identificación"
+                        value={
+                            form.identificationTypeId
+                        }
+                        options={
+                            identificationTypeOptions
+                        }
+                        onChange={
+                            onIdentificationTypeChange
+                        }
+                        error={
+                            formErrors.identificationTypeId
+                        }
+                        required
+                        disabled={loadingSubmit}
+                        minWidth="100%"
+                    />
 
-                        <Box>
-                            <Typography
-                                variant="subtitle2"
-                                sx={{
-                                    mb: 1,
-                                    fontWeight: 600,
-                                }}
-                            >
-                                Hoja de vida
+                    <TextInput
+                        label="Número de identificación"
+                        value={
+                            form.identificationNumber
+                        }
+                        onChange={
+                            onIdentificationNumberChange
+                        }
+                        error={Boolean(
+                            formErrors.identificationNumber
+                        )}
+                        helperText={
+                            formErrors.identificationNumber
+                        }
+                        required
+                        disabled={loadingSubmit}
+                        slotProps={{
+                            htmlInput: {
+                                maxLength: 50,
+                            },
+                        }}
+                    />
 
-                                {!isEditing && (
-                                    <Box
-                                        component="span"
-                                        sx={{
-                                            color: "error.main",
-                                        }}
-                                    >
-                                        {" "}
-                                        *
-                                    </Box>
-                                )}
-                            </Typography>
+                    <TextInput
+                        label="Nombre completo"
+                        value={form.name}
+                        onChange={onNameChange}
+                        error={Boolean(
+                            formErrors.name
+                        )}
+                        helperText={
+                            formErrors.name
+                        }
+                        required
+                        disabled={loadingSubmit}
+                    />
 
-                            <input
-                                ref={fileInputRef}
-                                type="file"
-                                accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                                hidden
-                                onChange={
-                                    handleFileInputChange
+                    <TextAreaInput
+                        label="Observación"
+                        value={form.observation}
+                        onChange={
+                            onObservationChange
+                        }
+                        rows={3}
+                        disabled={loadingSubmit}
+                        placeholder="Escribe una observación sobre el candidato..."
+                        error={Boolean(
+                            formErrors.observation
+                        )}
+                        helperText={
+                            formErrors.observation
+                                ? formErrors.observation
+                                : `${form.observation.length}/500`
+                        }
+                    />
+
+                    {/* Hoja de vida registrada actualmente. */}
+                    {isEditing &&
+                        editingCandidate && (
+                            <FilePreviewCard
+                                label="Hoja de vida actual"
+                                fileName={
+                                    editingCandidate.originalName
                                 }
-                                disabled={loadingSubmit}
+                                fileUrl={
+                                    editingCandidate.fileUrl
+                                }
+                                fileSize={
+                                    editingCandidate.fileSize
+                                }
+                                buttonLabel="Ver hoja de vida"
+                                buttonTooltip="Ver hoja de vida"
                             />
-
-                            <ActionButton
-                                actionType="upload"
-                                size="medium"
-                                fullWidth
-                                onClick={() =>
-                                    fileInputRef.current?.click()
-                                }
-                                disabled={loadingSubmit}
-                                sx={{
-                                    minHeight: 48,
-                                    justifyContent:
-                                        "flex-start",
-                                }}
-                            >
-                                {form.file
-                                    ? "Cambiar archivo seleccionado"
-                                    : isEditing
-                                        ? "Seleccionar nueva hoja de vida"
-                                        : "Seleccionar hoja de vida"}
-                            </ActionButton>
-
-                            {formErrors.file && (
-                                <FormHelperText error>
-                                    {formErrors.file}
-                                </FormHelperText>
-                            )}
-                        </Box>
-
-                        {form.file && (
-                            <Box
-                                sx={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent:
-                                        "space-between",
-                                    gap: 2,
-                                    p: 2,
-                                    border: 1,
-                                    borderColor: "divider",
-                                    borderRadius: 2,
-                                    bgcolor:
-                                        "background.default",
-                                }}
-                            >
-                                <Stack
-                                    direction="row"
-                                    spacing={1.5}
-                                    sx={{
-                                        alignItems: "center",
-                                        minWidth: 0,
-                                    }}
-                                >
-                                    <DescriptionOutlinedIcon color="primary" />
-
-                                    <Box
-                                        sx={{
-                                            minWidth: 0,
-                                        }}
-                                    >
-                                        <Typography
-                                            variant="body2"
-                                            noWrap
-                                            sx={{
-                                                fontWeight: 600,
-                                            }}
-                                        >
-                                            {form.file.name}
-                                        </Typography>
-
-                                        <Typography
-                                            variant="caption"
-                                            sx={{
-                                                color:
-                                                    "text.secondary",
-                                            }}
-                                        >
-                                            {formatFileSize(
-                                                form.file.size
-                                            )}
-                                        </Typography>
-                                    </Box>
-                                </Stack>
-
-                                <IconButton
-                                    size="small"
-                                    onClick={
-                                        handleClearSelectedFile
-                                    }
-                                    disabled={loadingSubmit}
-                                    aria-label="Quitar archivo seleccionado"
-                                >
-                                    <CloseIcon fontSize="small" />
-                                </IconButton>
-                            </Box>
                         )}
 
-                        {isEditing &&
-                            !form.file &&
-                            editingCandidate && (
-                                <Box
-                                    sx={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        gap: 1.5,
-                                        p: 2,
-                                        border: 1,
-                                        borderColor:
-                                            "divider",
-                                        borderRadius: 2,
-                                        bgcolor:
-                                            "background.default",
-                                    }}
-                                >
-                                    <DescriptionOutlinedIcon color="action" />
-
-                                    <Box
-                                        sx={{
-                                            minWidth: 0,
-                                        }}
-                                    >
-                                        <Typography
-                                            variant="body2"
-                                            noWrap
-                                            sx={{
-                                                fontWeight: 600,
-                                            }}
-                                        >
-                                            {
-                                                editingCandidate.originalName
-                                            }
-                                        </Typography>
-
-                                        <Typography
-                                            variant="caption"
-                                            sx={{
-                                                color:
-                                                    "text.secondary",
-                                            }}
-                                        >
-                                            Hoja de vida actual ·{" "}
-                                            {formatFileSize(
-                                                editingCandidate.fileSize
-                                            )}
-                                        </Typography>
-                                    </Box>
-                                </Box>
-                            )}
-                    </Stack>
-                </DialogContent>
-
-                <Divider />
-
-                <DialogActions
-                    sx={{
-                        px: 3,
-                        py: 2,
-                        gap: 1,
-                    }}
-                >
-                    <ActionButton
-                        actionType="cancel"
-                        onClick={handleDialogClose}
+                    <FileInput
+                        label={
+                            isEditing
+                                ? "Reemplazar hoja de vida"
+                                : "Hoja de vida"
+                        }
+                        value={form.file}
+                        accept=".pdf,.doc,.docx"
+                        required={!isEditing}
                         disabled={loadingSubmit}
-                    >
-                        Cancelar
-                    </ActionButton>
-
-                    <ActionButton
-                        type="submit"
-                        actionType={
+                        error={formErrors.file}
+                        hint={
                             isEditing
-                                ? "save"
-                                : "create"
+                                ? "Si no seleccionas un archivo, se conserva la hoja de vida actual."
+                                : "Formatos permitidos: PDF, DOC o DOCX."
                         }
-                        loading={loadingSubmit}
-                        loadingText={
-                            isEditing
-                                ? "Actualizando..."
-                                : "Registrando..."
+                        onChange={onFileChange}
+                        onRemove={() =>
+                            onFileChange(null)
                         }
-                        disabled={!hasFormChanges}
-                    >
-                        {isEditing
-                            ? "Actualizar"
-                            : "Registrar"}
-                    </ActionButton>
-                </DialogActions>
-            </Box>
-        </Dialog>
+                    />
+                </Stack>
+            </CustomDialog>
+        </form>
     );
 };
 

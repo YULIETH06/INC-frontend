@@ -136,7 +136,10 @@ const PositionProfileRevisionDialog = ({
                         </Stack>
                     }
                 >
-                    <Stack spacing={3}>
+                    <Stack
+                        spacing={3}
+                        sx={{ pt: 1 }}
+                    >
 
                         <TextAreaInput
                             label="Observación del cambio"
