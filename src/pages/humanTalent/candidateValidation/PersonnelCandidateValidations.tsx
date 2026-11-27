@@ -34,6 +34,7 @@ import {
     getValidationStatusColor,
     getValidationStatusLabel,
 } from "../../../utils/humanTalent/personnelCandidateValidationUtils";
+import { formatCandidateIdentification } from "../../../utils/humanTalent/personnelRequisitionUtils";
 
 import DataTable from "../../../components/common/DataTable";
 import LoadingBox from "../../../components/common/LoadingBox";
@@ -112,13 +113,11 @@ const PersonnelCandidateValidations = () => {
 
             return candidates.filter(
                 (candidate) => {
+                    // La identificación es opcional: sin tipo, se busca sobre texto vacío.
                     const identificationType =
-                        candidate
-                            .identificationType
-                            .code ||
-                        candidate
-                            .identificationType
-                            .name;
+                        candidate.identificationType?.code ||
+                        candidate.identificationType?.name ||
+                        "";
 
                     return (
                         candidate.name
@@ -126,8 +125,7 @@ const PersonnelCandidateValidations = () => {
                             .includes(
                                 normalizedSearch
                             ) ||
-                        candidate
-                            .identificationNumber
+                        (candidate.identificationNumber ?? "")
                             .toLowerCase()
                             .includes(
                                 normalizedSearch
@@ -221,10 +219,11 @@ const PersonnelCandidateValidations = () => {
                 render: (
                     candidate
                 ) =>
-                    `${candidate.identificationType.code ||
-                    candidate.identificationType.name
-                    } ${candidate.identificationNumber
-                    }`,
+                    formatCandidateIdentification(
+                        candidate.identificationType?.code ||
+                        candidate.identificationType?.name,
+                        candidate.identificationNumber
+                    ),
             },
 
             {

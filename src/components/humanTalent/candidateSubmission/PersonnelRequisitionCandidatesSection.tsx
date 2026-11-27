@@ -29,6 +29,7 @@ import PersonnelRequisitionCandidateDialog from "./PersonnelRequisitionCandidate
 import { usePersonnelRequisitionCandidates } from "../../../hooks/humanTalent/requisitions/usePersonnelRequisitionCandidates";
 
 import { formatDate } from "../../../utils/common/dateUtils";
+import { formatCandidateIdentification } from "../../../utils/humanTalent/personnelRequisitionUtils";
 
 import type {
     CandidateSubmissionStatus,
@@ -705,15 +706,11 @@ const PersonnelRequisitionCandidatesSection = ({
                                                 fontWeight: 600,
                                             }}
                                         >
-                                            {candidate.identificationType
-                                                ?.code ??
-                                                candidate
-                                                    .identificationType
-                                                    ?.name ??
-                                                "Documento"}{" "}
-                                            {
+                                            {formatCandidateIdentification(
+                                                candidate.identificationType?.code ??
+                                                candidate.identificationType?.name,
                                                 candidate.identificationNumber
-                                            }{" "}
+                                            )}{" "}
                                             - {candidate.name}
                                         </Typography>
                                     </Box>

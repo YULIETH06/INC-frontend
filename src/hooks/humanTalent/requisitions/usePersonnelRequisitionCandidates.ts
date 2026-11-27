@@ -385,6 +385,8 @@ export const usePersonnelRequisitionCandidates = ({
         }));
 
         clearFieldError("identificationTypeId");
+        clearFieldError("identificationNumber");
+        
     };
 
     // Actualiza el número de identificación.
@@ -397,6 +399,7 @@ export const usePersonnelRequisitionCandidates = ({
         }));
 
         clearFieldError("identificationNumber");
+        clearFieldError("identificationTypeId");
     };
 
     // Actualiza el nombre del candidato.
@@ -453,12 +456,14 @@ export const usePersonnelRequisitionCandidates = ({
         setEditingCandidate(candidate);
 
         setForm({
+            // Sin identificación registrada, los campos quedan vacíos.
             identificationTypeId:
-                String(candidate.identificationTypeId),
+                candidate.identificationTypeId !== null
+                    ? String(candidate.identificationTypeId)
+                    : "",
 
             identificationNumber:
-                candidate.identificationNumber,
-
+                candidate.identificationNumber ?? "",
             name: candidate.name,
 
             observation:
@@ -1026,9 +1031,11 @@ export const usePersonnelRequisitionCandidates = ({
     // Indica si el formulario contiene cambios.
     const hasFormChanges = editingCandidate
         ? form.identificationTypeId !==
-        String(editingCandidate.identificationTypeId) ||
+        (editingCandidate.identificationTypeId !== null
+            ? String(editingCandidate.identificationTypeId)
+            : "") ||
         form.identificationNumber.trim() !==
-        editingCandidate.identificationNumber ||
+        (editingCandidate.identificationNumber ?? "") ||
         form.name.trim() !==
         editingCandidate.name ||
         form.observation.trim() !==

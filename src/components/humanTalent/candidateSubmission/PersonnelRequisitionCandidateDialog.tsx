@@ -175,7 +175,7 @@ const PersonnelRequisitionCandidateDialog = ({
                         error={
                             formErrors.identificationTypeId
                         }
-                        required
+                        clearable
                         disabled={loadingSubmit}
                         minWidth="100%"
                     />
@@ -194,7 +194,6 @@ const PersonnelRequisitionCandidateDialog = ({
                         helperText={
                             formErrors.identificationNumber
                         }
-                        required
                         disabled={loadingSubmit}
                         slotProps={{
                             htmlInput: {

@@ -464,7 +464,7 @@ components/humanTalent/candidateValidation/
 | `CandidateRequirementValidationTable.tsx` | Tabla reutilizable dentro del flujo de validación. Agrupa las descripciones por requerimiento y permite evaluar cada descripción de forma independiente. Si el candidato cumple, solicita la evidencia de cumplimiento en un campo editable. Si no cumple, muestra el cierre de brecha llenado automáticamente con la descripción del requisito, en modo solo lectura mediante `TextInput.tsx` con `readOnly`, por lo que no se puede escribir. | Se utiliza dentro de `CandidateValidationStep.tsx` para presentar de forma compacta Formación, Experiencia y Conocimientos específicos, incluyendo múltiples descripciones por requisito. |
 | `CandidateValidationStep.tsx` | Representa la **Fase 3: Validación del postulante**. Agrupa las descripciones de la revisión exacta utilizada por la requisición, delega su evaluación a `CandidateRequirementValidationTable.tsx`, solicita el resultado final de aptitud y muestra la fecha y el usuario que realizó la validación cuando el proceso fue completado. | Se renderiza después de completar la Fase 2. |
 | `CandidateTechnicalEvaluationStep.tsx` | Representa la **Fase 4: Evaluación Técnica**. Permite al Analista de Talento Humano registrar las calificaciones de entrevista y examen de forma independiente y adjuntar la evidencia del examen técnico en formato PDF. Cuando ambas calificaciones están registradas, la evaluación queda pendiente de aprobación. El usuario que creó la requisición puede revisar las calificaciones y confirmar si el postulante es apto o no para continuar. | Se renderiza después de completar la Fase 3 cuando el postulante fue considerado apto para continuar. |
-| `CandidateCompetencyValidationTable.tsx` | Tabla utilizada dentro de la Evaluación de Competencias. Agrupa las competencias de la revisión del perfil de cargo por tipo de competencia y permite calificar cada una como `Destacada` o `Por destacar` mediante `RadioOptionGroup`. En modo lectura muestra los resultados guardados de forma bloqueada. | Se utiliza dentro de `CandidateCompetencyEvaluationStep.tsx`. |
+| `CandidateCompetencyValidationTable.tsx` | Tabla utilizada dentro de la Evaluación de Competencias. Agrupa las competencias de la revisión del perfil de cargo por tipo de competencia y permite calificar cada una como `Detectada` o `Por desarrollar` mediante `RadioOptionGroup`. En modo lectura muestra los resultados guardados de forma bloqueada. | Se utiliza dentro de `CandidateCompetencyEvaluationStep.tsx`. |
 | `CandidateCompetencyEvaluationStep.tsx` | Representa la **Fase 5: Evaluación de Competencias**. Permite registrar una o varias pruebas psicotécnicas con la prueba aplicada, los aspectos evaluados y la descripción de los resultados, agregar o quitar pruebas (manteniendo mínimo una), calificar las competencias del cargo, seleccionar el concepto general y definir si el postulante es apto. Toda la información se guarda en una sola acción. En modo lectura presenta las pruebas, los resultados de las competencias, el concepto general, la fecha y el usuario que realizó la evaluación. | Se renderiza después de completar la Fase 4 cuando el postulante fue confirmado como apto. |
 | `PersonnelCandidateValidationSection.tsx` | Componente coordinador del proceso de validación de cargo y postulante. Consulta la información del candidato, muestra el `ProcessStepper`, presenta la información general del cargo y del postulante, controla la etapa activa y delega las Fases 1, 2, 3, 4 y 5 a sus componentes correspondientes. También controla la navegación entre etapas y presenta estados de carga, errores y mensajes del proceso. | Se utiliza en la página `PersonnelCandidateValidationDetail.tsx`. |
 
@@ -717,7 +717,7 @@ El archivo `humanTalentOptions.ts` contiene las opciones estáticas utilizadas e
 | `requisitionStatusOptions`  | Contiene los estados disponibles para una requisición de personal.              | Se utilizará en listados, filtros o vistas donde se necesite mostrar o consultar el estado de la requisición. |
 | `candidateApplicationConceptOptions` | Contiene las opciones `Ingreso` y `Modificación de cargo` utilizadas en el concepto de aplicación. | Se utiliza en la Fase 1 de la validación de cargo y postulante. |
 | `candidatePositionTypeOptions` | Contiene las opciones `Nuevo cargo` y `Cargo existente`. | Se utiliza en la Fase 2 de la validación para clasificar el cargo del proceso. |
-| `candidateCompetencyResultOptions` | Contiene las opciones `Destacada` y `Por destacar` utilizadas para calificar cada competencia. | Se utiliza en la Fase 5 dentro de `CandidateCompetencyValidationTable.tsx`. |
+| `candidateCompetencyResultOptions` | Contiene las opciones `Detectada` y `Por desarrollar` utilizadas para calificar cada competencia. | Se utiliza en la Fase 5 dentro de `CandidateCompetencyValidationTable.tsx`. |
 | `candidateGeneralConceptOptions` | Contiene las frases fijas disponibles para el concepto general de la Evaluación de Competencias. El valor se guarda como texto, por lo que la lista puede ampliarse sin cambiar la lógica del componente. | Se utiliza en la Fase 5 dentro de `CandidateCompetencyEvaluationStep.tsx`. |
 
 ---
@@ -2377,6 +2377,8 @@ getRequisitionStatusColor()
 getRequisitionApprovalSlots()
 getHiringApprovalSlots()
 getRequisitionStatusComment()
+formatCandidateIdentification()
+CANDIDATE_WITHOUT_IDENTIFICATION_LABEL
 ```
 
 | Función                                    | Descripción                                                                                                                        |
@@ -2387,6 +2389,8 @@ getRequisitionStatusComment()
 | `getRequisitionApprovalSlots(approvals)`   | Ordena las aprobaciones iniciales y las distribuye entre jefe de área, jefe de departamento y gerente general.                     |
 | `getHiringApprovalSlots(approvals)`        | Distribuye las aprobaciones de la confirmación de contratación entre el analista y el jefe de Talento Humano.                      |
 | `getRequisitionStatusComment(requisition)` | Obtiene el comentario más reciente relacionado con el rechazo o cancelación de una requisición y define cómo debe mostrarse.       |
+| `formatCandidateIdentification(identificationTypeLabel, identificationNumber)` | Une el tipo y el número de identificación de un candidato para mostrarlos (por ejemplo, `CC 1045678901`). Si no hay número, retorna `CANDIDATE_WITHOUT_IDENTIFICATION_LABEL`; si hay número pero no tipo, muestra solo el número. Reutiliza `hasValue()`. Se usa en la tarjeta del candidato, la confirmación de preselección, el historial de cargues y la validación de candidatos. |
+| `CANDIDATE_WITHOUT_IDENTIFICATION_LABEL` | Constante con el texto `Sin identificación`, mostrado cuando un candidato se registró sin identificación. Se usa directamente donde el tipo y el número se muestran por separado, como en `InfoItem`. |
 
 ---
 
@@ -2670,7 +2674,7 @@ candidateCompetencyEvaluationSchema
 | `candidateTechnicalEvaluationSchema` | Valida las calificaciones de entrevista y examen y el estado de la evidencia seleccionada para la Fase 4. Permite registrar una o ambas calificaciones y controla que los valores se encuentren dentro del rango permitido antes de construir el `FormData` para el envío. | Se utiliza cuando el Analista de Talento Humano guarda las calificaciones y la evidencia del examen de la Fase 4. |
 | `candidateTechnicalEvaluationApprovalSchema` | Valida que se indique si el postulante es apto o no apto antes de confirmar la Evaluación Técnica. | Se utiliza cuando el responsable actual de la requisición confirma la Fase 4. |
 | `candidatePsychotechnicalTestSchema` | Valida cada prueba psicotécnica: la prueba aplicada, los aspectos evaluados y la descripción de resultados son obligatorios, con límites de 150, 1000 y 5000 caracteres respectivamente. | Se utiliza dentro de `candidateCompetencyEvaluationSchema`. |
-| `candidateCompetencyValidationSchema` | Valida que cada competencia tenga un resultado permitido: `Destacada` o `Por destacar`. | Se utiliza dentro de `candidateCompetencyEvaluationSchema`. |
+| `candidateCompetencyValidationSchema` | Valida que cada competencia tenga un resultado permitido: `Detectada` o `Por desarrollar`. | Se utiliza dentro de `candidateCompetencyEvaluationSchema`. |
 | `candidateCompetencyEvaluationSchema` | Valida la Fase 5 completa: exige mínimo una prueba, impide pruebas repetidas sin distinguir mayúsculas y minúsculas (marcando el error en el campo específico), exige el resultado de todas las competencias de la revisión y exige el concepto general y el resultado de aptitud. | Se utiliza en `useCompetencyEvaluation.ts` al guardar la Fase 5. |
 
 ---
@@ -2702,10 +2706,12 @@ reopenPersonnelRequisitionCandidatesSchema()
 
 | Esquema | Descripción | Uso dentro del proyecto |
 | ------- | ----------- | ----------------------- |
-| `createPersonnelRequisitionCandidateSchema()` | Valida que el tipo y número de identificación sean obligatorios, que el número contenga únicamente dígitos y no supere 50 caracteres, que el nombre sea obligatorio, contenga solo letras y tenga entre 3 y 150 caracteres, que la observación no supere 500 caracteres y que la hoja de vida sea obligatoria, corresponda a PDF, DOC o DOCX y no supere 5 MB. | Se utiliza al registrar un candidato desde `usePersonnelRequisitionCandidates.ts`. |
+| `createPersonnelRequisitionCandidateSchema()` | Valida que la identificación sea opcional pero en pareja: si se indica el tipo, el número es obligatorio y viceversa. Cuando hay número, debe contener solo dígitos y no superar 50 caracteres. También valida que el nombre sea obligatorio, contenga solo letras y tenga entre 3 y 150 caracteres, que la observación no supere 500 caracteres y que la hoja de vida sea obligatoria, corresponda a PDF, DOC o DOCX y no supere 5 MB. | Se utiliza al registrar un candidato desde `usePersonnelRequisitionCandidates.ts`. |
 | `updatePersonnelRequisitionCandidateSchema()` | Aplica las mismas reglas para identificación, nombre y observación. La hoja de vida es opcional para permitir conservar el documento actual cuando solo se modifican los demás datos. | Se utiliza al actualizar un candidato desde `usePersonnelRequisitionCandidates.ts`. |
 | `closePersonnelRequisitionCandidatesSchema()` | Valida `lateReason` cuando se envía: debe tener mínimo 3 y máximo 500 caracteres. El campo no se hace obligatorio de forma general, porque solo debe exigirse cuando el hook detecta que el primer cierre está fuera de `candidateSubmissionDeadlineAt`. | Se utiliza al cerrar el cargue de candidatos. |
 | `reopenPersonnelRequisitionCandidatesSchema()` | Valida que `reason` sea obligatorio en toda reapertura y tenga entre 3 y 500 caracteres. | Se utiliza antes de reabrir el cargue. |
+
+Las reglas de identificación están en dos esquemas internos compartidos, `candidateIdentificationTypeIdSchema` y `candidateIdentificationNumberSchema`, que usan tanto el esquema de creación como el de actualización. Así la regla de "los dos o ninguno" se mantiene en un solo lugar. El número usa `excludeEmptyString: true` para que la regla de solo dígitos no se aplique cuando el campo está vacío.
 
 ---
 

@@ -34,21 +34,49 @@ const candidateFileSchema = Yup.mixed<File>()
         }
     );
 
-// Validación para registrar un candidato.
+// Validación común del tipo de identificación (opcional).
+// Si se escribe el número, el tipo es obligatorio.
+const candidateIdentificationTypeIdSchema = Yup.string()
+    .trim()
+    .test(
+        "requiredWithNumber",
+        "Campo obligatorio si indicas el número.",
+        function (value) {
+            const identificationNumber =
+                this.parent.identificationNumber?.trim();
+
+            return !identificationNumber || Boolean(value);
+        }
+    );
+
+// Validación común del número de identificación (opcional).
+// Si se selecciona el tipo, el número es obligatorio.
+const candidateIdentificationNumberSchema = Yup.string()
+    .trim()
+    .max(50, "Máximo 50 caracteres.")
+    .matches(/^[0-9]+$/, {
+        message: "Solo puede contener números.",
+        excludeEmptyString: true,
+    })
+    .test(
+        "requiredWithType",
+        "Campo obligatorio si indicas el tipo.",
+        function (value) {
+            const identificationTypeId =
+                this.parent.identificationTypeId;
+
+            return !identificationTypeId || Boolean(value);
+        }
+    );
+
+    // Validación para registrar un candidato.
 export const createPersonnelRequisitionCandidateSchema =
     Yup.object({
-        identificationTypeId: Yup.string()
-            .trim()
-            .required("Campo obligatorio."),
+                identificationTypeId:
+            candidateIdentificationTypeIdSchema,
 
-        identificationNumber: Yup.string()
-            .trim()
-            .required("Campo obligatorio.")
-            .max(50, "Máximo 50 caracteres.")
-            .matches(
-                /^[0-9]+$/,
-                "Solo puede contener números."
-            ),
+        identificationNumber:
+            candidateIdentificationNumberSchema,
 
         name: Yup.string()
             .trim()
@@ -72,19 +100,11 @@ export const createPersonnelRequisitionCandidateSchema =
 // Validación para actualizar un candidato.
 export const updatePersonnelRequisitionCandidateSchema =
     Yup.object({
-        identificationTypeId: Yup.string()
-            .trim()
-            .required("Campo obligatorio."),
+               identificationTypeId:
+            candidateIdentificationTypeIdSchema,
 
-        identificationNumber: Yup.string()
-            .trim()
-            .required("Campo obligatorio.")
-            .max(50, "Máximo 50 caracteres.")
-            .matches(
-                /^[0-9]+$/,
-                "Solo puede contener números."
-            ),
-
+        identificationNumber:
+            candidateIdentificationNumberSchema,
         name: Yup.string()
             .trim()
             .required("Campo obligatorio.")

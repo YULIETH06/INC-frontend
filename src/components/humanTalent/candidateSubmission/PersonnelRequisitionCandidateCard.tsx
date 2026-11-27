@@ -17,6 +17,7 @@ import FilePreviewCard from "../../common/FilePreviewCard";
 
 import { getInitials } from "../../../utils/common/avatarUtils";
 import { formatDate } from "../../../utils/common/dateUtils";
+import { formatCandidateIdentification } from "../../../utils/humanTalent/personnelRequisitionUtils";
 
 import type {
     PersonnelRequisitionCandidate,
@@ -225,10 +226,10 @@ const PersonnelRequisitionCandidateCard = ({
                                         "text.secondary",
                                 }}
                             >
-                                {identificationType}{" "}
-                                {
+                                {formatCandidateIdentification(
+                                    identificationType,
                                     candidate.identificationNumber
-                                }
+                                )}
                             </Typography>
                         </Box>
                     </Stack>

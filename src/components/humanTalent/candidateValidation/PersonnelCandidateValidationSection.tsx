@@ -13,6 +13,7 @@ import CustomSnackbar from "../../common/CustomSnackbar";
 import EmptyState from "../../common/EmptyState";
 import FormGrid from "../../common/FormGrid";
 import InfoItem from "../../common/InfoItem";
+import { CANDIDATE_WITHOUT_IDENTIFICATION_LABEL } from "../../../utils/humanTalent/personnelRequisitionUtils";
 import LoadingBox from "../../common/LoadingBox";
 import ProcessStepper from "../../common/ProcessStepper";
 
@@ -338,20 +339,17 @@ const PersonnelCandidateValidationSection = ({
                                 <InfoItem
                                     label="Tipo de identificación"
                                     value={
-                                        candidate
-                                            .identificationType
-                                            .name ||
-                                        candidate
-                                            .identificationType
-                                            .code
+                                        candidate.identificationType?.name ||
+                                        candidate.identificationType?.code ||
+                                        CANDIDATE_WITHOUT_IDENTIFICATION_LABEL
                                     }
                                 />
 
                                 <InfoItem
                                     label="Número de identificación"
                                     value={
-                                        candidate
-                                            .identificationNumber
+                                        candidate.identificationNumber ??
+                                        CANDIDATE_WITHOUT_IDENTIFICATION_LABEL
                                     }
                                 />
                             </FormGrid>

@@ -75,10 +75,10 @@ export interface PersonnelCandidateValidationSummary {
 export interface PersonnelCandidateValidationListItem {
     id: number;
     requisitionId: number;
-    identificationNumber: string;
+    identificationNumber: string | null;
     name: string;
 
-    identificationType: IdentificationType;
+    identificationType: IdentificationType | null;
 
     requisition: {
         id: number;
@@ -270,11 +270,11 @@ export interface PersonnelCandidateValidation {
 export interface PersonnelCandidateValidationCandidate {
     id: number;
     requisitionId: number;
-    identificationNumber: string;
+    identificationNumber: string | null;
     name: string;
 
     identificationType:
-    IdentificationType;
+    IdentificationType | null;
 
     requisition: {
         id: number;

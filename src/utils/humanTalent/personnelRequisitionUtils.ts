@@ -28,6 +28,25 @@ export const hasValue = (
     );
 };
 
+// Texto que se muestra cuando el candidato no tiene identificación registrada.
+export const CANDIDATE_WITHOUT_IDENTIFICATION_LABEL =
+    "Sin identificación";
+
+// Arma la identificación del candidato para mostrarla, por ejemplo "CC 123456".
+// La identificación es opcional: si no tiene número, retorna "Sin identificación".
+export const formatCandidateIdentification = (
+    identificationTypeLabel?: string | null,
+    identificationNumber?: string | null
+): string => {
+    if (!hasValue(identificationNumber)) {
+        return CANDIDATE_WITHOUT_IDENTIFICATION_LABEL;
+    }
+
+    return hasValue(identificationTypeLabel)
+        ? `${identificationTypeLabel} ${identificationNumber}`
+        : `${identificationNumber}`;
+};
+
 // Formatea valores monetarios únicamente cuando existen.
 export const formatOptionalMoney = (
     value?: string | number | null

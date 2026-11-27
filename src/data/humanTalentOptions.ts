@@ -125,12 +125,12 @@ export const candidatePositionTypeOptions = [
 // Opciones del resultado de una competencia evaluada.
 export const candidateCompetencyResultOptions = [
     {
-        value: "Destacada",
-        label: "Destacada",
+        value: "Detectada",
+        label: "Detectada",
     },
     {
-        value: "Por destacar",
-        label: "Por destacar",
+        value: "Por desarrollar",
+        label: "por desarrollar",
     },
 ];
 

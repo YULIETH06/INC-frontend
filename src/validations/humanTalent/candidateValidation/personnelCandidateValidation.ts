@@ -223,6 +223,7 @@ const candidatePsychotechnicalTestSchema =
     });
 
 // Validación de cada competencia evaluada en la Fase 5.
+// Validación de cada competencia evaluada en la Fase 5.
 const candidateCompetencyValidationSchema =
     Yup.object({
         competencyDescriptionId: Yup.number()
@@ -233,8 +234,8 @@ const candidateCompetencyValidationSchema =
         result: Yup.string()
             .oneOf(
                 [
-                    "Destacada",
-                    "Por destacar",
+                    "Detectada",
+                    "Por desarrollar",
                 ],
                 "Campo obligatorio."
             )

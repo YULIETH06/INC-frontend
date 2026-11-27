@@ -13,6 +13,7 @@ import EmptyState from "../../common/EmptyState";
 import InfoItem from "../../common/InfoItem";
 
 import { formatDate } from "../../../utils/common/dateUtils";
+import { formatCandidateIdentification } from "../../../utils/humanTalent/personnelRequisitionUtils";
 
 import type {
     PersonnelCandidateSubmissionBatch,
@@ -141,12 +142,10 @@ const PersonnelCandidateSubmissionBatchesDialog = ({
                                                         }
                                                         .
                                                     </Box>{" "}
-                                                    {
-                                                        candidate.identificationTypeCode
-                                                    }{" "}
-                                                    {
+                                                    {formatCandidateIdentification(
+                                                        candidate.identificationTypeCode,
                                                         candidate.identificationNumber
-                                                    }{" "}
+                                                    )}{" "}
                                                     -{" "}
                                                     {
                                                         candidate.candidateName

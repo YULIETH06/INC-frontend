@@ -80,9 +80,10 @@ export interface PersonnelRequisitionCandidate {
     id: number;
     requisitionId: number;
 
-    identificationTypeId: number;
-    identificationType: IdentificationType;
-    identificationNumber: string;
+    // Opcionales: null cuando la hoja de vida no trae la identificación.
+    identificationTypeId: number | null;
+    identificationType: IdentificationType | null;
+    identificationNumber: string | null;
 
     name: string;
     observation: string | null;
@@ -407,8 +408,8 @@ export interface PersonnelCandidateSubmissionBatchItem {
     candidateId: number | null;
 
     candidateName: string;
-    identificationTypeCode: string;
-    identificationNumber: string;
+    identificationTypeCode: string | null;
+    identificationNumber: string | null;
 }
 
 // Fotografía histórica generada cada vez que se cierra el cargue.
@@ -444,8 +445,8 @@ export interface PersonnelPreselectedCandidate {
 
     name: string;
 
-    identificationNumber: string;
-    identificationType: IdentificationType;
+    identificationNumber: string | null;
+    identificationType: IdentificationType | null;
 
     isPreselected: boolean;
     preselectedAt: string | null;
